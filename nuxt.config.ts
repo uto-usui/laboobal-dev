@@ -34,7 +34,12 @@ const nuxtConfig: NuxtConfiguration = {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: [],
+  plugins: [
+    {
+      src: '~/plugins/exStore',
+      ssr: true,
+    },
+  ],
 
   /*
    ** Nuxt.js modules
