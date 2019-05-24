@@ -18,7 +18,13 @@ const nuxtConfig: NuxtConfiguration = {
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: 'laboobal dev' },
     ],
-    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    link: [
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css?family=Molle:400i&display=swap',
+      },
+    ],
   },
 
   /*
@@ -44,7 +50,14 @@ const nuxtConfig: NuxtConfiguration = {
   /*
    ** Nuxt.js modules
    */
-  modules: ['@nuxtjs/pwa', 'nuxt-user-agent'],
+  modules: ['@nuxtjs/style-resources', '@nuxtjs/pwa', 'nuxt-user-agent'],
+
+  styleResources: {
+    scss: [
+      '~/assets/sass/foundation/variable/_variable.scss',
+      '~/assets/sass/foundation/mixin/_mixin.scss',
+    ],
+  },
 
   /*
    ** Build configuration
