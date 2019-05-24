@@ -44,6 +44,7 @@ class ScrollManager {
   scrollEventDetach() {
     if (!this.isIE11 && !this.isSafari && this.isPC) {
       this.fakeScroll.eventDetach()
+      this.fakeScroll.destroyStyle()
       this.animateStop()
     }
   }

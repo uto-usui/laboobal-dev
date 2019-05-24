@@ -36,7 +36,7 @@ class fakeScroll {
   update() {
     this.position.y += (this.scroll.y - this.position.y) * this.speed
     this.position.y = Number(this.position.y.toFixed(1))
-    console.log(this.position.y)
+    // console.log(this.position.y)
 
     const y = this.scroll.y - this.position.y
 
@@ -73,6 +73,11 @@ class fakeScroll {
 
   eventDetach() {
     this._eventList.forEach(event => event.destroy())
+  }
+
+  destroyStyle() {
+    this.$body.style.height = ''
+    this.$target.style.transform = ''
   }
 
   resize() {

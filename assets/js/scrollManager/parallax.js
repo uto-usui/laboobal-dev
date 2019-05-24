@@ -71,8 +71,6 @@ class parallax {
         isShow: false,
       }
     })
-    // eslint-disable-next-line no-console
-    console.log(this.list)
 
     options && (this.config = Object.assign({ ...options }, this.config))
   }
