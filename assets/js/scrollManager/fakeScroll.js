@@ -1,4 +1,4 @@
-import EventManager from 'Js/eventManager'
+import EventManager from '../eventManager'
 
 class fakeScroll {
   constructor(target, speed = 0.1) {

@@ -1,4 +1,4 @@
-import EventManager from 'Js/eventManager'
+import EventManager from '../eventManager'
 
 class selfPosition {
   constructor(target) {

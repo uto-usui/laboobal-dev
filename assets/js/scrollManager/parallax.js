@@ -1,5 +1,5 @@
-import EventManager from 'Js/eventManager'
-import selfPosition from 'Js/scrollManager/selfPosition'
+import EventManager from '../eventManager'
+import selfPosition from './selfPosition'
 
 class parallax {
   //

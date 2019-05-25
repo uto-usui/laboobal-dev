@@ -1,5 +1,5 @@
-import FakeScroll from 'Js/scrollManager/fakeScroll'
-import Parallax from 'Js/scrollManager/parallax'
+import FakeScroll from './fakeScroll'
+import Parallax from './parallax'
 
 class ScrollManager {
   constructor(browser) {
