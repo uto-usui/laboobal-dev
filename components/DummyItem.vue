@@ -1,19 +1,22 @@
 <template>
   <div class="dummy-item js_parallaxItem">
-    <div class="di__inner">
-      <img
-        class="di__img js_parallaxItem-image"
-        src="~/Images/test/01.jpg"
-        alt="a"
-      />
+    <div class="di__inner js_parallaxItem-image">
+      <div v-lazy-container="{ selector: 'img' }">
+        <img
+          :data-src="require('Images/test/01.jpg')"
+          :data-loading="require('Images/test/01.jpg?sqip')"
+          class="di__img"
+        />
+      </div>
     </div>
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue'
+export default Vue.extend({
   name: 'DummyItem',
-}
+})
 </script>
 
 <style scoped lang="scss">
@@ -23,7 +26,6 @@ export default {
   margin-left: auto;
   margin-right: auto;
   overflow: hidden;
-  background-color: mediumaquamarine;
   //
   + .dummy-item {
     margin-top: 20vw;
@@ -31,6 +33,12 @@ export default {
 }
 
 .di__img {
+  width: 100%;
   max-width: 100%;
+  transition: filter 1s $easeOutSine;
+  //
+  &[lazy='loading'] {
+    filter: blur(5px);
+  }
 }
 </style>

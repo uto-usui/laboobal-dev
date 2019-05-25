@@ -10,10 +10,17 @@
 }
 </style>
 
-<script>
-import DummyItem from './DummyItem'
+<script lang="ts">
+import Vue from 'vue'
+import DummyItem from '~/components/DummyItem.vue'
 
-export default {
+export default Vue.extend({
+  name: 'DummyItems',
   components: { DummyItem },
-}
+  computed: {
+    // todos() {
+    //   return this.$getters['sample/getTodos']
+    // },
+  },
+})
 </script>

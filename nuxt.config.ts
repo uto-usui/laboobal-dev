@@ -51,13 +51,22 @@ const nuxtConfig: NuxtConfiguration = {
   /*
    ** Nuxt.js modules
    */
-  modules: ['@nuxtjs/style-resources', '@nuxtjs/pwa', 'nuxt-user-agent'],
+  modules: [
+    '@nuxtjs/style-resources',
+    '@nuxtjs/pwa',
+    'nuxt-user-agent',
+    '@bazzite/nuxt-optimized-images',
+  ],
 
   styleResources: {
     scss: [
       '~/assets/sass/foundation/variable/_variable.scss',
       '~/assets/sass/foundation/mixin/_mixin.scss',
     ],
+  },
+
+  optimizedImages: {
+    optimizeImages: true,
   },
 
   /*
