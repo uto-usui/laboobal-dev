@@ -25,6 +25,13 @@ const nuxtConfig: NuxtConfiguration = {
         href: 'https://fonts.googleapis.com/css?family=Molle:400i&display=swap',
       },
     ],
+    script: [
+      {
+        src:
+          'https://cdn.polyfill.io/v2/polyfill.js?features=IntersectionObserver,es6,es7',
+        type: 'text/javascript',
+      },
+    ],
   },
 
   /*
