@@ -73,27 +73,14 @@ select {
 }
 
 [lazy='loading'] {
-  opacity: 0;
+  //opacity: 0;
 }
 
 [lazy='error'] {
-  opacity: 1;
+  //opacity: 1;
 }
 
 [lazy='loaded'] {
-  opacity: 1;
-  transition: opacity 0.2s $easeOutSine;
-}
-
-.js-scroll {
-  //
-  .is-pc & {
-    visibility: hidden;
-    backface-visibility: hidden;
-    //
-    &.is-show {
-      visibility: visible;
-      animation: fadeIn 1 2s $easeFadeIn both;
-    }
-  }
+  //opacity: 1;
+  //transition: opacity 0.2s $easeOutSine;
 }

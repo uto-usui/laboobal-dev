@@ -41,6 +41,7 @@ const nuxtConfig: NuxtConfiguration = {
    ** Plugins to load before mounting the App
    */
   plugins: [
+    '~plugins/vue-lazyload.client.js',
     {
       src: '~/plugins/exStore',
       ssr: true,
