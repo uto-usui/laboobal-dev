@@ -1,8 +1,8 @@
 import path from 'path'
-import NuxtConfiguration from '@nuxt/config'
+// import NuxtConfiguration from '@nuxt/config'
 // import StylelintPlugin from 'stylelint-webpack-plugin'
 
-const nuxtConfig: NuxtConfiguration = {
+module.exports = {
   mode: 'universal',
 
   /*
@@ -110,5 +110,3 @@ const nuxtConfig: NuxtConfiguration = {
     },
   },
 }
-
-module.exports = nuxtConfig
