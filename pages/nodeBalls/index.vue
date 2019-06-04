@@ -24,9 +24,7 @@ export default Vue.extend({
   },
   mounted() {
     this.$nextTick(() => {
-      this.nodeBalls = new NodeBalls({
-        canvas: this.$refs.canvas as HTMLCanvasElement,
-      })
+      this.init()
     })
   },
   updated() {
@@ -41,7 +39,9 @@ export default Vue.extend({
   },
   methods: {
     init() {
-      //
+      this.nodeBalls = new NodeBalls({
+        canvas: this.$refs.canvas as HTMLCanvasElement,
+      })
     },
   },
 })

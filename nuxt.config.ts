@@ -49,6 +49,7 @@ module.exports = {
    */
   plugins: [
     '~plugins/vue-lazyload.client.js',
+    '~plugins/dat.client.ts',
     {
       src: '~/plugins/exStore',
       ssr: true,

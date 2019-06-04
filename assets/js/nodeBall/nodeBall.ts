@@ -53,6 +53,15 @@ class NodeBalls {
   /** each particle divide space */
   private divideX: number
   private divideY: number
+
+  /** dat params */
+  private params: { speed: number }
+
+  /* aa **/
+  private gui: any
+
+  /** dat.gui */
+  // private gui: dat.GUI
   //
   constructor({ canvas }: Options) {
     this.canvas = canvas
@@ -69,12 +78,23 @@ class NodeBalls {
 
     this.animationID = 0
 
+    // Parameter object
+    this.params = {
+      speed: 5.5,
+    }
+
     this.init()
   }
 
   public init(): void {
     this.createParticles()
     this.render()
+    this.dat()
+  }
+
+  private dat(): void {
+    this.gui = new window.dat.GUI()
+    this.gui.add(this.params, 'speed', 0.5, 100)
   }
 
   /**
@@ -216,10 +236,10 @@ class NodeBalls {
         // オブジェクト同士が衝突したら反転させて加速させる
         if (pDistance < p0.size + p1.size) {
           collision = true
-          p1.vx = Math.cos(pAngle) * speed
-          p1.vy = Math.sin(pAngle) * speed
-          p0.vx = -Math.cos(pAngle) * speed
-          p0.vy = -Math.sin(pAngle) * speed
+          p1.vx = Math.cos(pAngle) * this.params.speed
+          p1.vy = Math.sin(pAngle) * this.params.speed
+          p0.vx = -Math.cos(pAngle) * this.params.speed
+          p0.vy = -Math.sin(pAngle) * this.params.speed
         } else {
           collision = false
         }
@@ -231,6 +251,7 @@ class NodeBalls {
    * 破棄します。
    */
   public destroy(): void {
+    this.gui && this.gui.destroy()
     cancelAnimationFrame(this.animationID)
   }
 }

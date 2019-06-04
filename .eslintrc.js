@@ -7,6 +7,9 @@ module.exports = {
   parserOptions: {
     parser: '@typescript-eslint/parser'
   },
+  globals: {
+    dat: true
+  },
   extends: [
     '@nuxtjs',
     'plugin:nuxt/recommended',
