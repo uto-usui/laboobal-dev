@@ -5,7 +5,10 @@
  *
  *
  */
+
+// type info
 import _dat from 'dat-gui'
+
 import math from '../math'
 import Particle from './Particle'
 
