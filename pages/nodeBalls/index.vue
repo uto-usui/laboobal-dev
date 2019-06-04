@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { NodeBalls } from '../../assets/js/nodeBall/NodeBall'
+import { NodeBalls } from '~/assets/js/nodeBall/nodeBall.ts'
 
 interface data {
   nodeBalls: any
