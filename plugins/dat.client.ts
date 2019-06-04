@@ -1,5 +1,5 @@
 import dat from 'dat-gui'
 
-window.dat = dat
+window.dat = dat || {}
 
 export default dat

@@ -5,6 +5,7 @@
  *
  *
  */
+import _dat from 'dat-gui'
 import math from '../math'
 import Particle from './Particle'
 
@@ -58,7 +59,7 @@ class NodeBalls {
   private params: { speed: number }
 
   /* aa **/
-  private gui: any
+  private gui: _dat.GUI
 
   /** dat.gui */
   // private gui: dat.GUI
