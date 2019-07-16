@@ -2,24 +2,24 @@ module.exports = {
   root: true,
   env: {
     browser: true,
-    node: true
+    node: true,
   },
   parserOptions: {
-    parser: '@typescript-eslint/parser'
+    parser: '@typescript-eslint/parser',
   },
   globals: {
-    dat: true
+    dat: true,
   },
   extends: [
     '@nuxtjs',
     'plugin:nuxt/recommended',
     'plugin:prettier/recommended',
     'prettier',
-    'prettier/vue'
+    'prettier/vue',
   ],
   plugins: [
     'prettier',
-    '@typescript-eslint'
+    '@typescript-eslint',
   ],
   // add your custom rules here
   rules: {
@@ -27,6 +27,6 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'nuxt/no-cjs-in-config': 'off',
     'no-unused-vars': 'off',
-    'no-unused-expressions': 'off'
-  }
+    'no-unused-expressions': 'off',
+  },
 }
