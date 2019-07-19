@@ -7,7 +7,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import * as THREE from 'three'
-import { Power3 } from 'gsap/EasePack'
+import * as Ease from 'gsap/umd/EasePack'
 import * as TweenMax from 'gsap/umd/TweenMax'
 import math from '~/assets/js/math'
 import { Simplex3 } from '~/assets/js/noise'
@@ -235,7 +235,7 @@ export default Vue.extend({
       TweenMax.to(this.mouse.force, 0.3, {
         y: e.clientY / this.height,
         x: e.clientX / this.width,
-        ease: Power3.easeOut,
+        ease: Ease.Power3.easeOut,
       })
 
       this.mouse.x = e.clientX
@@ -246,7 +246,7 @@ export default Vue.extend({
         TweenMax.to(this.shape.position, 2, {
           x: math.map(e.clientX, 0, this.width, -100, 100),
           y: math.map(e.clientY, 0, this.height, -100, 100),
-          ease: Power3.easeOut,
+          ease: Ease.Power3.easeOut,
         })
     },
 
