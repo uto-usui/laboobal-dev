@@ -7,9 +7,9 @@
  */
 
 // type info
-import _dat from 'dat-gui'
+import * as dat from 'dat-gui'
 
-import math from '../math'
+import { distance } from '../math'
 import Particle from './Particle'
 
 type Options = {
@@ -62,7 +62,7 @@ class NodeBalls {
   private params: { speed: number }
 
   /* aa **/
-  private gui: _dat.GUI
+  private gui: dat.GUI
 
   /** dat.gui */
   // private gui: dat.GUI
@@ -210,7 +210,7 @@ class NodeBalls {
         const p1 = array[j]
 
         // オブジェクト同士の距離
-        const pDistance = math.distance(p0.x, p0.y, p1.x, p1.y)
+        const pDistance = distance(p0.x, p0.y, p1.x, p1.y)
 
         // オブジェクト同士の角度
         const pAngle = Math.atan2(p1.y - p0.y, p1.x - p0.x)
