@@ -1,6 +1,6 @@
 import path from 'path'
 // import NuxtConfiguration from '@nuxt/config'
-// import StylelintPlugin from 'stylelint-webpack-plugin'
+import StylelintPlugin from 'stylelint-webpack-plugin'
 
 module.exports = {
   mode: 'universal',
@@ -93,13 +93,13 @@ module.exports = {
           loader: 'eslint-loader',
           exclude: /(node_modules)/,
         })
-        //
-        // config.plugins.push(
-        //   new StylelintPlugin({
-        //     files: ['**/*.vue'],
-        //   }),
-        // )
-        //
+
+        config.plugins.push(
+          new StylelintPlugin({
+            files: ['**/*.vue'],
+          }),
+        )
+
         config.devtool = '#source-map'
       }
       // import alias
