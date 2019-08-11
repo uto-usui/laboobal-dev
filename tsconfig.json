@@ -18,11 +18,11 @@
     "noImplicitAny": false,
     "baseUrl": ".",
     "paths": {
-      "~/*": [
-        "*"
-      ],
       "@/*": [
-        "*"
+        "./*"
+      ],
+      "~/*": [
+        "./*"
       ],
       "Js/*": [
         "/assets/js/*"
@@ -31,7 +31,8 @@
     "types": [
       "@types/node",
       "@types/jest",
-      "@nuxt/vue-app"
+      "@nuxt/vue-app",
+      "./types"
     ]
   }
 }
