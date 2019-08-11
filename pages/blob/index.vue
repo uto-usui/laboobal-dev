@@ -9,7 +9,7 @@ import Vue from 'vue'
 import * as THREE from 'three'
 import * as Ease from 'gsap/umd/EasePack'
 import * as TweenMax from 'gsap/umd/TweenMax'
-import math from '~/assets/js/math'
+import { map } from '~/assets/js/math'
 import { Simplex3 } from '~/assets/js/noise'
 
 interface Data {
@@ -244,8 +244,8 @@ export default Vue.extend({
       // 移動
       this.shape &&
         TweenMax.to(this.shape.position, 2, {
-          x: math.map(e.clientX, 0, this.width, -100, 100),
-          y: math.map(e.clientY, 0, this.height, -100, 100),
+          x: map(e.clientX, 0, this.width, -100, 100),
+          y: map(e.clientY, 0, this.height, -100, 100),
           ease: Ease.Power3.easeOut,
         })
     },
@@ -284,17 +284,12 @@ export default Vue.extend({
   overflow: hidden;
   //
   canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
     width: 100%;
-    height: 100%;
+    height: 100vh;
   }
-}
-
-canvas {
-  position: fixed;
-  z-index: 10;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
 }
 </style>
