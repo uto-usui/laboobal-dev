@@ -16,25 +16,45 @@ class ScrollManager {
 
   // init
   scrollEventAttach() {
-    if (!this.isIE11 && !this.isSafari && this.isPC) {
-      // eslint-disable-next-line new-cap
-      this.fakeScroll = new FakeScroll('.js_parallaxWrap', 0.08)
-      this.fakeScroll.eventAttach()
+    if (!this.isIE11) {
+      if (this.isPC) {
+        this.fakeScroll = new FakeScroll('#main', 0.075)
+        this.fakeScroll.eventAttach()
+      }
       this.animatePlay()
     }
   }
 
   // init & update
   parallaxEventAttach() {
-    if (!this.isIE11 && this.isSafari) {
-      ;[...document.querySelectorAll('.js_parallaxItem')].addClass('is-show')
+    if (this.isIE11) {
+      const getter = Object.getOwnPropertyDescriptor(
+        HTMLElement.prototype,
+        'classList',
+      ).get
+
+      // Add to classList SVGElement getter
+      Object.defineProperty(SVGElement.prototype, 'classList', {
+        get: getter,
+      })
+      ;[...document.querySelectorAll('.js-parallax-item')].forEach(el => {
+        el.classList.add('is-show')
+        el.classList.add('is-viewport-in')
+      })
     } else if (!this.isIE11) {
       this.isPalax = true
-      this.parallax = new Parallax('.js_parallaxItem', {
-        degree: 10,
-        zoom: this.isEdge ? 0 : 160,
-        speed: 0.02,
-      })
+
+      console.log('🎪 parallaxEventAttach')
+
+      this.parallax = new Parallax(
+        '.js-parallax-item',
+        {
+          degree: 10,
+          zoom: this.isEdge ? 0 : 200,
+          speed: 0.05,
+        },
+        this.browser,
+      )
       this.parallax.eventAttach()
       //
       this.isPC && this.fakeScroll.resize()
@@ -42,7 +62,7 @@ class ScrollManager {
   }
 
   scrollEventDetach() {
-    if (!this.isIE11 && !this.isSafari && this.isPC) {
+    if (!this.isIE11 && this.isPC) {
       this.fakeScroll.eventDetach()
       this.fakeScroll.destroyStyle()
       this.animateStop()
@@ -50,7 +70,7 @@ class ScrollManager {
   }
 
   parallaxEventDetach() {
-    if (!this.isIE11 && !this.isSafari) {
+    if (!this.isIE11) {
       this.isPalax = false
       this.parallax.eventDetach()
       this.parallax = null
@@ -59,7 +79,7 @@ class ScrollManager {
 
   update() {
     //
-    if (!this.isIE11 && !this.isSafari && !this.rafLoop) {
+    if (!this.isIE11 && !this.rafLoop) {
       this.render()
       //
       if (this.isFirst && this.isPC) {
@@ -74,7 +94,7 @@ class ScrollManager {
 
   animatePlay() {
     //
-    if (!this.isIE11 && !this.isSafari) {
+    if (!this.isIE11) {
       this.rafLoop = false
       this.animateID = requestAnimationFrame(() => {
         this.update()
@@ -83,14 +103,14 @@ class ScrollManager {
   }
 
   animateStop() {
-    if (!this.isIE11 && !this.isSafari) {
+    if (!this.isIE11) {
       this.rafLoop = true
       cancelAnimationFrame(this.animateID)
     }
   }
 
   render() {
-    if (!this.isIE11 && !this.isSafari) {
+    if (!this.isIE11) {
       this.isPC
         ? this.isPalax && this.parallax.update(this.fakeScroll.position.y)
         : this.isPalax && this.parallax.update()

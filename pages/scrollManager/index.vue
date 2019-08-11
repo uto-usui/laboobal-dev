@@ -1,5 +1,5 @@
 <template>
-  <div class="wrap js_parallaxWrap">
+  <div id="main" class="wrap">
     <DummyItems />
   </div>
 </template>

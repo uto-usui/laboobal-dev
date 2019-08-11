@@ -4,7 +4,7 @@ class selfPosition {
   constructor(target) {
     this.element = target
     this.info = {
-      crt: 0,
+      ratio: 0,
       old: 0,
       topPosView: 0,
     }
@@ -31,16 +31,25 @@ class selfPosition {
   }
 
   update(e) {
+    // scroll position
     this.scrollTop =
       e || document.documentElement.scrollTop || document.body.scrollTop
+
+    // dist - from window bottom to content top
     this.contentTop = this.scrollTop + window.innerHeight - this.offset.top
-    this.info.crt =
+
+    // ratio - Until the element is visible and then invisible 0 ~ 1
+    this.info.ratio =
       this.contentTop / (this.element.clientHeight + window.innerHeight)
+
+    // ratio - Until the element top is visible and then invisible 0 ~ 1
     this.info.topPosView = this.contentTop / window.innerHeight
-    this.info.crt >= -0.1 && this.info.crt <= 1.1
+
+    // set viewport enable
+    this.info.ratio >= -0.1 && this.info.ratio <= 1.1
       ? (this.isInViewport = true)
       : (this.isInViewport = false)
-    this.info.old = this.info.crt
+    this.info.old = this.info.ratio
   }
 
   eventAttach() {
