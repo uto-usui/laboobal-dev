@@ -119,7 +119,7 @@ export default Vue.extend({
       /**
        * モーフィングをつくる
        * 20面体のジオメトリ
-       * IcosahedronGeometr(r, detail)
+       * IcosahedronGeometry(r, detail)
        */
       this.geometry = new THREE.IcosahedronGeometry(100, 4)
 
