@@ -56,6 +56,14 @@ export default Vue.extend({
 }
 
 .cl__target {
+  display: inline-block;
+  font-size: 5vw;
+  color: transparent;
+  -webkit-text-stroke: 1px $color-primary;
+  // -webkit-text-fill-color: #FFFFFF;
   //
+  &:hover {
+    font-size: 8vw;
+  }
 }
 </style>
