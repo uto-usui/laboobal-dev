@@ -1,5 +1,6 @@
 [
   "nodeBalls",
   "scrollManager",
-  "blob"
+  "blob",
+  "blobRadius"
 ]
