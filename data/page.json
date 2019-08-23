@@ -2,5 +2,6 @@
   "nodeBalls",
   "scrollManager",
   "blob",
-  "blobRadius"
+  "blobRadius",
+  "marquee"
 ]
