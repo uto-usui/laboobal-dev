@@ -46,15 +46,6 @@ export default Vue.extend({
 .wrap {
   width: 100%;
   overflow: hidden;
-  //
-  canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 10;
-    width: 100%;
-    height: 100vh;
-  }
 }
 
 .blob-radius {
@@ -79,12 +70,12 @@ export default Vue.extend({
   @include overlay;
   //
   &--01 {
-    animation: blobRadius 10s ease-in-out infinite both alternate,
+    animation: blobRadius 30s ease-in-out infinite both alternate,
       blobTrans 20s ease-in-out infinite both alternate;
   }
   //
   &--02 {
-    animation: blobRadius 10s ease-in-out infinite both alternate-reverse,
+    animation: blobRadius 30s ease-in-out infinite both alternate-reverse,
       blobTrans02 20s ease-in-out infinite both;
   }
 }
@@ -95,19 +86,39 @@ export default Vue.extend({
     border-radius: 33% 67% 70% 30% / 30% 30% 70% 70%;
   }
   //
-  20% {
+  10% {
     border-radius: 37% 63% 51% 49% / 37% 65% 35% 63%;
   }
   //
-  40% {
+  20% {
     border-radius: 36% 64% 64% 36% / 64% 48% 52% 36%;
   }
   //
-  60% {
+  30% {
     border-radius: 37% 63% 51% 49% / 30% 30% 70% 70%;
   }
   //
+  40% {
+    border-radius: 40% 60% 42% 58% / 41% 51% 49% 59%;
+  }
+  //
+  50% {
+    border-radius: 50% 50% 22% 78% / 36% 29% 71% 64%;
+  }
+  ///
+  60% {
+    border-radius: 64% 36% 78% 22% / 56% 33% 67% 44%;
+  }
+  //
+  70% {
+    border-radius: 39% 61% 33% 67% / 70% 67% 33% 30%;
+  }
+  //
   80% {
+    border-radius: 73% 27% 79% 21% / 37% 40% 60% 63%;
+  }
+  //
+  90% {
     border-radius: 40% 60% 42% 58% / 41% 51% 49% 59%;
   }
 }
