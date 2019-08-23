@@ -49,9 +49,15 @@ export default Vue.extend({
 }
 
 .title {
+  position: fixed;
+  top: 50%;
+  left: 50%;
   display: block;
   font-family: 'Molle', cursive;
-  font-size: 5vw;
+  font-size: 20vw;
   color: $color-white;
+  pointer-events: none;
+  opacity: 0.05;
+  transform: translate(-50%, -50%);
 }
 </style>
