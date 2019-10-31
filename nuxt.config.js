@@ -108,6 +108,13 @@ module.exports = {
 
         config.devtool = '#source-map'
       }
+
+      config.module.rules.push({
+        test: /\.(glsl|vs|fs)$/,
+        use: ['raw-loader', 'glslify-loader'],
+        exclude: /(node_modules)/,
+      })
+
       // import alias
       config.resolve.alias.Sass = path.resolve(__dirname, './assets/sass/')
       config.resolve.alias.Js = path.resolve(__dirname, './assets/js/')
