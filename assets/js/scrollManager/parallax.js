@@ -138,7 +138,7 @@ class parallax {
    * @param ratio
    * @param translate
    */
-  playTranslate(target, i, ratio, translate) {
+  playTranslate(target, _i, ratio, translate) {
     const x = orgTrunc(map(ratio, 0, 1, 0, translate.x.amount), 10)
     const y = orgTrunc(map(ratio, 0, 1, 0, translate.y.amount), 10)
     target.translatePos[0] +=
