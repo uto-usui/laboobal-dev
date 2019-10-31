@@ -6,10 +6,12 @@
     "lib": [
       "esnext",
       "esnext.asynciterable",
-      "dom"
+      "dom",
+      "dom.iterable"
     ],
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "downlevelIteration": true,
     "experimentalDecorators": true,
     "allowJs": true,
     "sourceMap": true,
@@ -31,7 +33,7 @@
     "types": [
       "@types/node",
       "@types/jest",
-      "@nuxt/vue-app",
+      "@nuxt/types",
       "./types"
     ]
   }

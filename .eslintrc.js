@@ -11,7 +11,7 @@ module.exports = {
     dat: true,
   },
   extends: [
-    '@nuxtjs',
+    '@nuxtjs/eslint-config-typescript',
     'plugin:nuxt/recommended',
     'plugin:prettier/recommended',
     'prettier',
@@ -28,5 +28,6 @@ module.exports = {
     'nuxt/no-cjs-in-config': 'off',
     'no-unused-vars': 'off',
     'no-unused-expressions': 'off',
+    'unicorn/number-literal-case': 'off',
   },
 }
