@@ -1,5 +1,5 @@
-import { Getters, Mutations, Actions } from 'vuex'
-import { S, G, M, A } from './type'
+import { GetterTree, MutationTree, ActionTree } from 'vuex'
+import { S } from './type'
 
 /**
  * state
@@ -21,8 +21,8 @@ export const state = (): S => ({
 /**
  * getters
  */
-export const getters: Getters<S, G> = {
-  todosCount(state, getters, rootState, rootgetters) {
+export const getters: GetterTree<S, S> = {
+  todosCount(state, _getters, _rootState, _rootgetters) {
     return state.todos.length
   },
   getTodos(state) {
@@ -33,14 +33,14 @@ export const getters: Getters<S, G> = {
 /**
  * mutations
  */
-export const mutations: Mutations<S, M> = {
+export const mutations: MutationTree<S> = {
   addTodo(state, payload) {
     state.todos.push(payload.todo)
   },
 }
 // ______________________________________________________
 //
-export const actions: Actions<S, A, G, M> = {
+export const actions: ActionTree<S, S> = {
   asyncAddTodo({ commit }, payload) {
     commit('addTodo', payload)
   },

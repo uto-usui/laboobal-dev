@@ -1,7 +1,9 @@
 <template>
   <div class="debug">
-    fps : {{ fps }} / w : {{ $state.global.window.w }} / h :
-    {{ $state.global.window.h }} / s : {{ $state.global.scrollY }}
+    fps : {{ fps }} / w :
+    {{ $store.state.global.window && $store.state.global.window.w }} / h :
+    {{ $store.state.global.window && $store.state.global.window.h }} / s :
+    {{ $store.state.global.scrollY }}
   </div>
 </template>
 

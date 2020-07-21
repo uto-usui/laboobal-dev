@@ -6,73 +6,77 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import {
+  computed,
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+} from '@vue/composition-api'
 import Debug from '~/components/layout/Debug.vue'
 
-export type Data = {
-  animationID: number
-}
-
-export default Vue.extend({
+export default defineComponent({
   components: {
     Debug,
   },
-  data: (): Data => ({
-    animationID: 0,
-  }),
-  computed: {
-    //
-  },
-  mounted() {
-    this.$dispatch('global/setScrollY', window.pageYOffset)
-    this.$dispatch('global/setWindow', {
-      w: window.innerWidth,
-      h: window.innerHeight,
-    })
-    //
-    this.eventAttach()
-  },
-  updated() {
-    //
-  },
-  beforeDestroy() {
-    this.eventDetach()
-  },
-  methods: {
-    /**
-     * resize function
-     */
-    handleResize() {
-      this.$dispatch('global/setWindow', {
+  setup(_props, ctx) {
+    const animationID = ref(0)
+
+    const handleResize = () => {
+      ctx.root.$store.dispatch('global/setWindow', {
         w: window.innerWidth,
         h: window.innerHeight,
       })
-    },
+    }
+
+    const isOpen = computed(() => {
+      return ctx.root.$store.getters['global/getIsMenuOpen']
+    })
 
     /**
      * scroll function -> requestAnimationFrame
      */
-    handleScroll() {
-      this.$dispatch('global/setScrollY', window.pageYOffset)
-      this.animationID = requestAnimationFrame(this.handleScroll)
-    },
+    const handleScroll = () => {
+      ctx.root.$store.dispatch('global/setScrollY', window.pageYOffset)
+      animationID.value = requestAnimationFrame(handleScroll)
+    }
 
     /**
      * on event
      */
-    eventAttach() {
-      window.addEventListener('resize', this.handleResize, false)
+    const eventAttach = () => {
+      window.addEventListener('resize', handleResize, false)
       //
-      this.handleScroll()
-    },
+      handleScroll()
+    }
 
     /**
      * off event
      */
-    eventDetach() {
-      window.removeEventListener('resize', this.handleResize)
-      cancelAnimationFrame(this.animationID)
-    },
+    const eventDetach = () => {
+      window.removeEventListener('resize', handleResize)
+      cancelAnimationFrame(animationID.value)
+    }
+
+    /**
+     * life cycle
+     */
+    onMounted(() => {
+      ctx.root.$store.dispatch('global/setScrollY', window.pageYOffset)
+      ctx.root.$store.dispatch('global/setWindow', {
+        w: window.innerWidth,
+        h: window.innerHeight,
+      })
+      //
+      eventAttach()
+    })
+    onBeforeUnmount(() => {
+      eventDetach()
+    })
+
+    return {
+      isOpen,
+    }
   },
 })
 </script>
