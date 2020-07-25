@@ -1,7 +1,7 @@
 <template>
   <div id="main" class="wrap">
     <client-only>
-      <Splitting :text="'abc abc abc abc abc abc'" />
+      <Splitting :text="'Animate split text'" />
     </client-only>
   </div>
 </template>

@@ -5,7 +5,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
+import { defineComponent, onMounted } from '@vue/composition-api'
+import { gsap } from 'gsap'
 
 export default defineComponent({
   props: {
@@ -13,6 +14,39 @@ export default defineComponent({
       type: String,
       default: '',
     },
+  },
+
+  setup(_props, _ctx) {
+    onMounted(() => {
+      const el = document.querySelectorAll('.char')
+
+      const timeline = gsap
+        .timeline({
+          paused: true,
+          repeat: -1,
+          yoyo: true,
+        })
+        .addLabel('start')
+        .to(
+          el,
+          {
+            ease: 'Power3.easeIn',
+            y: '-100%',
+            opacity: 0,
+            stagger: {
+              amount: 1,
+              each: 0.1,
+            },
+          },
+          'start',
+        )
+
+      timeline.play()
+    })
+
+    return {
+      //
+    }
   },
 })
 </script>
