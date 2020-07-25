@@ -56,6 +56,7 @@ module.exports = {
   plugins: [
     '~plugins/vue-lazyload.client.js',
     '~plugins/dat.client.ts',
+    '~plugins/splitting.client.ts',
     '~/plugins/composition-api',
     {
       src: '~plugins/exStore',

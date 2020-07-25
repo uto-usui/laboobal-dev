@@ -40,6 +40,7 @@
     "nuxt-user-agent": "^1.2.2",
     "raw-loader": "^3.1.0",
     "responsive-loader": "^1.2.0",
+    "splitting": "^1.0.6",
     "sqip-loader": "^0.2.0",
     "three": "^0.110.0",
     "ts-node": "^8.3.0",
