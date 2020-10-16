@@ -36,7 +36,7 @@ class eventManager {
   destroy() {
     if (this._eventRemovers) {
       // all items removeEventListener
-      this._eventRemovers.forEach(eventRemover => {
+      this._eventRemovers.forEach((eventRemover) => {
         eventRemover.remove()
       })
 

@@ -104,14 +104,14 @@ export const randRange = (min, max) => {
  * @param arr {array}
  * @returns {*}
  */
-export const randomArr = arr => arr[randomInt(0, arr.length - 1)]
+export const randomArr = (arr) => arr[randomInt(0, arr.length - 1)]
 
 /**
  * range の確率で true を返す
  * @param range
  * @returns {boolean}
  */
-export const rangeBoolean = range => randomInt(0, range - 1) === 0
+export const rangeBoolean = (range) => randomInt(0, range - 1) === 0
 
 /**
  * min ~ max に value が当てはまるとき 0 ~ 1 を返す

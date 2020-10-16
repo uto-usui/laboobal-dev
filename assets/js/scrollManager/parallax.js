@@ -229,7 +229,7 @@ class parallax {
       this.list[e].selfPosition.eventAttach()
     }
 
-    const handleResize = e => this.resize(e)
+    const handleResize = (e) => this.resize(e)
     this._eventList.push(new EventManager(window, 'resize', handleResize))
     this.resize()
   }
@@ -238,20 +238,20 @@ class parallax {
    * detach event
    */
   eventDetach() {
-    this.list.forEach(el => {
+    this.list.forEach((el) => {
       el.selfPosition.eventDetach()
       // eslint-disable-next-line no-param-reassign
       delete el.selfPosition
     })
     this.list = []
-    this._eventList.forEach(event => event.destroy())
+    this._eventList.forEach((event) => event.destroy())
   }
 
   /**
    * resize handle
    */
   resize() {
-    this.list.forEach(el => {
+    this.list.forEach((el) => {
       el.selfPosition.update()
     })
   }

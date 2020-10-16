@@ -53,13 +53,13 @@ class selfPosition {
   }
 
   eventAttach() {
-    const handleResize = e => this.resize(e)
+    const handleResize = (e) => this.resize(e)
     this._eventList.push(new EventManager(window, 'resize', handleResize))
     this.resize()
   }
 
   eventDetach() {
-    this._eventList.forEach(event => event.destroy())
+    this._eventList.forEach((event) => event.destroy())
   }
 
   resize() {

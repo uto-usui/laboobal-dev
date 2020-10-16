@@ -37,7 +37,7 @@ class ScrollManager {
       Object.defineProperty(SVGElement.prototype, 'classList', {
         get: getter,
       })
-      ;[...document.querySelectorAll('.js-parallax-item')].forEach(el => {
+      ;[...document.querySelectorAll('.js-parallax-item')].forEach((el) => {
         el.classList.add('is-show')
         el.classList.add('is-viewport-in')
       })

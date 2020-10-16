@@ -134,8 +134,8 @@ export class CanvasManager {
   }
 
   static disposeThreeObjects(scene, renderer) {
-    scene.children.forEach(obj => {
-      obj.traverse(obj3D => dispose(obj3D))
+    scene.children.forEach((obj) => {
+      obj.traverse((obj3D) => dispose(obj3D))
       scene.remove(obj)
     })
 
@@ -151,7 +151,7 @@ function dispose(obj) {
     obj.geometry = null
   }
   if (!!obj.material && Array.isArray(obj.material)) {
-    obj.material.forEach(material => disposeMaterial(material))
+    obj.material.forEach((material) => disposeMaterial(material))
   } else if (obj.material) {
     disposeMaterial(obj.material)
   }
