@@ -33,7 +33,7 @@ export default defineComponent({
 })
 </script>
 
-<style>
+<style scoped lang="scss">
 .wrap {
   display: flex;
   align-items: center;

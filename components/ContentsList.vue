@@ -6,49 +6,31 @@
       :key="`list${index}`"
       class="cl__item"
     >
-      <n-link class="cl__target" :to="`/${item}`" v-text="item" />
+      <n-link class="cl__target" :to="`/${item}/`" v-text="item" />
     </li>
   </ul>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-// import { TweenMax, Power0 } from 'gsap/umd/TweenMax'
+import { defineComponent, ref } from '@vue/composition-api'
+import listJson from '~/data/page.json'
 
-// list data josn
-import list from '~/data/page.json'
-
-interface data {
-  list: String[]
-}
-
-export default Vue.extend({
+export default defineComponent({
   name: 'ContentsList',
-  data() {
+  setup(_props, _ctx) {
+    const list = ref(listJson as string[])
+
     return {
       list,
     }
-  },
-  mounted() {
-    this.$nextTick(() => {
-      // this.animation()
-    })
-  },
-  methods: {
-    // animation(): void {
-    //   TweenMax.to(this.$refs.target, 5, {
-    //     repeat: -1,
-    //     rotationY: 360,
-    //     ease: Power0.easeIn,
-    //   })
-    // },
   },
 })
 </script>
 
 <style lang="scss" scoped>
 .contents-list {
-  //
+  padding-top: 25vh;
+  padding-bottom: 25vh;
 }
 
 .cl__item {
@@ -57,13 +39,21 @@ export default Vue.extend({
 
 .cl__target {
   display: inline-block;
-  font-size: 5vw;
+  font-size: 15vw;
   color: transparent;
+  text-transform: lowercase;
+  letter-spacing: -0.04em;
   -webkit-text-stroke: 1px $color-primary;
-  // -webkit-text-fill-color: #FFFFFF;
+  transition: color 1.25s $easeOutCirc;
+
+  @include desktop {
+    font-size: 10vw;
+  }
   //
   &:hover {
-    font-size: 8vw;
+    color: lighten($color-primary, 12%);
+    text-transform: capitalize;
+    transition: color 0.2s $easeFadeIn;
   }
 }
 </style>

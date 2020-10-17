@@ -1,39 +1,17 @@
 <template>
-  <div class="wrap js_parallaxWrap">
-    <section class="container">
-      <div>
-        <h1 class="title">laboobal.dev</h1>
-        <ContentsList />
-      </div>
-    </section>
-  </div>
+  <section class="wrap">
+    <h1 class="title">laboobal.dev</h1>
+    <ContentsList />
+  </section>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
 import ContentsList from '@/components/ContentsList.vue'
+import { defineComponent } from '@vue/composition-api'
 
-interface data {
-  test: string
-}
-
-export default Vue.extend({
+export default defineComponent({
   components: {
     ContentsList,
-  },
-  data(): data {
-    return {
-      test: 'test text',
-    }
-  },
-  mounted() {
-    //
-  },
-  updated() {
-    //
-  },
-  beforeDestroy() {
-    //
   },
 })
 </script>
@@ -41,11 +19,6 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .wrap {
   width: 100%;
-  overflow: hidden;
-}
-
-.container {
-  //
 }
 
 .title {
@@ -54,7 +27,7 @@ export default Vue.extend({
   left: 50%;
   display: block;
   font-family: 'Molle', cursive;
-  font-size: 20vw;
+  font-size: 18vw;
   color: $color-white;
   pointer-events: none;
   opacity: 0.05;
