@@ -48,7 +48,7 @@ module.exports = {
   /*
    ** Global CSS
    */
-  css: [],
+  css: ['locomotive-scroll/dist/locomotive-scroll.min.css'],
 
   /*
    ** Plugins to load before mounting the App
@@ -57,6 +57,7 @@ module.exports = {
     '~plugins/vue-lazyload.client.js',
     '~plugins/dat.client.ts',
     '~plugins/splitting.client.ts',
+    '~plugins/locomotive.client.ts',
     '~/plugins/composition-api',
     {
       src: '~plugins/exStore',
@@ -124,5 +125,9 @@ module.exports = {
       config.resolve.alias['~'] = path.resolve(__dirname)
       config.resolve.alias['@'] = path.resolve(__dirname)
     },
+  },
+
+  generate: {
+    exclude: ['/mixins'],
   },
 }

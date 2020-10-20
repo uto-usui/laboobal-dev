@@ -1,17 +1,46 @@
 <template>
   <section class="wrap">
     <h1 class="title">laboobal.dev</h1>
-    <ContentsList />
+    <div ref="scrollArea" data-scroll-container class="inner">
+      <ContentsList />
+    </div>
   </section>
 </template>
 
 <script lang="ts">
 import ContentsList from '@/components/ContentsList.vue'
-import { defineComponent } from '@vue/composition-api'
+import { defineComponent, getCurrentInstance, ref } from '@vue/composition-api'
+import { locomotiveInit } from '@/pages/mixins/locomotive'
 
 export default defineComponent({
   components: {
     ContentsList,
+  },
+  setup(_props, _ctx) {
+    /**
+     * current component instance
+     */
+    const instance = getCurrentInstance()
+    /**
+     * locomotive-scroll instance
+     */
+    const Ls = instance?.$store.$locomotiveScroll
+    /**
+     * dom of scroll area
+     */
+    const scrollArea = ref(null as null | HTMLDivElement)
+    /**
+     * init locomotive
+     *
+     * speed: {Number} wheel power
+     */
+    const { speed } = locomotiveInit({ Ls })
+
+    return {
+      speed,
+
+      scrollArea,
+    }
   },
 })
 </script>
@@ -19,6 +48,12 @@ export default defineComponent({
 <style lang="scss" scoped>
 .wrap {
   width: 100%;
+}
+
+.inner {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
 }
 
 .title {

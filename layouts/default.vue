@@ -93,6 +93,14 @@ export default defineComponent({
 @import '~Sass/animation/_keyframes';
 @import '~Sass/object/utility/_utility';
 
+html.has-scroll-smooth {
+  overflow: hidden;
+
+  > body {
+    overflow: hidden;
+  }
+}
+
 @font-face {
   font-family: 'MyYuGothicM';
   font-weight: normal;

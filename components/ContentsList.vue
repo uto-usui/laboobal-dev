@@ -1,10 +1,13 @@
 <template>
-  <ul class="contents-list">
+  <ul class="contents-list" data-scroll-section>
     <li
       v-for="(item, index) in list"
       ref="target"
       :key="`list${index}`"
       class="cl__item"
+      data-scroll
+      data-scroll-repeat
+      data-scroll-call="background, null"
     >
       <n-link class="cl__target" :to="`/${item}/`" v-text="item" />
     </li>
