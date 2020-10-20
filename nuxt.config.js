@@ -5,10 +5,21 @@ import StylelintPlugin from 'stylelint-webpack-plugin'
 module.exports = {
   mode: 'universal',
 
-  buildModules: ['@nuxt/typescript-build'],
+  buildModules: [
+    '@nuxt/typescript-build',
+    '@aceforth/nuxt-optimized-images',
+    '@nuxtjs/style-resources',
+  ],
 
   typescript: {
     typeCheck: true,
+  },
+
+  /**
+   * https://marquez.co/docs/nuxt-optimized-images/
+   */
+  optimizedImages: {
+    optimizeImages: true,
   },
 
   /*
@@ -68,22 +79,13 @@ module.exports = {
   /*
    ** Nuxt.js modules
    */
-  modules: [
-    '@nuxtjs/style-resources',
-    '@nuxtjs/pwa',
-    'nuxt-user-agent',
-    '@bazzite/nuxt-optimized-images',
-  ],
+  modules: ['@nuxtjs/pwa', 'nuxt-user-agent'],
 
   styleResources: {
     scss: [
       '~/assets/sass/foundation/variable/_variable.scss',
       '~/assets/sass/foundation/mixin/_mixin.scss',
     ],
-  },
-
-  optimizedImages: {
-    optimizeImages: true,
   },
 
   /*
