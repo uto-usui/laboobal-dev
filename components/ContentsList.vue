@@ -7,7 +7,6 @@
       class="cl__item"
       data-scroll
       data-scroll-repeat
-      data-scroll-call="background, null"
     >
       <n-link class="cl__target" :to="`/${item}/`" v-text="item" />
     </li>
@@ -54,7 +53,7 @@ export default defineComponent({
   }
   //
   &:hover {
-    color: lighten($color-primary, 12%);
+    color: $color-primary-light;
     text-transform: capitalize;
     transition: color 0.2s $easeFadeIn;
   }

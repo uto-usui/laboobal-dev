@@ -1,7 +1,7 @@
 <template>
   <section class="wrap">
     <h1 class="title">laboobal.dev</h1>
-    <div ref="scrollArea" data-scroll-container class="inner">
+    <div data-scroll-container class="inner">
       <ContentsList />
     </div>
   </section>
@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import ContentsList from '@/components/ContentsList.vue'
-import { defineComponent, getCurrentInstance, ref } from '@vue/composition-api'
+import { defineComponent, getCurrentInstance } from '@vue/composition-api'
 import { locomotiveInit } from '@/pages/mixins/locomotive'
 
 export default defineComponent({
@@ -26,20 +26,13 @@ export default defineComponent({
      */
     const Ls = instance?.$store.$locomotiveScroll
     /**
-     * dom of scroll area
-     */
-    const scrollArea = ref(null as null | HTMLDivElement)
-    /**
      * init locomotive
-     *
      * speed: {Number} wheel power
      */
     const { speed } = locomotiveInit({ Ls })
 
     return {
       speed,
-
-      scrollArea,
     }
   },
 })
@@ -61,7 +54,7 @@ export default defineComponent({
   top: 50%;
   left: 50%;
   display: block;
-  font-family: 'Molle', cursive;
+  font-family: $font-Molle;
   font-size: 18vw;
   color: $color-white;
   pointer-events: none;
