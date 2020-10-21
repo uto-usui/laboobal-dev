@@ -4,7 +4,7 @@
   // - - - - - - - -
  */
 $color-primary: #4ecca3 !default;
-$color-primary-light: #4ecca3 !default;
+$color-primary-light: lighten($color-primary, 12%) !default;
 $color-black: #232931 !default;
 $color-white: #eee !default;
 $color-green: #4ecca3 !default;

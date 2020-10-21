@@ -9,9 +9,10 @@ import locomotiveScroll from 'locomotive-scroll'
 
 interface LsType {
   Ls: locomotiveScroll
+  background?: boolean
 }
 
-export const locomotiveInit = ({ Ls }: LsType) => {
+export const locomotiveInit = ({ Ls, background }: LsType) => {
   /**
    * locomotive-scroll instance
    */
@@ -82,8 +83,17 @@ export const locomotiveInit = ({ Ls }: LsType) => {
     scrollObj.scroll = scroll
     scrollObj.speed = speed
 
-    // 1 for color hue - `hsla(${progressHue.value}, 50%, 50%, 0.1)`
-    progress.hue = (360 * scroll.y) / limit
+    // 1 for color hue - `hsla(${progress.hue}, 50%, 50%, 0.1)`
+    if (background) {
+      progress.hue = (360 * scroll.y) / limit
+
+      ls.value.el.style.backgroundColor = `hsla(${
+        progress.hue * 2
+      }, 5%, 63%, 1)`
+      backgrounds.forEach(({ el }) => {
+        el.style.backgroundColor = `hsla(${progress.hue * 2}, 5%, 63%, 1)`
+      })
+    }
 
     // set direction
     document.documentElement.setAttribute('data-direction', direction)
@@ -112,6 +122,8 @@ export const locomotiveInit = ({ Ls }: LsType) => {
       getSpeed: true,
       getDirection: true,
     })
+    ls.value.el.style.backgroundColor = `hsla(0, 5%, 63%, 1)`
+    // console.log(ls.value.)
 
     // set event
     window.addEventListener('resize', resizeHandler)
