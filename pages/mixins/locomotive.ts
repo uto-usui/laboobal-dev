@@ -122,7 +122,8 @@ export const locomotiveInit = ({ Ls, background }: LsType) => {
       getSpeed: true,
       getDirection: true,
     })
-    ls.value.el.style.backgroundColor = `hsla(0, 5%, 63%, 1)`
+
+    if (background) ls.value.el.style.backgroundColor = `hsla(0, 5%, 63%, 1)`
     // console.log(ls.value.)
 
     // set event
