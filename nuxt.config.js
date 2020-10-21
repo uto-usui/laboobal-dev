@@ -2,6 +2,16 @@ import path from 'path'
 // import NuxtConfiguration from '@nuxt/config'
 import StylelintPlugin from 'stylelint-webpack-plugin'
 
+import Fiber from 'fibers'
+import Sass from 'sass'
+
+const scss = {
+  implementation: Sass,
+  sassOptions: {
+    fiber: Fiber,
+  },
+}
+
 module.exports = {
   mode: 'universal',
 
@@ -89,9 +99,11 @@ module.exports = {
    * global webfonts
    */
   webfontloader: {
-    google: {
-      api: 'https://fonts.googleapis.com/css2',
-      families: ['Molle:ital@1&family=Montserrat:wght@400;700&display=swap'],
+    custom: {
+      urls: [
+        'https://fonts.googleapis.com/css2?family=Molle:ital@1&display=swa',
+        'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap',
+      ],
     },
   },
 
@@ -99,6 +111,10 @@ module.exports = {
    ** Build configuration
    */
   build: {
+    loaders: {
+      scss,
+    },
+
     /*
      ** You can extend webpack config here
      */
