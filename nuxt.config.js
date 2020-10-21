@@ -35,13 +35,7 @@ module.exports = {
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: 'laboobal dev' },
     ],
-    link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      {
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css?family=Molle:400i&display=swap',
-      },
-    ],
+    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
     script: [
       {
         src:
@@ -79,13 +73,26 @@ module.exports = {
   /*
    ** Nuxt.js modules
    */
-  modules: ['@nuxtjs/pwa', 'nuxt-user-agent'],
+  modules: ['@nuxtjs/pwa', 'nuxt-user-agent', 'nuxt-webfontloader'],
 
+  /**
+   * global scss variables and functions
+   */
   styleResources: {
     scss: [
       '~/assets/sass/foundation/variable/_variable.scss',
       '~/assets/sass/foundation/mixin/_mixin.scss',
     ],
+  },
+
+  /**
+   * global webfonts
+   */
+  webfontloader: {
+    google: {
+      api: 'https://fonts.googleapis.com/css2',
+      families: ['Molle:ital@1&family=Montserrat:wght@400;700&display=swap'],
+    },
   },
 
   /*
