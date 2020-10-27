@@ -28,14 +28,14 @@
 }
 
 @mixin waitAnimate($options: ()) {
-  $options: map-merge(( animationName: waitAnimate, duration: 1, waitTime: 0, timingFunction: linear, iterationCount: infinite), $options);
-  $name: map-get($options, animationName);
+  $options: map-merge(( animationname: waitanimate, duration: 1, waittime: 0, timingfunction: linear, iterationcount: infinite), $options);
+  $name: map-get($options, animationname);
   $kf: map-get($options, keyframes);
   $kfLength: length($kf);
   $duration: map-get($options, duration);
-  $waitTime: map-get($options, waitTime);
-  $timingFunction: map-get($options, timingFunction);
-  $iterationCount: map-get($options, iterationCount);
+  $waitTime: map-get($options, waittime);
+  $timingFunction: map-get($options, timingfunction);
+  $iterationCount: map-get($options, iterationcount);
   $counter: 1; // index of 'each'
 
   @keyframes #{$name} {
