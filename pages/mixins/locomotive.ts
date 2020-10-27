@@ -4,6 +4,8 @@ import {
   reactive,
   ref,
   toRefs,
+  onUpdated,
+  nextTick,
 } from '@vue/composition-api'
 import locomotiveScroll from 'locomotive-scroll'
 
@@ -49,6 +51,8 @@ export const locomotiveInit = ({ Ls, background }: LsType) => {
    */
   const backgrounds = [] as { id: number; el: HTMLElement }[]
 
+  const colorHue = 175
+
   /**
    * call handler functions
    */
@@ -88,10 +92,12 @@ export const locomotiveInit = ({ Ls, background }: LsType) => {
       progress.hue = (360 * scroll.y) / limit
 
       ls.value.el.style.backgroundColor = `hsla(${
-        progress.hue * 2
-      }, 5%, 63%, 1)`
+        progress.hue * 2 + colorHue
+      }, 4%, 61%, 1)`
       backgrounds.forEach(({ el }) => {
-        el.style.backgroundColor = `hsla(${progress.hue * 2}, 5%, 63%, 1)`
+        el.style.backgroundColor = `hsla(${
+          progress.hue * 2 + colorHue
+        }, 4%, 61%, 1)`
       })
     }
 
@@ -123,8 +129,9 @@ export const locomotiveInit = ({ Ls, background }: LsType) => {
       getDirection: true,
     })
 
-    if (background) ls.value.el.style.backgroundColor = `hsla(0, 5%, 63%, 1)`
-    // console.log(ls.value.)
+    if (background)
+      ls.value.el.style.backgroundColor = `hsla(${colorHue}, 4%, 61%, 1)`
+    // console.log(ls.value)
 
     // set event
     window.addEventListener('resize', resizeHandler)
@@ -146,6 +153,15 @@ export const locomotiveInit = ({ Ls, background }: LsType) => {
     ls.value.off('scroll', scrollHandler)
 
     ls.value = null
+  })
+
+  // update
+  onUpdated(() => {
+    nextTick(() => {
+      console.log('onUpdated _ locomotive')
+
+      ls.value && ls.value.update()
+    })
   })
 
   return { ls, ...toRefs(progress), ...toRefs(scrollObj) }
