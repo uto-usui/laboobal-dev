@@ -70,10 +70,10 @@ module.exports = {
    */
   plugins: [
     '~plugins/vue-lazyload.client.js',
-    '~plugins/dat.client.ts',
-    '~plugins/splitting.client.ts',
-    '~plugins/locomotive.client.ts',
-    '~/plugins/composition-api',
+    '~plugins/dat.client',
+    '~plugins/splitting.client',
+    '~plugins/locomotive.client',
+    '~plugins/composition-api',
     {
       src: '~plugins/exStore',
       ssr: true,
@@ -101,7 +101,7 @@ module.exports = {
   webfontloader: {
     custom: {
       urls: [
-        'https://fonts.googleapis.com/css2?family=Molle:ital@1&display=swa',
+        'https://fonts.googleapis.com/css2?family=Molle:ital@1&display=swap',
         'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap',
       ],
     },
