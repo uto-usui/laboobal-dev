@@ -332,7 +332,7 @@ import DummyImage from '@/components/DummyImage.vue'
 import { locomotiveInit } from '@/pages/mixins/locomotive'
 
 // tile components
-// https://github.com/codrops/TileScroll/blob/main/src/index.html
+// from: https://github.com/codrops/TileScroll/blob/main/src/index.html
 
 export default defineComponent({
   components: {
