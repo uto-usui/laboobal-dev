@@ -13,7 +13,7 @@ const scss = {
 }
 
 module.exports = {
-  mode: 'universal',
+  target: 'static',
 
   buildModules: [
     '@nuxt/typescript-build',
@@ -153,6 +153,6 @@ module.exports = {
   },
 
   generate: {
-    exclude: ['/mixins'],
+    exclude: [/^(?=.*\bmixins\b).*$/],
   },
 }
