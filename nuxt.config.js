@@ -184,4 +184,43 @@ module.exports = {
   generate: {
     exclude: [/^(?=.*\bmixins\b).*$/],
   },
+
+  /**
+   * env variables
+   */
+  env: {
+    nodeEnv: process.env.NODE_ENV,
+  },
+  // server and client
+  publicRuntimeConfig: {
+    nodeEnv: process.env.NODE_ENV,
+  },
+  // server only
+  privateRuntimeConfig: {},
+
+  /**
+   * PWA workbox setting
+   *
+   * doc
+   * : https://pwa.nuxtjs.org/
+   * : https://developers.google.com/web/tools/workbox/guides/get-started
+   */
+  workbox: {
+    // ios safari video support
+    cachingExtensions: '~/plugins/workbox-range-request.js',
+    runtimeCaching: [
+      // google fonts
+      {
+        urlPattern: '^https://fonts.(?:googleapis|gstatic).com/(.*)',
+        handler: 'cacheFirst',
+        method: 'GET',
+        strategyOptions: { cacheableResponse: { statuses: [0, 200] } },
+      },
+      {
+        // cdn
+        urlPattern: 'https://cdn.jsdelivr.net/.*',
+        handler: 'cacheFirst',
+      },
+    ],
+  },
 }
