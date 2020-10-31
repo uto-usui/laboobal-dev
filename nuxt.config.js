@@ -83,7 +83,20 @@ module.exports = {
   /*
    ** Nuxt.js modules
    */
-  modules: ['@nuxtjs/pwa', 'nuxt-user-agent', 'nuxt-webfontloader'],
+  modules: [
+    '@nuxtjs/pwa',
+    'nuxt-user-agent',
+    'nuxt-webfontloader',
+    '@nuxtjs/google-gtag',
+  ],
+
+  'google-gtag': {
+    id: 'G-1RJ1F2HNG8',
+    config: {
+      send_page_view: false, // might be necessary to avoid duplicated page track on page reload
+    },
+    debug: false, // use dev mode
+  },
 
   /**
    * global scss variables and functions
