@@ -128,6 +128,13 @@ module.exports = {
       scss,
     },
 
+    terser: {
+      terserOptions: {
+        // disable console on prod
+        compress: { drop_console: true },
+      },
+    },
+
     /*
      ** You can extend webpack config here
      */
