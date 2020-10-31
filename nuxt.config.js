@@ -172,6 +172,15 @@ module.exports = {
     },
   },
 
+  postcss: {
+    preset: {
+      // IE grid support
+      autoprefixer: {
+        grid: 'autoplace',
+      },
+    },
+  },
+
   generate: {
     exclude: [/^(?=.*\bmixins\b).*$/],
   },
