@@ -27,7 +27,6 @@ interface Data {
   geometry: THREE.IcosahedronGeometry | null
   scene: THREE.Scene | null
   canvas: HTMLCanvasElement | null
-  // eslint-disable-next-line
   resizeId: NodeJS.Timeout | null
   animId: number
 }
