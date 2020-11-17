@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import ContentsList from '@/components/ContentsList.vue'
-import { defineComponent, getCurrentInstance } from '@vue/composition-api'
+import { defineComponent } from '@vue/composition-api'
 import { locomotiveInit } from '@/pages/mixins/locomotive'
 
 export default defineComponent({
@@ -18,18 +18,10 @@ export default defineComponent({
   },
   setup(_props, _ctx) {
     /**
-     * current component instance
-     */
-    const instance = getCurrentInstance()
-    /**
-     * locomotive-scroll instance
-     */
-    const Ls = instance?.$store.$locomotiveScroll
-    /**
      * init locomotive
      * speed: {Number} wheel power
      */
-    const { speed } = locomotiveInit({ Ls })
+    const { speed } = locomotiveInit({})
 
     return {
       speed,

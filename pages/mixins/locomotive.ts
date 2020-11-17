@@ -6,15 +6,24 @@ import {
   toRefs,
   onUpdated,
   nextTick,
+  getCurrentInstance,
 } from '@vue/composition-api'
 import locomotiveScroll from 'locomotive-scroll'
 
 interface LsType {
-  Ls: locomotiveScroll
-  background?: boolean
+  background?: boolean | undefined
 }
 
-export const locomotiveInit = ({ Ls, background }: LsType) => {
+export const locomotiveInit = ({ background }: LsType) => {
+  /**
+   * current component instance
+   */
+  const instance = getCurrentInstance()
+  /**
+   * locomotive-scroll instance
+   */
+  const Ls = instance?.$store.$locomotiveScroll
+
   /**
    * locomotive-scroll instance
    */
@@ -34,7 +43,10 @@ export const locomotiveInit = ({ Ls, background }: LsType) => {
     delta: 0,
     direction: '',
     limit: 0,
-    scroll: 0,
+    scroll: {
+      x: 0,
+      y: 0,
+    },
     speed: 0,
   })
 
@@ -84,8 +96,20 @@ export const locomotiveInit = ({ Ls, background }: LsType) => {
   const scrollHandler = ({ direction, limit, scroll, speed }) => {
     scrollObj.direction = direction
     scrollObj.limit = limit
-    scrollObj.scroll = scroll
+    scrollObj.scroll = {
+      x: scroll.x,
+      y: scroll.y,
+    }
     scrollObj.speed = speed
+    if (instance) {
+      instance.$dispatch('ls/setDirection', direction)
+      instance.$dispatch('ls/setScroll', {
+        x: scroll.x,
+        y: scroll.y,
+      })
+      instance.$dispatch('ls/setLimit', limit)
+      instance.$dispatch('ls/setSpeed', speed)
+    }
 
     // 1 for color hue - `hsla(${progress.hue}, 50%, 50%, 0.1)`
     if (background) {
@@ -128,6 +152,7 @@ export const locomotiveInit = ({ Ls, background }: LsType) => {
       getSpeed: true,
       getDirection: true,
     })
+    instance?.$dispatch('ls/setLs', (el) => ls.value.scrollTo(el))
 
     if (background)
       ls.value.el.style.backgroundColor = `hsla(${colorHue}, 4%, 61%, 1)`

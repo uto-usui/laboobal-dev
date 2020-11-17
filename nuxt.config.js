@@ -63,7 +63,7 @@ module.exports = {
   /*
    ** Global CSS
    */
-  css: ['locomotive-scroll/dist/locomotive-scroll.min.css'],
+  css: [],
 
   /*
    ** Plugins to load before mounting the App

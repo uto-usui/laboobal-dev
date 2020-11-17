@@ -327,7 +327,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, getCurrentInstance } from '@vue/composition-api'
+import { defineComponent } from '@vue/composition-api'
 import DummyImage from '@/components/DummyImage.vue'
 import { locomotiveInit } from '@/pages/mixins/locomotive'
 
@@ -340,13 +340,10 @@ export default defineComponent({
   },
   setup(_props, _ctx) {
     /**
-     * locomotive-scroll instance
-     */
-    const Ls = getCurrentInstance()?.$store.$locomotiveScroll
-    /**
      * init locomotive
+     * speed: {Number} wheel power
      */
-    const { ls } = locomotiveInit({ Ls, background: true })
+    const { ls } = locomotiveInit({ background: true })
 
     return { ls }
   },
