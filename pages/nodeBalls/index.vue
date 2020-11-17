@@ -14,10 +14,6 @@ import {
 } from '@vue/composition-api'
 import { NodeBalls } from '~/assets/js/nodeBall/nodeBall.ts'
 
-interface data {
-  nodeBalls: any
-}
-
 export default defineComponent({
   components: {
     // DummyItems,
