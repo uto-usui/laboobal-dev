@@ -223,4 +223,8 @@ module.exports = {
       },
     ],
   },
+
+  icon: {
+    iconFileName: 'icon.png',
+  },
 }
