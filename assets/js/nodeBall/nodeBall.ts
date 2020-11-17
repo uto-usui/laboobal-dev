@@ -5,10 +5,7 @@
  *
  *
  */
-
-// type info
-import * as dat from 'dat-gui'
-
+import Tweakpane from 'tweakpane'
 import { distance } from '../math'
 import Particle from './Particle'
 
@@ -27,7 +24,7 @@ const colorPallet1 = ['#4ECCA3', '#5A81E5', '#E5754A', '#A98BF3']
 const colorPallet2 = ['#3b9372', '#3e549b', '#6a519b']
 const colorPallet3 = ['#235542', '#463b5f']
 const originSpeed = 0.5
-const speed = 18.8
+// const speed = 18.8
 
 const largeParticles: Particle[] = []
 const middleParticles: Particle[] = []
@@ -60,9 +57,8 @@ class NodeBalls {
 
   /** dat params */
   private params: { speed: number }
-
-  /* aa **/
-  private gui: dat.GUI
+  /* pane **/
+  private pane: Tweakpane | null
 
   /** dat.gui */
   // private gui: dat.GUI
@@ -82,6 +78,8 @@ class NodeBalls {
 
     this.animationID = 0
 
+    this.pane = null
+
     // Parameter object
     this.params = {
       speed: 5.5,
@@ -97,8 +95,11 @@ class NodeBalls {
   }
 
   private dat(): void {
-    this.gui = new window.dat.GUI()
-    this.gui.add(this.params, 'speed', 0.5, 100)
+    this.pane = new Tweakpane()
+    this.pane.addInput(this.params, 'speed', {
+      min: 0.5,
+      max: 100,
+    })
   }
 
   /**
@@ -255,7 +256,7 @@ class NodeBalls {
    * 破棄します。
    */
   public destroy(): void {
-    this.gui && this.gui.destroy()
+    this.pane && this.pane.dispose()
     cancelAnimationFrame(this.animationID)
   }
 }

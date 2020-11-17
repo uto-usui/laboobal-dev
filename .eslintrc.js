@@ -5,7 +5,7 @@ module.exports = {
     node: true,
   },
   globals: {
-    dat: true,
+    // dat: true,
   },
   extends: [
     '@nuxtjs/eslint-config-typescript',

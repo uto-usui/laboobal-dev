@@ -70,7 +70,6 @@ module.exports = {
    */
   plugins: [
     '~plugins/vue-lazyload.client.js',
-    '~plugins/dat.client',
     '~plugins/splitting.client',
     '~plugins/locomotive.client',
     '~plugins/composition-api',
