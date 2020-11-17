@@ -5,7 +5,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, getCurrentInstance, onBeforeUnmount, onMounted, ref } from '@vue/composition-api'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+} from '@vue/composition-api'
 import { NodeBalls } from '~/assets/js/nodeBall/nodeBall.ts'
 
 interface data {
