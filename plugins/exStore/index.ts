@@ -1,5 +1,4 @@
 import * as Vuex from 'vuex'
-import { UA } from 'nuxt-user-agent/lib/types'
 
 declare module 'vuex' {
   // ______________________________________________________
