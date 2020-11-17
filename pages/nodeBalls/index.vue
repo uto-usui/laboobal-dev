@@ -1,48 +1,46 @@
 <template>
   <div class="wrap">
-    <canvas id="canvas" ref="canvas"></canvas>
+    <canvas id="canvas" ref="canvas" />
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
+import { defineComponent, getCurrentInstance, onBeforeUnmount, onMounted, ref } from '@vue/composition-api'
 import { NodeBalls } from '~/assets/js/nodeBall/nodeBall.ts'
 
 interface data {
   nodeBalls: any
 }
 
-export default Vue.extend({
+export default defineComponent({
   components: {
     // DummyItems,
   },
-  data(): data {
-    return {
-      //
-      nodeBalls: null,
-    }
-  },
-  mounted() {
-    this.$nextTick(() => {
-      this.init()
-    })
-  },
-  updated() {
-    this.$nextTick(() => {
-      // this.scrollManager.parallaxEventDetach()
-      // this.scrollManager.parallaxEventAttach()
-    })
-  },
-  beforeDestroy() {
-    this.nodeBalls && this.nodeBalls.destroy()
-    this.nodeBalls = null
-  },
-  methods: {
-    init() {
-      this.nodeBalls = new NodeBalls({
-        canvas: this.$refs.canvas as HTMLCanvasElement,
+  setup(_props, _ctx) {
+    let nodeBalls = null as null | NodeBalls
+    const canvas = ref<HTMLCanvasElement>()
+
+    const init = () => {
+      if (!canvas.value) return
+      nodeBalls = new NodeBalls({
+        canvas: canvas.value,
       })
-    },
+    }
+
+    onMounted(() => {
+      getCurrentInstance()?.$nextTick(() => {
+        init()
+      })
+    })
+
+    onBeforeUnmount(() => {
+      nodeBalls && nodeBalls.destroy()
+      nodeBalls = null
+    })
+
+    return {
+      canvas,
+    }
   },
 })
 </script>
