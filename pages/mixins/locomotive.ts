@@ -22,7 +22,7 @@ export const locomotiveInit = ({ background }: LsType) => {
   /**
    * locomotive-scroll instance
    */
-  const Ls = instance?.$store.$locomotiveScroll
+  const Ls = instance?.$locomotiveScroll
 
   /**
    * locomotive-scroll instance
