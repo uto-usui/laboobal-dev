@@ -90,7 +90,7 @@ module.exports = {
   ],
 
   'google-gtag': {
-    id: 'G-1RJ1F2HNG8',
+    id: 'xxx',
     config: {
       send_page_view: false, // might be necessary to avoid duplicated page track on page reload
     },
