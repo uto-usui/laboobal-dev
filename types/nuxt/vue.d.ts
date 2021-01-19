@@ -1,13 +1,19 @@
 import { UA } from 'nuxt-user-agent/lib/types'
 import locomotiveScroll from 'locomotive-scroll'
-import Vue from 'vue'
 import { Gtag } from '@/types/gtag'
+import Vuex from 'vuex'
 
 declare module '@nuxt/vue-app' {
   interface Context {
     $ua: UA
     $gtag: Gtag
     $locomotiveScroll: locomotiveScroll
+
+    $exStore: Vuex.ExStore
+    $state: Vuex.ExStore['state']
+    $getters: Vuex.ExStore['getters']
+    $commit: Vuex.ExStore['commit']
+    $dispatch: Vuex.ExStore['dispatch']
   }
 }
 
@@ -16,6 +22,12 @@ declare module '@nuxt/types' {
     $ua: UA
     $gtag: Gtag
     $locomotiveScroll: locomotiveScroll
+
+    $exStore: Vuex.ExStore
+    $state: Vuex.ExStore['state']
+    $getters: Vuex.ExStore['getters']
+    $commit: Vuex.ExStore['commit']
+    $dispatch: Vuex.ExStore['dispatch']
   }
 }
 
@@ -24,6 +36,12 @@ declare module 'vue/types/vue' {
     $ua: UA
     $gtag: Gtag
     $locomotiveScroll: locomotiveScroll
+
+    $exStore: Vuex.ExStore
+    $state: Vuex.ExStore['state']
+    $getters: Vuex.ExStore['getters']
+    $commit: Vuex.ExStore['commit']
+    $dispatch: Vuex.ExStore['dispatch']
   }
 }
 
@@ -32,6 +50,12 @@ declare module 'vuex' {
     $ua: UA
     $gtag: Gtag
     $locomotiveScroll: locomotiveScroll
+
+    $exStore: Vuex.ExStore
+    $state: Vuex.ExStore['state']
+    $getters: Vuex.ExStore['getters']
+    $commit: Vuex.ExStore['commit']
+    $dispatch: Vuex.ExStore['dispatch']
   }
 }
 

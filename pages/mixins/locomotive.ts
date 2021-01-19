@@ -6,28 +6,29 @@ import {
   toRefs,
   onUpdated,
   nextTick,
-  getCurrentInstance,
 } from '@vue/composition-api'
 import locomotiveScroll from 'locomotive-scroll'
+import { useContext } from '@/components/core/getCurrentInstance'
 
 interface LsType {
-  background?: boolean | undefined
+  background?: boolean
 }
 
 export const locomotiveInit = ({ background }: LsType) => {
   /**
    * current component instance
    */
-  const instance = getCurrentInstance()
-  /**
-   * locomotive-scroll instance
-   */
-  const Ls = instance?.$locomotiveScroll
+  const { $locomotiveScroll, $dispatch } = useContext()
 
   /**
    * locomotive-scroll instance
    */
-  const ls = ref(null) as null | locomotiveScroll
+  const Ls = $locomotiveScroll
+
+  /**
+   * locomotive-scroll instance
+   */
+  const ls = ref<locomotiveScroll | null>(null)
 
   /**
    * scroll progress for hue
@@ -101,15 +102,14 @@ export const locomotiveInit = ({ background }: LsType) => {
       y: scroll.y,
     }
     scrollObj.speed = speed
-    if (instance) {
-      instance.$dispatch('ls/setDirection', direction)
-      instance.$dispatch('ls/setScroll', {
-        x: scroll.x,
-        y: scroll.y,
-      })
-      instance.$dispatch('ls/setLimit', limit)
-      instance.$dispatch('ls/setSpeed', speed)
-    }
+
+    $dispatch('ls/setDirection', direction)
+    $dispatch('ls/setScroll', {
+      x: scroll.x,
+      y: scroll.y,
+    })
+    $dispatch('ls/setLimit', limit)
+    $dispatch('ls/setSpeed', speed)
 
     // 1 for color hue - `hsla(${progress.hue}, 50%, 50%, 0.1)`
     if (background) {
@@ -143,25 +143,27 @@ export const locomotiveInit = ({ background }: LsType) => {
   onMounted(() => {
     console.log('onMounted _ locomotive')
 
-    /**
-     * create locomotive-scroll instance
-     */
-    ls.value = new Ls({
-      el: document.querySelector('[data-scroll-container]'),
-      smooth: true,
-      getSpeed: true,
-      getDirection: true,
+    nextTick(() => {
+      /**
+       * create locomotive-scroll instance
+       */
+      ls.value = new Ls({
+        el: document.querySelector('[data-scroll-container]'),
+        smooth: true,
+        getSpeed: true,
+        getDirection: true,
+      })
+      $dispatch('ls/setLs', (el) => ls.value.scrollTo(el))
+
+      if (background)
+        ls.value.el.style.backgroundColor = `hsla(${colorHue}, 4%, 61%, 1)`
+      // console.log(ls.value)
+
+      // set event
+      window.addEventListener('resize', resizeHandler)
+      ls.value && ls.value.on('call', callHandler)
+      ls.value && ls.value.on('scroll', scrollHandler)
     })
-    instance?.$dispatch('ls/setLs', (el) => ls.value.scrollTo(el))
-
-    if (background)
-      ls.value.el.style.backgroundColor = `hsla(${colorHue}, 4%, 61%, 1)`
-    // console.log(ls.value)
-
-    // set event
-    window.addEventListener('resize', resizeHandler)
-    ls.value && ls.value.on('call', callHandler)
-    ls.value && ls.value.on('scroll', scrollHandler)
   })
 
   // destroy

@@ -7,7 +7,7 @@
 <script lang="ts">
 import {
   defineComponent,
-  getCurrentInstance,
+  nextTick,
   onBeforeUnmount,
   onMounted,
   ref,
@@ -30,7 +30,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      getCurrentInstance()?.$nextTick(() => {
+      nextTick(() => {
         init()
       })
     })
