@@ -22,6 +22,7 @@
           data-scroll
           data-scroll-speed="1"
           data-scroll-position="top"
+          data-scroll-call="exFunc, null"
         >
           ex-1
         </p>
@@ -308,6 +309,17 @@
     </section>
 
     <section class="sm__section" data-scroll-section>
+      <div
+        data-scroll-id="rotate"
+        data-scroll
+        data-scroll-repeat
+        class="sm__rotate"
+      >
+        rotate
+      </div>
+    </section>
+
+    <section class="sm__section" data-scroll-section>
       <div class="sm__pagetop-wrap">
         <a class="sm__pagetop" data-scroll @click="ls && ls.scrollTo('#main')">
           <span
@@ -343,9 +355,9 @@ export default defineComponent({
      * init locomotive
      * speed: {Number} wheel power
      */
-    const { ls } = locomotiveInit({ background: true })
+    const { ls, hue } = locomotiveInit({ background: true })
 
-    return { ls }
+    return { ls, hue }
   },
 })
 </script>
@@ -607,6 +619,14 @@ export default defineComponent({
   height: 100%;
   background-position: 50%;
   background-size: cover;
+}
+
+.sm__rotate {
+  width: 100%;
+  font-family: $font-Montserrat;
+  font-size: 7vw;
+  font-weight: $font-weight-Montserrat-bold;
+  text-transform: uppercase;
 }
 
 .sm__pagetop-wrap {

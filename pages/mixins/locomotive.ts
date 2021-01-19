@@ -10,6 +10,8 @@ import {
 import locomotiveScroll from 'locomotive-scroll'
 import { useContext } from '@/components/core/getCurrentInstance'
 
+import { gsap } from 'gsap'
+
 interface LsType {
   background?: boolean
 }
@@ -63,6 +65,7 @@ export const locomotiveInit = ({ background }: LsType) => {
    * elements of bg interaction
    */
   const backgrounds = [] as { id: number; el: HTMLElement }[]
+  const rotates = [] as { id: number; el: HTMLElement; progress: number }[]
 
   const colorHue = 175
 
@@ -94,9 +97,15 @@ export const locomotiveInit = ({ background }: LsType) => {
   /**
    * scroll function
    */
-  const scrollHandler = ({ direction, limit, scroll, speed }) => {
+  const scrollHandler = ({
+    direction,
+    limit,
+    scroll,
+    speed,
+    currentElements,
+  }) => {
     scrollObj.direction = direction
-    scrollObj.limit = limit
+    scrollObj.limit = limit.y
     scrollObj.scroll = {
       x: scroll.x,
       y: scroll.y,
@@ -108,12 +117,12 @@ export const locomotiveInit = ({ background }: LsType) => {
       x: scroll.x,
       y: scroll.y,
     })
-    $dispatch('ls/setLimit', limit)
+    $dispatch('ls/setLimit', limit.y)
     $dispatch('ls/setSpeed', speed)
 
     // 1 for color hue - `hsla(${progress.hue}, 50%, 50%, 0.1)`
     if (background) {
-      progress.hue = (360 * scroll.y) / limit
+      progress.hue = (360 * scroll.y) / limit.y
 
       ls.value.el.style.backgroundColor = `hsla(${
         progress.hue * 2 + colorHue
@@ -122,6 +131,13 @@ export const locomotiveInit = ({ background }: LsType) => {
         el.style.backgroundColor = `hsla(${
           progress.hue * 2 + colorHue
         }, 4%, 61%, 1)`
+      })
+    }
+
+    // element by data-scroll-id="rotate"
+    if (currentElements.rotate) {
+      gsap.set(currentElements.rotate.el, {
+        rotation: currentElements.rotate.progress * 360,
       })
     }
 
