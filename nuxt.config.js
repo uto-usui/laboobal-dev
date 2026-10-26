@@ -46,13 +46,6 @@ module.exports = {
       { hid: 'description', name: 'description', content: 'laboobal dev' },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
-    script: [
-      {
-        src:
-          'https://cdn.polyfill.io/v2/polyfill.js?features=IntersectionObserver,es6,es7',
-        type: 'text/javascript',
-      },
-    ],
   },
 
   /*
