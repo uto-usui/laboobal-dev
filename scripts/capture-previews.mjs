@@ -1,0 +1,166 @@
+// トップの一覧で、触れたときに出す短い動画とポスター画像を作る。
+// 手元で `pnpm build && pnpm preview --port 4322` を立ててから `node scripts/capture-previews.mjs [slug...]`。
+// Netlify のビルドには GPU も ffmpeg もないので、ここで作ったものを public/previews/ にコミットする
+import { execFileSync } from 'node:child_process'
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+} from 'node:fs'
+import { join } from 'node:path'
+import { chromium } from '@playwright/test'
+
+const BASE = process.env.PREVIEW_BASE_URL ?? 'http://localhost:4322'
+const OUT = 'public/previews'
+const TMP = 'node_modules/.cache/previews'
+const VIEW = { width: 800, height: 500 }
+// 読み込んで動き出すまで待ってから、この長さだけ切り出す
+const WARMUP = 1200
+const LENGTH = 3600
+
+const demos = readdirSync('src/demos')
+  .filter((slug) => existsSync(`src/demos/${slug}/meta.ts`))
+  .map((slug) => {
+    const source = readFileSync(`src/demos/${slug}/meta.ts`, 'utf8')
+    return {
+      slug,
+      interaction: source.match(/interaction:\s*'([^']+)'/)?.[1] ?? 'none',
+    }
+  })
+const only = process.argv.slice(2)
+const targets = only.length ? demos.filter((d) => only.includes(d.slug)) : demos
+
+const wait = (page, ms) => page.waitForTimeout(ms)
+
+/** points の上を、duration ミリ秒かけてなめらかにたどる。録画に映るよう 1 フレームずつ動かす */
+const glide = async (page, points, duration) => {
+  const steps = Math.round(duration / 16)
+  for (let i = 0; i <= steps; i++) {
+    const t = (i / steps) * (points.length - 1)
+    const k = Math.min(Math.floor(t), points.length - 2)
+    const f = t - k
+    const [x0, y0] = points[k]
+    const [x1, y1] = points[k + 1]
+    await page.mouse.move(x0 + (x1 - x0) * f, y0 + (y1 - y0) * f)
+    await wait(page, 16)
+  }
+}
+
+const act = async (page, interaction) => {
+  const { width: w, height: h } = VIEW
+  switch (interaction) {
+    case 'hover':
+      await glide(
+        page,
+        [
+          [w * 0.2, h * 0.3],
+          [w * 0.75, h * 0.25],
+          [w * 0.7, h * 0.75],
+          [w * 0.3, h * 0.7],
+          [w * 0.5, h * 0.45],
+        ],
+        LENGTH,
+      )
+      break
+    case 'drag':
+      await page.mouse.move(w * 0.5, h * 0.5)
+      await page.mouse.down()
+      await glide(
+        page,
+        [
+          [w * 0.5, h * 0.5],
+          [w * 0.75, h * 0.35],
+          [w * 0.3, h * 0.65],
+        ],
+        1600,
+      )
+      await page.mouse.up()
+      await wait(page, LENGTH - 1600)
+      break
+    case 'scroll':
+      await page.mouse.move(w * 0.5, h * 0.5)
+      // 要素どうしの間が広いデモが多く、進み続けると空の画面ばかり映る。半分進んだら戻して、出入りを見せる
+      for (let i = 0; i < 36; i++) {
+        await page.mouse.wheel(0, i < 18 ? 30 : -30)
+        await wait(page, LENGTH / 36)
+      }
+      break
+    case 'click':
+      await page.mouse.click(w * 0.5, h * 0.5)
+      await wait(page, LENGTH / 2)
+      await page.mouse.click(w * 0.5, h * 0.5)
+      await wait(page, LENGTH / 2)
+      break
+    default:
+      await wait(page, LENGTH)
+  }
+}
+
+mkdirSync(OUT, { recursive: true })
+mkdirSync(TMP, { recursive: true })
+const browser = await chromium.launch({
+  args: ['--enable-gpu', '--use-angle=metal'],
+})
+
+for (const demo of targets) {
+  const dir = join(TMP, demo.slug)
+  rmSync(dir, { recursive: true, force: true })
+  const context = await browser.newContext({
+    viewport: VIEW,
+    recordVideo: { dir, size: VIEW },
+  })
+  const started = Date.now()
+  const page = await context.newPage()
+  await page.goto(`${BASE}/${demo.slug}/`)
+  // 隅のリンクは一覧のサムネイルには要らない
+  await page.addStyleTag({ content: '.links { display: none !important }' })
+  await wait(page, WARMUP)
+  const offset = (Date.now() - started) / 1000
+  await act(page, demo.interaction)
+  await context.close()
+  const raw = join(
+    dir,
+    readdirSync(dir).find((f) => f.endsWith('.webm')),
+  )
+
+  const ffmpeg = (...args) =>
+    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...args])
+  ffmpeg(
+    '-ss',
+    String(offset),
+    '-t',
+    String(LENGTH / 1000),
+    '-i',
+    raw,
+    '-vf',
+    'scale=480:300,fps=30',
+    '-an',
+    '-c:v',
+    'libvpx-vp9',
+    '-b:v',
+    '0',
+    '-crf',
+    '42',
+    '-row-mt',
+    '1',
+    join(OUT, `${demo.slug}.webm`),
+  )
+  ffmpeg(
+    '-ss',
+    String(offset + 0.2),
+    '-i',
+    raw,
+    '-frames:v',
+    '1',
+    '-vf',
+    'scale=480:300',
+    '-q:v',
+    '4',
+    join(OUT, `${demo.slug}.jpg`),
+  )
+  console.log(`${demo.slug} (${demo.interaction})`)
+}
+
+await browser.close()
