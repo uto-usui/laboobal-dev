@@ -112,12 +112,20 @@ for (const demo of demos) {
     // 動き出すまで少し待つ
     await page.waitForTimeout(1000)
 
-    const canvasCount = await page.locator('canvas').count()
-    for (let i = 0; i < canvasCount; i++) {
-      expect(await isCanvasBlank(page, i), `canvas ${i} が 1 色のまま`).toBe(
-        false,
-      )
+    // 1 枚だけで決めない。写真を読み終えるまでや、押して画面いっぱいに 1 色で広がる途中（three-scale）は 1 色になりうる
+    const expectDrawn = async (message: string) => {
+      const canvasCount = await page.locator('canvas').count()
+      for (let i = 0; i < canvasCount; i++) {
+        await expect
+          .poll(() => isCanvasBlank(page, i), {
+            message: `${message}canvas ${i} が 1 色のまま`,
+            timeout: 5000,
+          })
+          .toBe(false)
+      }
     }
+
+    await expectDrawn('')
 
     await interact(page, demo)
 
@@ -130,12 +138,7 @@ for (const demo of demos) {
         document.documentElement.clientWidth,
     )
     expect(overflow, '横にはみ出している').toBeLessThanOrEqual(0)
-    for (let i = 0; i < canvasCount; i++) {
-      expect(
-        await isCanvasBlank(page, i),
-        `縮めたあと canvas ${i} が 1 色のまま`,
-      ).toBe(false)
-    }
+    await expectDrawn('縮めたあと ')
 
     expect(errors).toEqual([])
   })
