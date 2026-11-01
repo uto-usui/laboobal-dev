@@ -147,7 +147,7 @@ export const createDistortionSlider = ({
     })
   }
 
+  // ホイールでは進めない。記事に埋め込むと、スクロールで通り過ぎるたびに切り替わってしまう
   root.addEventListener('click', go)
-  window.addEventListener('wheel', go, { passive: true })
   if (!prefersReducedMotion()) setInterval(go, interval * 1000)
 }
