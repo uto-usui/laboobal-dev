@@ -1,0 +1,82 @@
+---
+const rows = ['', 'tb', 'bt', 'diag'] as const
+const text = 'marquee infinite animation'
+---
+
+<div class="marquee">
+  {rows.map((dir) => (
+    <div
+      class="row"
+      data-dir={dir || undefined}
+      aria-hidden={dir ? 'true' : undefined}
+    >
+      {/* 同じ文を 4 つ並べ、1 つ分（全体の 25%）だけ動かして初めに戻す。つなぎ目が見えない */}
+      <p class="track">
+        {Array.from({ length: 4 }, (_, i) => (
+          <span aria-hidden={i > 0 ? 'true' : undefined}>{text}</span>
+        ))}
+      </p>
+    </div>
+  ))}
+</div>
+
+<style>
+  .marquee {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    container-type: size;
+  }
+
+  .row {
+    --size: 10cqw;
+
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100cqw;
+    height: 1lh;
+    margin-top: -0.5lh;
+    font-size: var(--size);
+    line-height: 1;
+  }
+
+  /* 向きを変えるのは行ごと。文字の流れ方は 4 行とも同じ */
+  .row[data-dir='tb'] {
+    transform: translateX(0.5em) rotate(-90deg);
+  }
+
+  .row[data-dir='bt'] {
+    transform: translateX(-0.5em) rotate(90deg);
+  }
+
+  .row[data-dir='diag'] {
+    transform: translateX(2em) rotate(210deg);
+  }
+
+  .track {
+    display: flex;
+    width: max-content;
+    margin: 0;
+    font-weight: 700;
+    color: rgb(238 238 238 / 15%);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    animation: marquee 15s linear infinite;
+  }
+
+  .track span {
+    padding-right: 0.5em;
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(-50%);
+    }
+
+    to {
+      transform: translateX(-75%);
+    }
+  }
+</style>
