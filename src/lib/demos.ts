@@ -43,7 +43,8 @@ const components = import.meta.glob<AstroComponentFactory>(
 const folderOf = (path: string) => path.split('/').at(-2)!
 
 /**
- * meta.ts を集めて確かめる。決まりに合わないものがあればビルドを落とす（docs/plan.md の 5 章）
+ * meta.ts を集めて確かめる。決まりに合わないものがあればビルドを落とす（docs/plan.md の 5 章）。
+ * 開発サーバーでは、作りかけのデモがあっても全ページが 500 にならないよう、そのデモだけ外して警告にする
  */
 const collect = async () => {
   const metas = Object.fromEntries(
@@ -54,6 +55,11 @@ const collect = async () => {
     ),
   )
   const errors: string[] = []
+  const broken = new Set<string>()
+  const fail = (folder: string, message: string) => {
+    errors.push(message)
+    broken.add(folder)
+  }
   const seen = new Set<string>()
   const noteFolders = new Set(Object.keys(notes).map(folderOf))
   const componentFolders = new Set(Object.keys(components).map(folderOf))
@@ -62,54 +68,59 @@ const collect = async () => {
     const folder = folderOf(path)
     const where = `src/demos/${folder}/meta.ts`
     if (!meta) {
-      errors.push(`${where}: defineDemo(...) を default export していない`)
+      fail(folder, `${where}: defineDemo(...) を default export していない`)
       return meta
     }
     for (const key of ['slug', 'title', 'category', 'origin'] as const) {
-      if (!meta[key]) errors.push(`${where}: ${key} がない`)
+      if (!meta[key]) fail(folder, `${where}: ${key} がない`)
     }
-    if (!Array.isArray(meta.credits)) errors.push(`${where}: credits がない`)
-    if (typeof meta.webgl !== 'boolean') errors.push(`${where}: webgl がない`)
+    if (!Array.isArray(meta.credits)) fail(folder, `${where}: credits がない`)
+    if (typeof meta.webgl !== 'boolean') fail(folder, `${where}: webgl がない`)
     if (!BATCHES.includes(meta.batch))
-      errors.push(`${where}: batch が ${BATCHES.join(' | ')} のどれでもない`)
+      fail(folder, `${where}: batch が ${BATCHES.join(' | ')} のどれでもない`)
     if (!INTERACTIONS.includes(meta.interaction))
-      errors.push(
+      fail(
+        folder,
         `${where}: interaction が ${INTERACTIONS.join(' | ')} のどれでもない`,
       )
     if (meta.slug !== folder)
-      errors.push(`${where}: slug "${meta.slug}" がフォルダ名と違う`)
+      fail(folder, `${where}: slug "${meta.slug}" がフォルダ名と違う`)
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(folder))
-      errors.push(`${where}: フォルダ名が小文字のケバブケースでない`)
-    if (seen.has(meta.slug)) errors.push(`${where}: slug が重なっている`)
+      fail(folder, `${where}: フォルダ名が小文字のケバブケースでない`)
+    if (seen.has(meta.slug)) fail(folder, `${where}: slug が重なっている`)
     seen.add(meta.slug)
     if (!noteFolders.has(folder))
-      errors.push(`src/demos/${folder}/notes.md がない`)
+      fail(folder, `src/demos/${folder}/notes.md がない`)
     if (!componentFolders.has(folder))
-      errors.push(`src/demos/${folder}/Demo.astro がない`)
+      fail(folder, `src/demos/${folder}/Demo.astro がない`)
     return meta
   })
 
   for (const folder of new Set([...noteFolders, ...componentFolders])) {
     if (!Object.keys(metas).some((path) => folderOf(path) === folder))
-      errors.push(`src/demos/${folder}/meta.ts がない`)
+      fail(folder, `src/demos/${folder}/meta.ts がない`)
   }
 
   if (errors.length > 0) {
-    throw new Error(
-      `デモの決まりに合わないものがある:\n- ${errors.join('\n- ')}`,
-    )
+    const message = `デモの決まりに合わないものがある:\n- ${errors.join('\n- ')}`
+    if (!import.meta.env.DEV) throw new Error(message)
+    console.warn(`${message}\n（開発サーバーなので、このデモを外して続ける）`)
   }
-  return list.sort(
-    (a, b) =>
-      BATCHES.indexOf(a.batch) - BATCHES.indexOf(b.batch) ||
-      a.slug.localeCompare(b.slug),
-  )
+  const folders = Object.keys(metas).map(folderOf)
+  return list
+    .filter((_, i) => !broken.has(folders[i]))
+    .sort(
+      (a, b) =>
+        BATCHES.indexOf(a.batch) - BATCHES.indexOf(b.batch) ||
+        a.slug.localeCompare(b.slug),
+    )
 }
 
 let cache: Promise<DemoMeta[]> | undefined
 
-/** 全デモの一覧。batch の順、その中は slug の順 */
-export const getDemos = () => (cache ??= collect())
+/** 全デモの一覧。batch の順、その中は slug の順。開発中は meta.ts の書き換えを拾うため毎回集め直す */
+export const getDemos = () =>
+  import.meta.env.DEV ? collect() : (cache ??= collect())
 
 export const loadDemoComponent = (slug: string) =>
   components[`../demos/${slug}/Demo.astro`]()
