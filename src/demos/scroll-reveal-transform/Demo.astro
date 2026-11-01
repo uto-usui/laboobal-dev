@@ -1,0 +1,44 @@
+<div class="page">
+  <p class="hint">scroll</p>
+  <div class="slot">
+    <div class="target">transform</div>
+  </div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  /* 開いたときは要素が画面の下の方に少しだけ見え、上へ出ていくまでをスクロールで見せる */
+  .page {
+    padding-block: 75dvh 100dvh;
+  }
+
+  .hint {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* 奥行きはすぐ上の親に付ける（孫には効かない）。視点の位置（perspective-origin）は JS で画面の真ん中に合わせ続ける */
+  .slot {
+    perspective: 400px;
+    width: 75%;
+    height: 200px;
+    margin-inline: auto;
+  }
+
+  .target {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    font-size: 14px;
+    color: #232931;
+    background: #25ecb7;
+  }
+</style>

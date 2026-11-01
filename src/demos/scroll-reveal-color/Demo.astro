@@ -1,0 +1,63 @@
+<div class="page">
+  <p class="hint">scroll</p>
+  <div class="target">background color</div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  /* 開いたときは要素が画面の下の方に少しだけ見え、上へ出ていくまでをスクロールで見せる */
+  .page {
+    padding-block: 75dvh 100dvh;
+  }
+
+  .hint {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    margin: 0;
+    font-size: 11px;
+    color: var(--color-muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* 0〜1 の進み具合。数として登録しておくと、アニメーションで途中の値を取れる */
+  @property --p {
+    syntax: '<number>';
+    inherits: false;
+    initial-value: 0;
+  }
+
+  .target {
+    display: grid;
+    place-items: center;
+    width: 200px;
+    height: 100px;
+    margin-inline: auto;
+    font-size: 14px;
+    color: #232931;
+    /* 色相を 110（緑）から 240（青）へ回しながら、明るさを 45% から 70% へ上げる */
+    background: hsl(calc(110 + 130 * var(--p)) 75% calc(45% + 25% * var(--p)));
+  }
+
+  /* 画面の下から 100px 入ったところで 0、下端が画面の上を出たところで 1 */
+  @supports (animation-timeline: view()) {
+    .target {
+      animation: progress linear both;
+      animation-timeline: view();
+      animation-range: cover 100px cover 100%;
+    }
+  }
+
+  @keyframes progress {
+    from {
+      --p: 0;
+    }
+
+    to {
+      --p: 1;
+    }
+  }
+</style>
