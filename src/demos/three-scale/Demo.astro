@@ -1,0 +1,68 @@
+---
+const items = [
+  { label: '左から', color: '#ff6473' },
+  { label: '角から', color: '#4ecca3' },
+  { label: '真ん中から', color: '#f6c85f' },
+]
+---
+
+<div class="scale">
+  <ul class="list">
+    {items.map((item) => (
+      <li>
+        <button
+          type="button"
+          class="item"
+          style={`background-color: ${item.color}`}
+        >
+          {item.label}
+        </button>
+      </li>
+    ))}
+  </ul>
+  <canvas aria-hidden="true"></canvas>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .scale {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  .list {
+    display: flex;
+    gap: clamp(12px, 3vw, 32px);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .item {
+    width: clamp(72px, 14vw, 140px);
+    aspect-ratio: 1;
+    padding: 0;
+    font: inherit;
+    font-size: 11px;
+    color: rgb(0 0 0 / 55%);
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    border: 0;
+  }
+
+  /* 広がる板は箱の上に重ねる。押せるのは箱のほう */
+  canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+</style>

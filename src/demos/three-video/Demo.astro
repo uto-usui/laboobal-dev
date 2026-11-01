@@ -1,0 +1,36 @@
+---
+import sky from './assets/sky.mp4'
+---
+
+<div class="video-demo">
+  <video src={sky} muted loop playsinline autoplay aria-hidden="true"></video>
+  <canvas aria-label="空の動画を貼った多面体が回り、地面に影を落とす。ドラッグで見る向きを変えられる"></canvas>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .video-demo {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #b00;
+  }
+
+  /* 動画は画面に出さず、テクスチャの元としてだけ使う */
+  video {
+    display: none;
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+  }
+
+  canvas:active {
+    cursor: grabbing;
+  }
+</style>
