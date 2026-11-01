@@ -2,7 +2,7 @@
 
 [labobal.dev](https://labobal.dev) のコードです。動きの実験のデモを置いています。デモの説明は [webmanab](https://webmanab.com/lab/) の lab の記事に書き、記事からデモを埋め込みます。
 
-Astro で作り直しているところです。[laboobal](https://github.com/uto-usui/laboobal) のデモもここに移します（[webmanab#53](https://github.com/uto-usui/webmanab/issues/53)）。まわりのリポジトリとの関係と作業の流れは [docs/context.md](docs/context.md)、作り直しの進め方は [docs/plan.md](docs/plan.md) にあります。作り直す前の Nuxt 2 のコードは、タグ `nuxt2-final` に残しています。
+2026-11-02 に Astro で作り直し、[laboobal](https://github.com/uto-usui/laboobal) のデモもここに移しました（[webmanab#53](https://github.com/uto-usui/webmanab/issues/53)）。まわりのリポジトリとの関係と作業の流れは [docs/context.md](docs/context.md)、作り直しの進め方は [docs/plan.md](docs/plan.md) にあります。作り直す前の Nuxt 2 のコードは、タグ `nuxt2-final` に残しています。
 
 ## 手元で動かす
 
