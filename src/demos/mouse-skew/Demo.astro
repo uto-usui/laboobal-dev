@@ -1,0 +1,31 @@
+---
+import photo from './assets/photo.jpg'
+---
+
+<div class="stage">
+  <img class="photo" src={photo.src} alt="" />
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    container-type: size;
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  /* 入れ物の幅の 80% と高さの 80% の、どちらにも収まる 16:9 */
+  .photo {
+    width: min(80cqw, 80cqh * 16 / 9);
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    pointer-events: none;
+  }
+</style>
