@@ -18,7 +18,8 @@ import photo from './assets/photo.jpg'
     place-items: center;
     container-type: size;
     overflow: hidden;
-    touch-action: none;
+    /* 記事に埋め込んだとき、縦に指を動かせば記事がスクロールするようにする。横の動きはデモが受け取る */
+    touch-action: pan-y;
   }
 
   /* 入れ物の幅の 80% と高さの 80% の、どちらにも収まる 16:9 */

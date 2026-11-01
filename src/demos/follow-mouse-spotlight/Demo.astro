@@ -17,7 +17,8 @@ import photo from './assets/photo.jpg'
     position: absolute;
     inset: 0;
     overflow: hidden;
-    touch-action: none;
+    /* 記事に埋め込んだとき、縦に指を動かせば記事がスクロールするようにする。横の動きはデモが受け取る */
+    touch-action: pan-y;
     background: #000;
   }
 
