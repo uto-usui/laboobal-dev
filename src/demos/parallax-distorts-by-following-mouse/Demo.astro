@@ -1,0 +1,53 @@
+---
+import photo from './assets/photo.jpg'
+---
+
+<div class="stage">
+  <img
+    data-mouse-parallax="0.05"
+    src={photo.src}
+    width="300"
+    height="300"
+    alt=""
+  />
+  <h1 data-mouse-parallax="0.1">Skew Element</h1>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: #363636;
+    color-scheme: light;
+    background: #fff;
+    container-type: size;
+  }
+
+  img {
+    width: min(300px, 55cqw);
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    box-shadow: 0 0 20px rgb(0 0 0 / 50%);
+  }
+
+  /* 写真の右下に少し重ねる。係数が写真の倍なので、2 枚の間でずれが見える */
+  h1 {
+    margin: 100px 0 0 -2rem;
+    padding: 3rem 2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    background: rgb(255 255 255 / 90%);
+    border: 5px solid currentcolor;
+  }
+</style>

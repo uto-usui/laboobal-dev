@@ -1,0 +1,28 @@
+---
+import '@fontsource/montserrat/400.css'
+import '@fontsource/montserrat/700.css'
+import '../styles/base.css'
+
+interface Props {
+  title: string
+  description?: string
+}
+
+const { title, description = '動きの実験のデモ' } = Astro.props
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,51 @@
+<div class="stage">
+  <div class="scene">
+    <div class="card" data-card>
+      <div class="face"></div>
+      <div class="face" data-back></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    container-type: size;
+    background: #f1f1f1;
+  }
+
+  /* perspective は入れ物の大きさに合わせる。旧デモは高さ 500px で 400px */
+  .scene {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    perspective: 80cqmin;
+  }
+
+  .card {
+    position: relative;
+    width: 20cqmin;
+    height: 20cqmin;
+    transform-style: preserve-3d;
+  }
+
+  .face {
+    position: absolute;
+    inset: 0;
+    background: #25ecb7;
+    backface-visibility: hidden;
+  }
+
+  /* 裏を少し暗くして、いまどちらを向いているかを見えるようにする */
+  .face[data-back] {
+    background: #1bb38a;
+    transform: rotateY(180deg);
+  }
+</style>

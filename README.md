@@ -2,15 +2,20 @@
 
 [labobal.dev](https://labobal.dev) のコードです。動きの実験のデモを置いています。デモの説明は [webmanab](https://webmanab.com/lab/) の lab の記事に書き、記事からデモを埋め込みます。
 
-今は Nuxt 2 のデモが 7 本あります。webmanab と道具をそろえて作り直し、[laboobal](https://github.com/uto-usui/laboobal) のデモもここに移す予定です（[webmanab#53](https://github.com/uto-usui/webmanab/issues/53)）。まわりのリポジトリとの関係と、作業の流れは [docs/context.md](docs/context.md) にあります。
+Astro で作り直しているところです。[laboobal](https://github.com/uto-usui/laboobal) のデモもここに移します（[webmanab#53](https://github.com/uto-usui/webmanab/issues/53)）。まわりのリポジトリとの関係と作業の流れは [docs/context.md](docs/context.md)、作り直しの進め方は [docs/plan.md](docs/plan.md) にあります。作り直す前の Nuxt 2 のコードは、タグ `nuxt2-final` に残しています。
 
-## 今の Nuxt 2 を手元で動かす
+## 手元で動かす
 
-Node 12 と yarn が要ります。今の Netlify のビルド環境ではビルドできないので、master に入れるコミットには `[skip netlify]` を付けてください。
+Node 26 と pnpm 10 が要ります（`.nvmrc` と `package.json` の `packageManager`）。
 
 ```sh
-n 12.14.1
-yarn install
-yarn run dev:dev   # localhost:8080
-yarn run generate  # dist/ に静的な HTML を出す
+pnpm install
+pnpm dev          # localhost:4321
+pnpm build        # dist/ に静的な HTML を出す
+pnpm test:e2e     # dist/ を開いて全デモを確かめる。先に pnpm build が要る
+pnpm verify       # lint、整形、型、ビルド、E2E をまとめて
 ```
+
+## デモを足す
+
+`src/demos/<slug>/` に `meta.ts`、`Demo.astro`、`notes.md` を置くと、`/<slug>/` のページとトップの一覧に出ます。共有のファイルは書き換えません。決まりは [docs/plan.md](docs/plan.md) の 5 章、見本は `src/demos/marquee/` です。

@@ -1,0 +1,52 @@
+<div class="fake3d">
+  <canvas
+    class="gl"
+    aria-label="マウスの位置で、球の固まりが立体のようにずれる絵"
+  ></canvas>
+  <figure class="depth">
+    <canvas aria-hidden="true"></canvas>
+    <figcaption>深度</figcaption>
+  </figure>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .fake3d {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #0b1719;
+  }
+
+  .gl {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* 絵と組になっている深度の画像。白いほど手前 */
+  .depth {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: clamp(72px, 12vw, 120px);
+    margin: 0;
+    pointer-events: none;
+    opacity: 0.85;
+  }
+
+  .depth canvas {
+    width: 100%;
+    height: auto;
+    outline: 1px solid rgb(255 255 255 / 20%);
+  }
+
+  .depth figcaption {
+    margin-top: 4px;
+    font-size: 10px;
+    color: rgb(255 255 255 / 60%);
+    letter-spacing: 0.1em;
+  }
+</style>

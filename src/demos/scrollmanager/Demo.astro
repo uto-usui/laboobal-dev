@@ -1,0 +1,483 @@
+---
+import '@fontsource/molle/400-italic.css'
+import flowersWide from './assets/flowers-wide.jpg'
+import flowers from './assets/flowers.jpg'
+import foliage from './assets/foliage.jpg'
+
+const pageTop = 'Back To Page Top'
+---
+
+<div class="sm">
+  <header class="sm-header">
+    <h1 class="sm-title">
+      <span data-scroll data-scroll-speed="0.22">
+        scroll
+      </span>
+      <span data-scroll data-scroll-speed="0.11">
+        manager
+      </span>
+    </h1>
+    <p class="sm-sub" data-scroll data-scroll-speed="0.06">
+      ex-1
+    </p>
+  </header>
+
+  <section class="sm-section">
+    <div class="sm-lag" data-lag="0.05" data-lag-speed="2">
+      <figure class="sm-figure" style="--w: 50vw; --h: 100vh">
+        <div class="sm-figure-inner" data-scroll data-scroll-speed="-0.15">
+          <img src={foliage.src} alt="" />
+        </div>
+      </figure>
+    </div>
+    <div class="sm-caption space-a" data-scroll data-scroll-speed="-0.3">
+      <div class="sm-caption-inner" data-scroll data-scroll-offset="200">
+        <h2 class="sm-hed">data-scroll-speed</h2>
+        <p class="sm-text">
+          The frame and the photo inside move at different speeds. The frame
+          also lags behind the scroll and catches up.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sm-section">
+    <div class="sm-lag" data-lag="0.05" data-lag-speed="1">
+      <figure class="sm-figure" style="--w: 90vw; --h: 25vh">
+        <div class="sm-figure-inner" data-scroll data-scroll-speed="-0.06">
+          <img src={flowersWide.src} alt="" />
+        </div>
+      </figure>
+    </div>
+    <div class="sm-lag spacer-b" data-lag="0.05" data-lag-speed="4">
+      <figure class="sm-figure" style="--w: 50vw; --h: 50vw">
+        <div class="sm-figure-inner" data-scroll data-scroll-speed="-0.13">
+          <img src={flowers.src} alt="" />
+        </div>
+      </figure>
+    </div>
+    <div class="sm-lag spacer-a" data-lag="0.05" data-lag-speed="6">
+      <figure class="sm-figure" style="--w: 15vw; --h: 30vw">
+        <div class="sm-figure-inner" data-scroll data-scroll-speed="-0.15">
+          <img src={flowers.src} alt="" />
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="sm-section">
+    <div class="sm-caption" data-scroll data-scroll-speed="0.17">
+      <div class="sm-caption-inner" data-scroll>
+        <h2 class="sm-hed">horizontal</h2>
+        <p class="sm-text">
+          The page scrolls vertically, and the rows slide sideways. Odd and even
+          rows go opposite ways.
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="sm-tiles sm-tiles--rotated"
+      data-scroll
+      data-scroll-css-progress
+    >
+      <div class="sm-tiles-wrap">
+        {Array.from({ length: 5 }, (_, i) => (
+          <div class="sm-tiles-line" style={`--speed: ${i % 2 ? 1 : -1}`}>
+            {Array.from({ length: 6 }, () => (
+              <div
+                class="sm-tile"
+                style={`background-image: url(${flowersWide.src})`}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="sm-section">
+    <div class="sm-caption space-a" data-scroll data-scroll-speed="0.2">
+      <div class="sm-caption-inner" data-scroll data-scroll-offset="200">
+        <h2 class="sm-hed">data-scroll-css-progress</h2>
+        <p class="sm-text">
+          One progress value on the block drives every row inside it.
+        </p>
+      </div>
+    </div>
+
+    <div class="sm-tiles sm-tiles--row" data-scroll data-scroll-css-progress>
+      <div class="sm-tiles-wrap">
+        {Array.from({ length: 3 }, (_, i) => (
+          <div class="sm-tiles-line" style={`--speed: ${i % 2 ? 3 : 1}`}>
+            {Array.from({ length: 6 }, () => (
+              <div
+                class="sm-tile"
+                style={`background-image: url(${flowersWide.src})`}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="sm-lead" data-scroll data-scroll-css-progress>
+      this is a conventional, boring lead text.
+    </div>
+  </section>
+
+  <section class="sm-section">
+    <div class="sm-tiles sm-tiles--column" data-scroll data-scroll-css-progress>
+      <div class="sm-tiles-wrap">
+        {Array.from({ length: 4 }, (_, i) => (
+          <div class="sm-tiles-line" style={`--speed: ${i % 2 ? 1 : -1}`}>
+            {Array.from({ length: 3 }, () => (
+              <div
+                class="sm-tile"
+                style={`background-image: url(${flowers.src})`}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="sm-section">
+    <div class="sm-fixed">
+      <figure class="sm-fixed-figure">
+        <div class="sm-fixed-track">
+          <div
+            class="sm-fixed-bg"
+            style={`background-image: url(${flowers.src})`}
+          ></div>
+        </div>
+      </figure>
+      <div class="sm-caption sm-sticky">
+        <div class="sm-caption-inner" data-scroll>
+          <h2 class="sm-hed">position: sticky</h2>
+          <p class="sm-text">
+            Lenis keeps the native scroll, so plain CSS sticky does the pinning.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sm-section">
+    <div class="sm-rotate" data-scroll data-scroll-css-progress>
+      rotate
+    </div>
+  </section>
+
+  <section class="sm-section">
+    <div class="sm-pagetop-wrap">
+      <button class="sm-pagetop" type="button" aria-label={pageTop}>
+        {[...pageTop].map((char, i) => (
+          <span
+            class:list={['sm-pagetop-char', { space: char === ' ' }]}
+            aria-hidden="true"
+            data-lag={(0.18 - i * 0.01).toFixed(2)}
+            data-lag-speed="6"
+          >
+            {char}
+          </span>
+        ))}
+      </button>
+    </div>
+  </section>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .sm {
+    --bg: hsl(calc(175deg + var(--turn, 0) * 720deg) 4% 61%);
+
+    padding: 50vh 5vw 0;
+    /*
+     * 回したタイルや長い一行が横に、視差でずらした要素が下にはみ出す。下にはみ出すとページが伸びてスクロールの終わりが動くので、
+     * 縦も切る。hidden にすると sticky が効かなくなるので clip
+     */
+    overflow: clip;
+    background-color: var(--bg);
+  }
+
+  .sm-header {
+    position: relative;
+    font-family: Molle, cursive;
+    font-style: italic;
+    text-align: right;
+    text-transform: uppercase;
+    translate: 0 -50%;
+  }
+
+  .sm-title {
+    margin: 0;
+    font-size: 12.5vw;
+    font-weight: 400;
+    line-height: 1.1;
+  }
+
+  .sm-title span {
+    display: inline-block;
+  }
+
+  .sm-sub {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin: 0;
+    font-size: 5vw;
+    opacity: 0.45;
+  }
+
+  .sm-section {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding-top: 35vh;
+  }
+
+  .spacer-a {
+    padding-top: 45vh;
+  }
+
+  .spacer-b {
+    padding-top: 25vh;
+  }
+
+  .sm-figure {
+    position: relative;
+    width: var(--w);
+    height: var(--h);
+    margin: 0;
+    overflow: hidden;
+    background-color: var(--bg);
+  }
+
+  /* 中の写真は枠と違う速さで動くので、上下に余らせておき、枠の中に隙間が見えないようにする */
+  .sm-figure-inner {
+    position: absolute;
+    inset: -20% 0;
+  }
+
+  .sm-figure-inner img,
+  .sm-tile,
+  .sm-fixed-bg {
+    filter: grayscale(0.85);
+    mix-blend-mode: multiply;
+    opacity: 0.78;
+  }
+
+  .sm-figure-inner img {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .sm-caption {
+    width: 33vw;
+    line-height: 1.5;
+  }
+
+  .sm-caption.space-a {
+    padding-top: 35vh;
+  }
+
+  .sm-caption-inner {
+    opacity: 0;
+    transition:
+      opacity 0.6s cubic-bezier(0.445, 0.05, 0.55, 0.95),
+      translate 0.6s cubic-bezier(0.445, 0.05, 0.55, 0.95);
+    translate: 0 15vh;
+  }
+
+  .sm-caption-inner.is-inview {
+    opacity: 1;
+    translate: none;
+  }
+
+  .sm-hed {
+    margin: 0;
+    font-size: clamp(1.1rem, 1.6vw, 1.6rem);
+    font-weight: 700;
+  }
+
+  .sm-text {
+    margin: 0.5em 0 0;
+    font-size: clamp(0.75rem, 1vw, 0.95rem);
+  }
+
+  /*
+   * タイルの列は、ブロック全体の進み具合（locomotive-scroll が入れる --progress、0〜1）で横へずらす。
+   * 列ごとの --speed で向きと量を変える。ずらす量は旧デモ（locomotive-scroll 4 の速さ 1 = 1px のスクロールで 0.1px）に合わせた
+   */
+  .sm-tiles {
+    --tiles-height: 52vw;
+    --travel: calc((100vh + var(--tiles-height)) * 0.1);
+
+    position: relative;
+    width: 100vw;
+    height: var(--tiles-height);
+    margin-inline: -5vw;
+    overflow: hidden;
+  }
+
+  .sm-tiles--column {
+    --tiles-height: 72vw;
+  }
+
+  .sm-tiles-wrap {
+    --wrap-height: calc(var(--tiles-height) * 1.8);
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150%;
+    height: var(--wrap-height);
+    transform: translate(-50%, -50%);
+  }
+
+  .sm-tiles--rotated .sm-tiles-wrap {
+    transform: translate(-50%, -50%) rotate(22.5deg);
+  }
+
+  .sm-tiles--row .sm-tiles-wrap {
+    --wrap-height: var(--tiles-height);
+  }
+
+  .sm-tiles--column .sm-tiles-wrap {
+    --wrap-height: calc(var(--tiles-height) * 1.25);
+
+    left: 0;
+    display: flex;
+    width: 100%;
+    transform: translateY(-50%);
+  }
+
+  .sm-tiles-line {
+    display: flex;
+    translate: calc((0.5 - var(--progress, 0.5)) * var(--travel) * var(--speed))
+      0;
+  }
+
+  .sm-tiles--column .sm-tiles-line {
+    display: block;
+    width: 25%;
+    padding: 0 1rem;
+    translate: 0
+      calc((0.5 - var(--progress, 0.5)) * var(--travel) * var(--speed));
+  }
+
+  .sm-tile {
+    --margin: 1vw;
+
+    flex: none;
+    width: calc(16.6666% - var(--margin) * 2);
+    height: calc(var(--wrap-height) / 3 - var(--margin) * 1.5);
+    margin: var(--margin);
+    background-position: 50% 50%;
+    background-size: cover;
+  }
+
+  .sm-tiles--rotated .sm-tile {
+    height: calc(var(--wrap-height) / 5 - var(--margin) * 2);
+  }
+
+  .sm-tiles--column .sm-tile {
+    width: 100%;
+    height: calc(25vw * 1.3);
+    margin: 2rem 0;
+  }
+
+  .sm-lead {
+    margin: -2vh -3em;
+    font-family: Molle, cursive;
+    font-size: 6vw;
+    font-style: italic;
+    text-transform: capitalize;
+    white-space: nowrap;
+    opacity: 0.42;
+    translate: calc((0.5 - var(--progress, 0.5)) * (100vh + 6vw) * 0.3) 0;
+  }
+
+  .sm-fixed {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  /*
+   * 枠は clip で切り抜き、写真は上下に 1 画面分ずつ長い入れ物の中で sticky にする。
+   * 枠が画面にある間、写真は画面の上に貼り付いたままになり、枠だけが写真の上を通り過ぎて見える
+   */
+  .sm-fixed-figure {
+    --fixed-height: 100vh;
+
+    position: relative;
+    width: 50%;
+    height: var(--fixed-height);
+    margin: 0;
+    overflow: clip;
+    background-color: var(--bg);
+  }
+
+  .sm-fixed-track {
+    position: absolute;
+    inset: calc(var(--fixed-height) * -1) 0;
+  }
+
+  .sm-fixed-bg {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    background-position: 50%;
+    background-size: cover;
+  }
+
+  .sm-sticky {
+    position: sticky;
+    top: 35vh;
+  }
+
+  .sm-rotate {
+    width: 100%;
+    font-size: 7vw;
+    font-weight: 700;
+    text-transform: uppercase;
+    rotate: calc(var(--progress, 0) * 360deg);
+  }
+
+  .sm-pagetop-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+  }
+
+  .sm-pagetop {
+    padding: 0;
+    font: inherit;
+    font-size: 7vw;
+    font-weight: 700;
+    color: var(--color-fg);
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  .sm-pagetop-char {
+    display: inline-block;
+  }
+
+  .sm-pagetop-char.space {
+    width: 0.25em;
+  }
+</style>

@@ -1,0 +1,134 @@
+---
+import '@fontsource/molle/400-italic.css'
+import Base from '../layouts/Base.astro'
+import { getDemos } from '../lib/demos'
+
+const demos = await getDemos()
+
+// 旧トップの雰囲気（暗い背景、後ろに薄く Molle、線だけの大きな名前）を残し、locomotive をやめて素のスクロールにした案。
+// 見た目は作者に見てもらってから決める（docs/plan.md の 3 章）
+---
+
+<Base title="labobal.dev">
+  <p class="mark" aria-hidden="true">
+    labobal.dev
+  </p>
+  <main class="wrap">
+    <h1 class="visually-hidden">labobal.dev</h1>
+    <p class="lead">
+      動きの実験のデモ。説明は{' '}
+      <a href="https://webmanab.com/lab/">webmanab の lab</a> に。
+    </p>
+    <ul class="list">
+      {demos.map((demo) => (
+        <li class="item">
+          <a class="link" href={`/${demo.slug}/`}>
+            <span class="slug">{demo.slug}</span>
+            <span class="title">{demo.title}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </main>
+</Base>
+
+<style>
+  .mark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin: 0;
+    font-family: Molle, cursive;
+    font-size: 18vw;
+    font-style: italic;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0.05;
+    transform: translate(-50%, -50%);
+  }
+
+  .wrap {
+    position: relative;
+    padding: 25dvh 16px;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .lead {
+    margin: 0 0 8vh;
+    font-size: 12px;
+    color: var(--color-muted);
+    text-align: center;
+    letter-spacing: 0.08em;
+  }
+
+  .lead a {
+    color: inherit;
+  }
+
+  .list {
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    list-style: none;
+  }
+
+  .link {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block: 0.5vh;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* 線だけで描き、触れたときだけ塗る。Montserrat は字形の中で輪郭が重なっていて、線だけにすると重なりが透けるので、
+     旧トップと同じく手元の Helvetica 系にする。長い slug はハイフンのところで折り返す */
+  .slug {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: clamp(32px, 8vw, 120px);
+    font-weight: 400;
+    line-height: 1.05;
+    color: transparent;
+    letter-spacing: -0.04em;
+    -webkit-text-stroke: 1px var(--color-accent);
+    transition: color 1.25s cubic-bezier(0.08, 0.82, 0.17, 1);
+  }
+
+  .title {
+    font-size: 11px;
+    color: var(--color-muted);
+    letter-spacing: 0.1em;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .link:hover .slug,
+  .link:focus-visible .slug {
+    color: color-mix(in oklch, var(--color-accent), white 24%);
+    transition-duration: 0.2s;
+  }
+
+  .link:hover .title,
+  .link:focus-visible .title {
+    opacity: 1;
+  }
+
+  .link:focus-visible {
+    outline: 1px solid var(--color-accent);
+    outline-offset: 8px;
+  }
+
+  @media (pointer: coarse) {
+    .title {
+      opacity: 1;
+    }
+  }
+</style>

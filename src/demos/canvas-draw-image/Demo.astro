@@ -1,0 +1,36 @@
+<div class="draw-image">
+  <canvas aria-label="写真の 1 列を引き伸ばした縞。クリックすると、縞を引きずりながら写真が左から現れる"></canvas>
+  <p class="label" aria-live="polite"></p>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .draw-image {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    cursor: pointer;
+    background: #111;
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  .label {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    margin: 0;
+    font-size: 11px;
+    color: #fff;
+    letter-spacing: 0.08em;
+    pointer-events: none;
+    mix-blend-mode: difference;
+    opacity: 0.7;
+  }
+</style>

@@ -1,0 +1,28 @@
+# Node の版は .nvmrc、pnpm の版は package.json の packageManager から決まる
+[build]
+  command = "pnpm build"
+  publish = "dist"
+  # 本番に使わないファイル（docs、テスト、道具）だけの変更ではビルドしない。対象は scripts/netlify-ignore.sh
+  ignore = "sh scripts/netlify-ignore.sh"
+
+# 大文字のパス（/nodeBalls/ など）の 301 は書かない。Netlify は、あるファイルを大文字まじりのパスで
+# 開かれると小文字のパスへ 301 する（2026-11-01 に本番で /NodeBalls/ も 301 になるのを確かめた）。
+# ルールを書くと、ルールの照合が大文字小文字を区別しない場合に /nodeballs/ 自身にも当たって回り続けるおそれがある
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # lab の記事（webmanab.com）から iframe で埋め込む。手元の webmanab の開発サーバーからも試せるよう localhost を足す
+    Content-Security-Policy = "frame-ancestors 'self' https://webmanab.com http://localhost:*"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

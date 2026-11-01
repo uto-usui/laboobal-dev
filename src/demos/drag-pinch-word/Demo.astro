@@ -1,0 +1,43 @@
+<div class="stage">
+  <div class="words">
+    {Array.from({ length: 5 }, () => (
+      <p class="word">drag</p>
+    ))}
+  </div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-items: center;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .stage:active {
+    cursor: grabbing;
+  }
+
+  .word {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    margin: 0;
+    font-size: 1em;
+    font-weight: 700;
+    line-height: 1;
+    color: #232931;
+    text-transform: uppercase;
+    white-space: nowrap;
+    background: #25ecb7;
+  }
+</style>

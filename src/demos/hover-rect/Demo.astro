@@ -1,0 +1,30 @@
+<div class="grid">
+  {Array.from({ length: 20 }, (_, i) => (
+    <div class="cell">{i + 1}</div>
+  ))}
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  /* 枠の色をページの地の色にしておくと、枠が太るほど、四角が地に沈んで縮んだように見える */
+  .cell {
+    display: grid;
+    place-items: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #232931;
+    background: #25ecb7;
+    border: 0 solid var(--color-bg);
+  }
+</style>

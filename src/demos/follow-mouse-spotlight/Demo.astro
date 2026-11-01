@@ -1,0 +1,53 @@
+---
+import photo from './assets/photo.jpg'
+---
+
+<div class="stage">
+  <img class="photo" src={photo.src} alt="" />
+  <div class="light"></div>
+  <div class="light light--sm"></div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    /* 記事に埋め込んだとき、縦に指を動かせば記事がスクロールするようにする。横の動きはデモが受け取る */
+    touch-action: pan-y;
+    background: #000;
+  }
+
+  .photo {
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 25%;
+    filter: brightness(30%);
+  }
+
+  /* 白いぼかした円を soft-light で重ねる。暗くした写真の、円の下だけが元の明るさに近づく */
+  .light {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 15rem;
+    aspect-ratio: 1;
+    pointer-events: none;
+    background: rgb(255 255 255 / 90%);
+    filter: blur(15px);
+    border-radius: 50%;
+    mix-blend-mode: soft-light;
+  }
+
+  .light--sm {
+    width: 10rem;
+    background: rgb(255 255 255 / 80%);
+    filter: blur(20px);
+  }
+</style>

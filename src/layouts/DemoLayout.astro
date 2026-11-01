@@ -1,0 +1,64 @@
+---
+import Base from './Base.astro'
+import type { DemoMeta } from '../lib/demos'
+
+interface Props {
+  demo: DemoMeta
+}
+
+const { demo } = Astro.props
+---
+
+<Base title={`${demo.title} | labobal.dev`}>
+  <main class="demo" data-slug={demo.slug}>
+    <slot />
+  </main>
+  <nav class="links" aria-label="リンク">
+    {demo.article && (
+      <a href={demo.article} target="_top">
+        記事
+      </a>
+    )}
+    {demo.credits.map((credit) => (
+      <a href={credit.url} target="_top">
+        {credit.label}
+      </a>
+    ))}
+    <a href="/" target="_top">
+      labobal.dev
+    </a>
+  </nav>
+</Base>
+
+<style>
+  .demo {
+    position: relative;
+    min-height: 100dvh;
+  }
+
+  /* どの背景の上でも読めるよう、背景との差で色を出す */
+  .links {
+    position: fixed;
+    right: 8px;
+    bottom: 8px;
+    z-index: 2147483647;
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    line-height: 1;
+    mix-blend-mode: difference;
+  }
+
+  .links a {
+    padding: 4px 2px;
+    color: #fff;
+    text-decoration: none;
+    opacity: 0.6;
+  }
+
+  .links a:hover,
+  .links a:focus-visible {
+    text-decoration: underline;
+    opacity: 1;
+  }
+</style>
