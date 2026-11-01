@@ -1,0 +1,62 @@
+---
+import photo from './assets/photo.jpg'
+---
+
+<div class="stage">
+  <div class="frame">
+    <img class="photo" src={photo.src} alt="" />
+  </div>
+  <button class="replay" type="button">
+    replay
+  </button>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    container-type: size;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  /* 入れ物の幅の 80% と高さの 80% の、どちらにも収まる 16:9 */
+  .frame {
+    position: relative;
+    width: min(80cqw, 80cqh * 16 / 9);
+    aspect-ratio: 16 / 9;
+  }
+
+  .photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    clip-path: inset(0% 100% 0% 0%);
+  }
+
+  .replay {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    padding: 4px 8px;
+    font: inherit;
+    font-size: 11px;
+    color: var(--color-fg);
+    cursor: pointer;
+    background: none;
+    border: 1px solid currentcolor;
+    border-radius: 2px;
+    opacity: 0.6;
+  }
+
+  .replay:hover,
+  .replay:focus-visible {
+    opacity: 1;
+  }
+</style>
