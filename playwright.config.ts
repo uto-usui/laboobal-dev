@@ -1,7 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
 
-// 複数の担当が同時に回すときは E2E_PORT で分ける
+// E2E_BASE_URL があればそこを開く（担当は統合役の dev サーバー http://localhost:4321 に向ける）。
+// なければ dist/ を preview で配って開く（CI と統合役の全体の確認）
 const port = Number(process.env.E2E_PORT ?? 4322)
+const external = process.env.E2E_BASE_URL
 
 export default defineConfig({
   testDir: 'e2e',
@@ -13,13 +15,15 @@ export default defineConfig({
   reporter: process.env.CI ? 'github' : 'list',
   use: {
     ...devices['Desktop Chrome'],
-    baseURL: `http://localhost:${port}`,
+    baseURL: external ?? `http://localhost:${port}`,
     viewport: { width: 1280, height: 800 },
   },
-  webServer: {
-    // Astro 7.4 はエージェントの環境を検知すると preview を裏に回して終了する。--ignore-lock なら前面のまま動く
-    command: `pnpm preview --port ${port} --ignore-lock`,
-    url: `http://localhost:${port}/`,
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: external
+    ? undefined
+    : {
+        // Astro 7.4 はエージェントの環境を検知すると preview を裏に回して終了する。--ignore-lock なら前面のまま動く
+        command: `pnpm preview --port ${port} --ignore-lock`,
+        url: `http://localhost:${port}/`,
+        reuseExistingServer: !process.env.CI,
+      },
 })

@@ -1,15 +1,30 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
-import type { DemoMeta } from '../src/lib/demos'
+import type { Batch, DemoMeta, Interaction } from '../src/lib/demos'
 
-// 一覧はビルドの結果から読む。先に pnpm build が要る
-const loadDemos = (): DemoMeta[] => {
-  try {
-    return JSON.parse(readFileSync('dist/demos.json', 'utf8'))
-  } catch {
-    throw new Error('dist/demos.json がない。先に pnpm build を動かす')
-  }
-}
+type Demo = Pick<DemoMeta, 'slug' | 'batch' | 'interaction'>
+
+/**
+ * 一覧は src/demos/<slug>/meta.ts を文字として読んで作る。Playwright は Vite を通らないので import.meta.glob が使えず、
+ * dist/demos.json を読むと、ビルドし直すまで担当の新しいデモが入らない（担当は dev サーバーに向けて回す）
+ */
+const loadDemos = (): Demo[] =>
+  readdirSync('src/demos', { withFileTypes: true })
+    // 作りかけで meta.ts がまだないフォルダは飛ばす
+    .filter(
+      (entry) =>
+        entry.isDirectory() && existsSync(`src/demos/${entry.name}/meta.ts`),
+    )
+    .map((entry) => {
+      const source = readFileSync(`src/demos/${entry.name}/meta.ts`, 'utf8')
+      const pick = (key: string) =>
+        source.match(new RegExp(`${key}:\\s*'([^']+)'`))?.[1]
+      return {
+        slug: entry.name,
+        batch: pick('batch') as Batch,
+        interaction: (pick('interaction') ?? 'none') as Interaction,
+      }
+    })
 const demos = loadDemos()
 
 /** console.error と、捕まえられなかった例外を集める */
@@ -52,7 +67,7 @@ const isCanvasBlank = async (page: Page, index: number) => {
   }, png.toString('base64'))
 }
 
-const interact = async (page: Page, demo: DemoMeta) => {
+const interact = async (page: Page, demo: Demo) => {
   const { width, height } = page.viewportSize()!
   const cx = width / 2
   const cy = height / 2
