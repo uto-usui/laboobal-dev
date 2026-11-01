@@ -52,6 +52,58 @@ const hslToRgb = (h: number, s: number, l: number) => {
   return [f(0), f(8), f(4)]
 }
 
+/** 縁がぼけた楕円。輪郭から外へ向かって透明になる放射グラデーションで塗る */
+const softEllipse = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  rx: number,
+  ry: number,
+  rotation: number,
+  color: string,
+  transparent: string,
+) => {
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.rotate(rotation)
+  ctx.scale(rx, ry)
+  const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 1)
+  gradient.addColorStop(0.5, color)
+  gradient.addColorStop(1, transparent)
+  ctx.fillStyle = gradient
+  ctx.fillRect(-1, -1, 2, 2)
+  ctx.restore()
+}
+
+/**
+ * 横と縦に分けて平均をとるぼかし（2 回かけると、ガウスのぼかしに近くなる）。
+ * ctx.filter の blur はブラウザの対応にばらつきがあり、効かないと黙って無視されるので、画素を直に計算する
+ */
+const boxBlur = (values: Float32Array, radius: number) => {
+  const temp = new Float32Array(values.length)
+  const pass = (from: Float32Array, to: Float32Array, horizontal: boolean) => {
+    const lines = horizontal ? HEIGHT : WIDTH
+    const length = horizontal ? WIDTH : HEIGHT
+    const step = horizontal ? 1 : WIDTH
+    for (let line = 0; line < lines; line++) {
+      const start = horizontal ? line * WIDTH : line
+      let sum = 0
+      for (let i = -radius; i <= radius; i++)
+        sum += from[start + Math.min(Math.max(i, 0), length - 1) * step]
+      for (let i = 0; i < length; i++) {
+        to[start + i * step] = sum / (radius * 2 + 1)
+        const add = Math.min(i + radius + 1, length - 1)
+        const remove = Math.max(i - radius, 0)
+        sum += from[start + add * step] - from[start + remove * step]
+      }
+    }
+  }
+  for (let n = 0; n < 2; n++) {
+    pass(values, temp, true)
+    pass(temp, values, false)
+  }
+}
+
 const paintBackground = (
   ctx: CanvasRenderingContext2D,
   random: () => number,
@@ -70,31 +122,35 @@ const paintBackground = (
   ctx.fillRect(0, 0, WIDTH, HEIGHT)
 
   // ぼけた葉や光の粒。奥にあるものとして、深度の画像には書かない
-  ctx.filter = 'blur(18px)'
   for (let i = 0; i < 40; i++) {
     const leaf = random() < 0.7
-    ctx.fillStyle = leaf
-      ? `hsl(${160 + random() * 30} 45% ${18 + random() * 18}% / 0.8)`
-      : `hsl(${40 + random() * 30} 60% 85% / 0.5)`
-    ctx.beginPath()
-    ctx.ellipse(
+    const hue = leaf ? 160 + random() * 30 : 40 + random() * 30
+    const color = leaf
+      ? `hsl(${hue} 45% ${18 + random() * 18}%`
+      : `hsl(${hue} 60% 85%`
+    const alpha = leaf ? 0.8 : 0.5
+    softEllipse(
+      ctx,
       random() * WIDTH,
       random() * HEIGHT,
-      40 + random() * 70,
-      25 + random() * 40,
+      60 + random() * 80,
+      40 + random() * 50,
       random() * Math.PI,
-      0,
-      Math.PI * 2,
+      `${color} / ${alpha})`,
+      `${color} / 0)`,
     )
-    ctx.fill()
   }
   // 球の固まりが落とす影
-  ctx.filter = 'blur(60px)'
-  ctx.fillStyle = 'rgb(0 0 0 / 0.55)'
-  ctx.beginPath()
-  ctx.ellipse(WIDTH / 2 + 60, HEIGHT / 2 + 70, 500, 380, 0, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.filter = 'none'
+  softEllipse(
+    ctx,
+    WIDTH / 2 + 60,
+    HEIGHT / 2 + 70,
+    580,
+    460,
+    0,
+    'rgb(0 0 0 / 0.55)',
+    'rgb(0 0 0 / 0)',
+  )
 }
 
 export const paintScene = (seed = 3) => {
@@ -153,26 +209,24 @@ export const paintScene = (seed = 3) => {
   colorCtx.putImageData(image, 0, 0)
 
   // 深度: 奥が黒、手前が白。球は 0.3〜1、背景は 0
-  const raw = document.createElement('canvas')
-  raw.width = WIDTH
-  raw.height = HEIGHT
-  const rawCtx = raw.getContext('2d')!
-  const depthImage = rawCtx.createImageData(WIDTH, HEIGHT)
+  const values = new Float32Array(zbuffer.length)
   for (let i = 0; i < zbuffer.length; i++) {
-    const v = zbuffer[i] > 0 ? 0.3 + 0.7 * (zbuffer[i] / zMax) : 0
+    values[i] = zbuffer[i] > 0 ? 0.3 + 0.7 * (zbuffer[i] / zMax) : 0
+  }
+  // 深度の段差をぼかす。段差のまま使うと、ずらしたときに輪郭が裂ける
+  boxBlur(values, 4)
+
+  const depthCtx = depth.getContext('2d')!
+  const depthImage = depthCtx.createImageData(WIDTH, HEIGHT)
+  for (let i = 0; i < values.length; i++) {
     const p = i * 4
     depthImage.data[p] =
       depthImage.data[p + 1] =
       depthImage.data[p + 2] =
-        v * 255
+        values[i] * 255
     depthImage.data[p + 3] = 255
   }
-  rawCtx.putImageData(depthImage, 0, 0)
-
-  // 深度の段差をぼかす。段差のまま使うと、ずらしたときに輪郭が裂ける
-  const depthCtx = depth.getContext('2d')!
-  depthCtx.filter = 'blur(6px)'
-  depthCtx.drawImage(raw, 0, 0)
+  depthCtx.putImageData(depthImage, 0, 0)
 
   return { color, depth }
 }
