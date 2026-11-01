@@ -1,0 +1,35 @@
+<div class="splitting">
+  <h1 class="title" data-split>
+    Animate split text
+  </h1>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .splitting {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    container-type: size;
+  }
+
+  .title {
+    margin: 0;
+    font-size: min(10cqw, 30cqh);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  /* span は inline のままだと transform が効かない */
+  .title :global(.word),
+  .title :global(.char) {
+    display: inline-block;
+  }
+</style>
