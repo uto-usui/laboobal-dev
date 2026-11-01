@@ -1,0 +1,56 @@
+---
+import photo1 from './assets/photo-1.jpg'
+import photo2 from './assets/photo-2.jpg'
+import photo3 from './assets/photo-3.jpg'
+
+const photos = [photo1, photo2, photo3]
+const boxes = Array.from({ length: 7 }, (_, i) => photos[i % photos.length])
+---
+
+<div class="range">
+  {boxes.map((photo) => (
+    <div class="box">
+      <img class="inner" src={photo.src} width="400" height="400" alt="" />
+    </div>
+  ))}
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .range {
+    display: flex;
+    flex-direction: column;
+    gap: 150px;
+    align-items: center;
+    min-height: 100dvh;
+    padding-block: 80px 50dvh;
+    color-scheme: light;
+    background: #fff;
+  }
+
+  .box {
+    flex: none;
+    width: 300px;
+    height: 300px;
+    overflow: hidden;
+    border: 5px solid rgb(0 0 0 / 50%);
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+
+  .box.is-show {
+    opacity: 1;
+  }
+
+  /* 中身を箱より 100px ほど大きくしておき、はみ出した分だけスクロールに合わせて動かす */
+  .inner {
+    width: 400px;
+    max-width: none;
+    height: 400px;
+    object-fit: cover;
+    background: lightblue;
+  }
+</style>

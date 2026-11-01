@@ -1,0 +1,175 @@
+---
+import '@fontsource/molle/400-italic.css'
+import photos from './assets/photos.jpg'
+---
+
+<div class="mockup">
+  <h1>iPhone 6 Mockup</h1>
+  <div class="tilt">
+    <div class="phone">
+      <span class="key key-power"></span>
+      <span class="key key-mute"></span>
+      <span class="key key-up"></span>
+      <span class="key key-down"></span>
+      <div class="face">
+        <div class="head">
+          <span class="sensor"></span>
+          <span class="speaker"></span>
+        </div>
+        <div class="screen" tabindex="0" aria-label="画面（スクロールできる）">
+          <img
+            src={photos.src}
+            width={photos.width}
+            height={photos.height}
+            alt=""
+          />
+        </div>
+        <span class="home"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* 寸法はもとの px の値に --u を掛けて書く。iframe の高さに合わせて全体を縮める */
+  .mockup {
+    --u: clamp(0.5px, min((100cqh - 150px) / 470, 100cqw / 330), 1.4px);
+    --line: #666;
+
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-image: linear-gradient(45deg, #f7cac9 15%, #91a8d0 85%);
+    container-type: size;
+  }
+
+  h1 {
+    margin: 0;
+    font-family: Molle, cursive;
+    font-size: clamp(28px, 6cqh, 48px);
+    font-style: italic;
+    font-weight: 400;
+    color: rgb(255 255 255 / 85%);
+  }
+
+  /* 斜め上から見下ろす向きに固定し、その中で本体だけを回す */
+  .tilt {
+    perspective: 1400px;
+    transform: rotate3d(-1, 1, 0, 30deg);
+    transform-style: preserve-3d;
+  }
+
+  .phone {
+    position: relative;
+    width: calc(230 * var(--u));
+    border: 1px solid var(--line);
+    border-radius: calc(30 * var(--u));
+    animation: spin 5s cubic-bezier(0.445, 0.05, 0.55, 0.95) infinite;
+  }
+
+  /* 始めと終わりの 20% は止めておく。正面を見せる間ができる */
+  @keyframes spin {
+    0%,
+    20% {
+      transform: rotateY(0);
+    }
+
+    80%,
+    100% {
+      transform: rotateY(360deg);
+    }
+  }
+
+  .face {
+    width: calc(190 * var(--u));
+    margin-inline: auto;
+  }
+
+  .head {
+    position: relative;
+    height: calc(10 * var(--u));
+    margin-block: calc(30 * var(--u));
+  }
+
+  .sensor,
+  .speaker {
+    position: absolute;
+    left: 50%;
+    border: 1px solid var(--line);
+    border-radius: calc(10 * var(--u));
+  }
+
+  .sensor {
+    top: 0;
+    width: calc(8 * var(--u));
+    height: calc(8 * var(--u));
+    margin-left: calc(-45 * var(--u));
+  }
+
+  .speaker {
+    top: calc(2 * var(--u));
+    width: calc(50 * var(--u));
+    height: calc(4 * var(--u));
+    margin-left: calc(-25 * var(--u));
+  }
+
+  /* 写真の高さだけ縦にスクロールできる。スクロールバーは隠す */
+  .screen {
+    height: calc(300 * var(--u));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    border: 1px solid var(--line);
+  }
+
+  .screen::-webkit-scrollbar {
+    display: none;
+  }
+
+  .screen img {
+    width: 100%;
+    height: auto;
+  }
+
+  .home {
+    display: block;
+    width: calc(40 * var(--u));
+    height: calc(40 * var(--u));
+    margin: calc(15 * var(--u)) auto;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+  }
+
+  .key {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(3 * var(--u));
+    background: var(--line);
+  }
+
+  .key-power {
+    height: calc(30 * var(--u));
+    margin: calc(-130 * var(--u)) 0 0 calc(117 * var(--u));
+  }
+
+  .key-mute {
+    height: calc(15 * var(--u));
+    margin: calc(-170 * var(--u)) 0 0 calc(-120 * var(--u));
+  }
+
+  .key-up {
+    height: calc(20 * var(--u));
+    margin: calc(-130 * var(--u)) 0 0 calc(-120 * var(--u));
+  }
+
+  .key-down {
+    height: calc(20 * var(--u));
+    margin: calc(-90 * var(--u)) 0 0 calc(-120 * var(--u));
+  }
+</style>
