@@ -1,0 +1,31 @@
+<div class="stage">
+  <div class="ball"></div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .stage:active {
+    cursor: grabbing;
+  }
+
+  .ball {
+    width: 100px;
+    aspect-ratio: 1;
+    background: #25ecb7;
+    border-radius: 50%;
+  }
+</style>

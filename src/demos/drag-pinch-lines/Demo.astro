@@ -1,0 +1,50 @@
+---
+const count = 80
+---
+
+<div class="stage">
+  {Array.from({ length: count }, () => (
+    <i class="line"></i>
+  ))}
+  <div class="ball"></div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .stage:active {
+    cursor: grabbing;
+  }
+
+  .line,
+  .ball {
+    --t: 0;
+
+    background: color-mix(in oklab, #25ecb7, #ff6473 calc(var(--t) * 100%));
+  }
+
+  .line {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+  }
+
+  .ball {
+    width: 200px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+  }
+</style>
