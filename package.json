@@ -26,6 +26,7 @@
     "astro": "7.4.4",
     "gsap": "3.15.0",
     "lil-gui": "0.21.0",
+    "locomotive-scroll": "5.0.1",
     "three": "0.187.0"
   },
   "devDependencies": {
