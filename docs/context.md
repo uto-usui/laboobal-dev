@@ -8,7 +8,7 @@
 
 | 場所 | 役割 | 公開先 | 今の状態 |
 | --- | --- | --- | --- |
-| `uto-usui/laboobal-dev`（ここ） | 動くデモ。1 デモ 1 ページ。説明は書かず、lab の記事へのリンクだけ置く | [labobal.dev](https://labobal.dev) | Nuxt 2 の 7 デモ。作り直す |
+| `uto-usui/laboobal-dev`（ここ） | 動くデモ。1 デモ 1 ページ。説明は書かず、lab の記事へのリンクだけ置く | [labobal.dev](https://labobal.dev) | Astro の 46 デモ（2026-11-02 に作り直した） |
 | [`uto-usui/webmanab`](https://github.com/uto-usui/webmanab) | ブログ webmanab.com のサイトのコード。lab の記事がデモを `<iframe>` で埋め込む | [webmanab.com](https://webmanab.com) | Astro 7。動いている |
 | 作者の Obsidian の vault（非公開） | webmanab の記事の原稿。lab の記事もここで書く | なし。push すると webmanab に写る | 動いている |
 | [`uto-usui/laboobal`](https://github.com/uto-usui/laboobal) | なくす。デモを移し終えたら、リポジトリをアーカイブする | laboobal.netlify.app | 2021-05 から止まっている |
@@ -56,12 +56,14 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 - トップの見た目。見た目は作者が決めるので、案を作ってスクショで見てもらう
 - 計測を入れるか
 
-## 3. 今の状態（2026-11-01）
+## 3. 今の状態（2026-11-02）
 
 ### コードとビルド
 
-- Nuxt 2.14、TypeScript、GLSL、yarn。`.nvmrc` は v12.14.1
-- デモは 7 本。`pages/` と `data/page.json` と公開中のトップのリンクで数が合う
+- Astro 7.4（静的出力）、TypeScript、GLSL、pnpm 10。Node は 26（`.nvmrc`）
+- 作り直す前の Nuxt 2 のコードは、タグ `nuxt2-final` に残しています
+- デモは 46 本です。`src/demos/<slug>/` に 1 本ずつあり、`/<slug>/` のページとトップの一覧に出ます。laboobal から移す候補のうち 19 本は下げました。理由は `docs/dropped/` にあります
+- 前からある 7 本は、パスを変えずに作り直しました
 
 | デモ | 公開中のパス |
 | --- | --- |
@@ -73,18 +75,19 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 | scrollManager | `/scrollmanager/` |
 | splitting | `/splitting/` |
 
-大文字のパス（`/nodeBalls/` など）は、今は Netlify が小文字へ 301 しています。作り直しでは `netlify.toml` に明示します。
+大文字のパス（`/nodeBalls/` など）は、Netlify が小文字へ 301 しています。`netlify.toml` にルールは書いていません。理由は `netlify.toml` のコメントにあります。
 
 ### 公開中のもの
 
-- 2021-01-19 のビルド（`/_nuxt/static/1611065813/`）から `polyfill.io` の読み込みだけ消し、2026-10-26 に手で上げ直したものが出ています。経緯は 9e996ba のコミット本文にあります
-- `/sw.js`（workbox、`/_nuxt/` を CacheFirst）が残っています。作り直しの最初のデプロイで、同じパスに自分を解除してキャッシュを消す Service Worker を置きます。置かないと、前に来た人には Nuxt のページが出続けます
-- CSP も `X-Frame-Options` も返していません。今はどのサイトからでも埋め込めます
+- 2026-11-02 に作り直し（#10）をマージし、本番は Astro の版になりました
+- `/sw.js` は、自分の登録を解除してキャッシュを消す Service Worker です。旧サイトを開いたことのあるブラウザで、1 回開くと登録とキャッシュが消えて新しいページが出ることを確かめました。まだ来ていない人のために、消さずに置いておきます
+- 全ページが `Content-Security-Policy: frame-ancestors 'self' https://webmanab.com http://localhost:*` を返します。埋め込めるのは、webmanab と手元の開発サーバーだけです
 
 ### Netlify
 
-- サイト `labobal-dev` は、このリポジトリの master につながっています。管理画面のビルド設定は `yarn generate`、公開フォルダは `dist`。`netlify.toml` はまだありません
-- Nuxt 2 と Node 12 は、今の Netlify のビルド環境ではビルドできません。master に push すると本番のビルドが動いて落ちます。落ちても公開中の版はそのまま残りますが、作り直しが出るまでは、master に入れるコミットに `[skip netlify]` を付けるか、作り直しはブランチで進めてください
+- サイト `labobal-dev` は、このリポジトリの master につながっています。ビルドの設定は `netlify.toml` にあります（`pnpm build`、公開フォルダは `dist`）
+- master に入ると本番のビルドが動き、そのまま公開されます。PR ごとにデプロイプレビューが出ます
+- docs やテストだけの変更では、`scripts/netlify-ignore.sh` がビルドを止めます。キャッシュがないビルドでは前のコミットと比べられないので、止めずにビルドします（#11。これがなかったため、#10 のマージのビルドが止まりました）
 - Netlify の無料枠のビルド時間は、webmanab と同じアカウントで分け合っています
 
 ### ドメイン
@@ -95,8 +98,8 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 
 ### そのほか
 
-- Dependabot の open の PR が 7 本あります。作り直しで中身を入れ替えるときに閉じます
-- 今の Nuxt のコードは、入れ替える前に `nuxt2-final` のタグを付けて残します
+- GitHub Actions の CI が、lint、整形、型、ビルド、E2E（全デモのページが開けるか）、`pnpm audit` を見ます。canvas が描かれたかの確かめは、GPU のない CI では飛ばし、手元で見ます
+- Dependabot の PR 7 本は、作り直しのマージのあとに閉じました
 
 ## 4. 作業の流れ
 
