@@ -1,0 +1,54 @@
+<div class="stage" data-stage>
+  {Array.from({ length: 12 }, () => (
+    <div class="dot" data-dot />
+  ))}
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    --unit: 500px;
+
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    touch-action: none;
+    background: #f1f1f1;
+    transform-style: preserve-3d;
+    perspective: calc(var(--unit) * 1.6);
+  }
+
+  .dot {
+    --size: calc(var(--unit) * 0.1);
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: var(--size);
+    height: var(--size);
+    margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+    border-radius: 48%;
+    mix-blend-mode: multiply;
+  }
+
+  /* 座標を入れる前は全部が真ん中に重なり、multiply で黒い丸になるので隠しておく */
+  .stage:not([data-ready]) .dot {
+    visibility: hidden;
+  }
+
+  /* 濃い色、淡い色、赤を順に。multiply で重なったところが暗くなり、前後が読める */
+  .dot:nth-child(3n + 1) {
+    background: #befcfe;
+  }
+
+  .dot:nth-child(3n + 2) {
+    background: #ff6473;
+  }
+
+  .dot:nth-child(3n) {
+    background: #005257;
+  }
+</style>
