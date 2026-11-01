@@ -5,6 +5,20 @@ import { getDemos } from '../lib/demos'
 
 const demos = await getDemos()
 
+// 何をすると動くかで絞る。meta.ts の interaction はテストでも使っていて、どのデモにも確かに入っている
+const FILTERS = [
+  { key: 'all', label: 'all' },
+  { key: 'hover', label: 'hover' },
+  { key: 'drag', label: 'drag' },
+  { key: 'scroll', label: 'scroll' },
+  { key: 'click', label: 'click' },
+  { key: 'none', label: 'watch' },
+] as const
+const countOf = (key: string) =>
+  key === 'all'
+    ? demos.length
+    : demos.filter((demo) => demo.interaction === key).length
+
 // 旧トップの雰囲気（暗い背景、後ろに薄く Molle、線だけの大きな名前）を残し、locomotive をやめて素のスクロールにした案。
 // 見た目は作者に見てもらってから決める（docs/plan.md の 3 章）
 ---
@@ -19,10 +33,28 @@ const demos = await getDemos()
       動きの実験のデモ。説明は{' '}
       <a href="https://webmanab.com/lab/">webmanab の lab</a> に。
     </p>
+    <nav class="filters" aria-label="何をすると動くかで絞る">
+      {FILTERS.map((filter) => (
+        <button
+          class="filter"
+          type="button"
+          data-filter={filter.key}
+          aria-pressed={filter.key === 'all' ? 'true' : 'false'}
+        >
+          {filter.label}
+          <sup>{countOf(filter.key)}</sup>
+        </button>
+      ))}
+    </nav>
     <ul class="list">
       {demos.map((demo) => (
-        <li class="item">
-          <a class="link" href={`/${demo.slug}/`}>
+        <li class="item" data-interaction={demo.interaction}>
+          <a
+            class="link"
+            href={`/${demo.slug}/`}
+            data-slug={demo.slug}
+            data-title={demo.title}
+          >
             <span class="slug">{demo.slug}</span>
             <span class="title">{demo.title}</span>
           </a>
@@ -30,7 +62,108 @@ const demos = await getDemos()
       ))}
     </ul>
   </main>
+  <figure class="preview" aria-hidden="true">
+    <video muted loop playsinline preload="none"></video>
+    <figcaption></figcaption>
+  </figure>
 </Base>
+
+<script>
+  import { damp } from '../shared/math'
+  import { isCoarsePointer, prefersReducedMotion } from '../shared/dom'
+
+  const list = document.querySelector<HTMLElement>('.list')!
+  const items = [...list.querySelectorAll<HTMLElement>('.item')]
+  const filters = [...document.querySelectorAll<HTMLButtonElement>('.filter')]
+
+  filters.forEach((button) =>
+    button.addEventListener('click', () => {
+      const key = button.dataset.filter
+      filters.forEach((b) =>
+        b.setAttribute('aria-pressed', String(b === button)),
+      )
+      const apply = () =>
+        items.forEach((item) => {
+          item.hidden = key !== 'all' && item.dataset.interaction !== key
+        })
+      // 並びが詰まる動きは、対応するブラウザでだけ付ける
+      if (document.startViewTransition && !prefersReducedMotion())
+        document.startViewTransition(apply)
+      else apply()
+    }),
+  )
+
+  // 触れたときの動画。タッチの端末では出さない（触れた時点で開くので見る間がない）
+  const preview = document.querySelector<HTMLElement>('.preview')!
+  const video = preview.querySelector('video')!
+  const caption = preview.querySelector('figcaption')!
+  if (!isCoarsePointer()) {
+    const reduce = prefersReducedMotion()
+    const target = { x: innerWidth / 2, y: innerHeight / 2 }
+    const pos = { ...target }
+    let frame = 0
+    let hideTimer = 0
+    let last = 0
+
+    const tick = (now: number) => {
+      const dt = Math.min((now - last) / 1000, 0.1)
+      last = now
+      // 少し遅れて追いかける。速さで傾けると、引っぱられているように見える
+      const lambda = reduce ? 1000 : 10
+      const prevX = pos.x
+      pos.x = damp(pos.x, target.x, lambda, dt)
+      pos.y = damp(pos.y, target.y, lambda, dt)
+      const tilt = reduce
+        ? 0
+        : Math.max(-12, Math.min(12, (pos.x - prevX) * 0.4))
+      preview.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, -50%) rotate(${tilt}deg)`
+      frame = requestAnimationFrame(tick)
+    }
+
+    addEventListener('pointermove', (event) => {
+      target.x = event.clientX
+      target.y = event.clientY
+    })
+
+    list.querySelectorAll<HTMLAnchorElement>('.link').forEach((link) => {
+      const show = () => {
+        clearTimeout(hideTimer)
+        const slug = link.dataset.slug
+        video.poster = `/previews/${slug}.jpg`
+        caption.textContent = link.dataset.title ?? ''
+        if (!reduce) {
+          video.src = `/previews/${slug}.webm`
+          video.play().catch(() => {})
+        }
+        if (!preview.classList.contains('is-active')) {
+          pos.x = target.x
+          pos.y = target.y
+          last = performance.now()
+          frame = requestAnimationFrame(tick)
+        }
+        preview.classList.add('is-active')
+      }
+      // 名前と名前のすき間を通るたびに閉じると、ちらつく。少し待ち、隣に移ったら開いたまま中身だけ替える
+      const hide = () => {
+        hideTimer = window.setTimeout(() => {
+          preview.classList.remove('is-active')
+          video.pause()
+          cancelAnimationFrame(frame)
+        }, 150)
+      }
+      link.addEventListener('pointerenter', show)
+      link.addEventListener('pointerleave', hide)
+      // キーボードで移ったときは、名前の右寄りに出す
+      link.addEventListener('focus', () => {
+        const rect = link.getBoundingClientRect()
+        target.x = rect.left + rect.width * 0.75
+        target.y = rect.top + rect.height / 2
+        show()
+      })
+      link.addEventListener('blur', hide)
+    })
+  }
+</script>
 
 <style>
   .mark {
@@ -130,5 +263,94 @@ const demos = await getDemos()
     .title {
       opacity: 1;
     }
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    justify-content: center;
+    margin: 0 0 6vh;
+  }
+
+  .filter {
+    padding: 4px 0;
+    font: inherit;
+    font-size: 12px;
+    color: var(--color-muted);
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid transparent;
+  }
+
+  .filter[aria-pressed='true'] {
+    color: var(--color-accent);
+    border-bottom-color: currentcolor;
+  }
+
+  .filter sup {
+    margin-left: 2px;
+    font-size: 9px;
+  }
+
+  .item {
+    view-transition-name: match-element;
+  }
+
+  /* 一覧の上に浮かせる。名前の上に乗っても触れたままでいられるよう、ポインタを通す */
+  .preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: min(36vw, 400px);
+    aspect-ratio: 16 / 10;
+    margin: 0;
+    overflow: hidden;
+    pointer-events: none;
+    clip-path: inset(50% 50% 50% 50%);
+    opacity: 0;
+    transition:
+      clip-path 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.3s;
+  }
+
+  .preview.is-active {
+    clip-path: inset(0);
+    opacity: 1;
+  }
+
+  .preview figcaption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 6px 10px;
+    font-size: 11px;
+    color: #fff;
+    letter-spacing: 0.08em;
+    background: rgb(0 0 0 / 0.55);
+  }
+
+  /* 触れている間は動画の帯に出すので、名前の下には出さない */
+  @media (pointer: fine) {
+    .title {
+      display: none;
+    }
+  }
+
+  .preview video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* 動画が名前の線と重なると読めないので、触れている名前は動画より手前に出す。
+     .item は view-transition-name で重なりの範囲を作るので、.link ではなく .item に付ける */
+  .item:has(.link:hover) {
+    position: relative;
+    z-index: 2;
   }
 </style>
