@@ -1,0 +1,47 @@
+<div class="stage">
+  <div class="scene">
+    <div class="grid">
+      {Array.from({ length: 100 }, () => (
+        <div class="cell" data-cell />
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    container-type: size;
+    background: #f1f1f1;
+  }
+
+  /* 奥行きの値は高さに合わせる。旧デモは高さ 500px で perspective 800px */
+  .scene {
+    position: absolute;
+    inset: 0;
+    perspective: 160cqh;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    height: 100%;
+    transform: translateZ(-160cqh) rotateX(60deg) rotateY(30deg);
+    transform-style: preserve-3d;
+  }
+
+  .cell {
+    --lift: 0;
+
+    background: color-mix(in oklch, #25ecb7, #fff calc(var(--lift) * 25%));
+    transform: translateZ(calc(var(--lift) * 20cqh))
+      scale(calc(1 - var(--lift) * 0.25));
+  }
+</style>
