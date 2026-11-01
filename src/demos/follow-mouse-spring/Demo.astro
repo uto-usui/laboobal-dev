@@ -1,0 +1,33 @@
+<div class="stage">
+  <div class="ball"></div>
+  <div class="ball ball--sm"></div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  .ball {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5rem;
+    aspect-ratio: 1;
+    pointer-events: none;
+    background: #25ecb7;
+    border-radius: 50%;
+  }
+
+  .ball--sm {
+    width: 1.5rem;
+    background: color-mix(in oklab, #25ecb7, #000 25%);
+  }
+</style>
