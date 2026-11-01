@@ -1,42 +1,5 @@
 {
-  "compilerOptions": {
-    "target": "es2020",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "lib": [
-      "esnext",
-      "esnext.asynciterable",
-      "dom",
-      "dom.iterable"
-    ],
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "downlevelIteration": true,
-    "experimentalDecorators": true,
-    "allowJs": true,
-    "sourceMap": true,
-    "strict": true,
-    "noEmit": true,
-    "noImplicitAny": false,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "~/*": [
-        "./*"
-      ],
-      "Js/*": [
-        "/assets/js/*"
-      ]
-    },
-    "types": [
-      "@types/node",
-      "@types/jest",
-      "@nuxt/types",
-      "./types/gtag",
-      "./types/vuex",
-      "./types/nuxt/vue"
-    ]
-  }
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist", "docs"]
 }
