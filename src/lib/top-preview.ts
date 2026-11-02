@@ -18,67 +18,69 @@ const DAMPING = 13
 const BEND = 0.012
 const MAX_SPEED = 2500
 const TILT = 0.00002
-// 開くのと閉じるのにかける秒数
-const ENTER = 0.8
+// 開くのにかける秒数。巻物は転がる様子を見せたいので長め
+const ENTER = { roll: 1.1, rect: 0.8 }
+// 巻物は開いたのを逆に巻き戻して閉じる。四角は昔のテレビを切ったように、短くパツンと閉じる
 const LEAVE = 0.45
+const CLOSE = 0.28
 
-/** 出てくるときの動き。閉じるときは同じ動きを逆に流す */
-export const ENTER_MODES = ['roll', 'twist', 'fold', 'drop', 'rect'] as const
+export const ENTER_MODES = ['roll', 'rect'] as const
 export type EnterMode = (typeof ENTER_MODES)[number]
 
 const vertexShader = /* glsl */ `
   uniform vec2 uSize;
   uniform vec2 uVelocity;
   uniform float uProgress;
+  uniform float uClose;
   uniform int uMode;
   varying vec2 vUv;
-  varying float vShade;
+  varying vec3 vNormal;
 
-  const float PI = 3.141592653589793;
+  vec3 rotateY(vec3 v, float a) {
+    float c = cos(a), s = sin(a);
+    return vec3(c * v.x + s * v.z, v.y, -s * v.x + c * v.z);
+  }
+
+  vec3 rotateX(vec3 v, float a) {
+    float c = cos(a), s = sin(a);
+    return vec3(v.x, c * v.y - s * v.z, s * v.y + c * v.z);
+  }
 
   void main() {
     vUv = uv;
     vec3 p = position;
+    vec3 normal = vec3(0.0, 0.0, 1.0);
     float t = uProgress;
-    vShade = 1.0;
+    float w = uSize.x;
 
     if (uMode == 0) {
-      // 巻物。左の端に丸まった筒が、右へ転がりながら広がる。front より右はまだ巻かれている
-      float r = uSize.x * 0.08;
-      float x = p.x + uSize.x * 0.5;
-      float front = t * uSize.x;
+      // 巻物。front より右は、左の端を芯にした渦巻きに巻かれている。開くにつれて front が右へ進む
+      float r0 = w * 0.11;
+      float x = p.x + w * 0.5;
+      float front = t * w;
       if (x > front) {
-        float a = (x - front) / r;
+        float a = (x - front) / r0;
+        // 内側ほど細く巻いて、何重にも重なって見せる
+        float r = r0 * exp(-a * 0.07);
         x = front + r * sin(a);
-        p.z = r * (1.0 - cos(a));
-        vShade = 1.0 - 0.45 * (p.z / (2.0 * r));
+        p.z = r0 - r * cos(a);
+        normal = vec3(-sin(a), 0.0, cos(a));
       }
-      p.x = x - uSize.x * 0.5;
-    } else if (uMode == 1) {
-      // ねじれ。上の段ほど多く回っていて、下から順にほどける
-      float a = (1.0 - t) * PI * (1.0 + 1.5 * uv.y);
-      float x = p.x;
-      p.x = x * cos(a);
-      p.z = x * sin(a);
-      vShade = 0.6 + 0.4 * abs(cos(a));
-    } else if (uMode == 2) {
-      // 屏風。8 枚の細い板が、山と谷を交互に作って畳まれている
-      float n = 8.0;
-      float w = uSize.x / n;
-      float x = p.x + uSize.x * 0.5;
-      float i = min(floor(x / w + 0.0001), n - 1.0);
-      float u = x - i * w;
-      float a = (1.0 - t) * PI * 0.5 * 0.92;
-      bool even = mod(i, 2.0) < 0.5;
-      p.x = (i * w + u) * cos(a) - uSize.x * 0.5 * cos(a);
-      p.z = (even ? u : w - u) * sin(a);
-      vShade = even ? 1.0 : 1.0 - 0.5 * sin(a);
-    } else if (uMode == 3) {
-      // 水滴。真ん中から波が広がり、開ききると静まる
-      float d = length(p.xy / uSize.x);
-      p.z = sin(d * 28.0 - t * 18.0) * (1.0 - t) * uSize.x * 0.05;
-      vShade = 1.0 + 0.25 * cos(d * 28.0 - t * 18.0) * (1.0 - t);
+      float k = 1.0 - t;
+      // 筒はカーソルの近くから転がり出す
+      p.x = x - w * 0.5 + k * w * 0.35;
+      // 斜めに傾いて手前に浮いたところから、開くにつれて正面に起き上がる
+      p = rotateX(rotateY(p, -0.8 * k), 0.45 * k);
+      normal = rotateX(rotateY(normal, -0.8 * k), 0.45 * k);
+      p.z += k * w * 0.3;
+    } else if (uClose > 0.0) {
+      // 昔のテレビを切ったときのように、縦につぶれて横線になり、横線が点に縮んで消える
+      float k1 = smoothstep(0.0, 0.5, uClose);
+      float k2 = smoothstep(0.45, 1.0, uClose);
+      p.y *= mix(1.0, 2.0 / uSize.y, k1 * k1);
+      p.x *= mix(1.0 + 0.08 * k1, 0.004, k2 * k2);
     }
+    vNormal = normal;
 
     // 真ん中が先に進み、上下（左右）の端ほど遅れて、帆のようにたわむ
     vec2 n = position.xy / uSize;
@@ -91,30 +93,37 @@ const vertexShader = /* glsl */ `
 const fragmentShader = /* glsl */ `
   uniform sampler2D uMap;
   uniform float uProgress;
+  uniform float uClose;
   uniform int uMode;
-  uniform vec2 uSize;
   varying vec2 vUv;
-  varying float vShade;
+  varying vec3 vNormal;
+
+  const vec3 LIGHT = vec3(-0.4, 0.7, 0.8);
+  // 紙の裏の色
+  const vec3 BACK = vec3(0.92, 0.93, 0.95);
 
   void main() {
     float t = uProgress;
-    vec2 uv = vUv;
-    float alpha = smoothstep(0.0, 0.12, t);
-    if (uMode == 3) {
-      // 丸く開く。開ききる手前で四角に戻す
-      vec2 c = (vUv - 0.5) * vec2(uSize.x / uSize.y, 1.0);
-      float radius = t * 1.1;
-      if (length(c) > radius && t < 0.999) discard;
-      uv += normalize(c + 1e-5) * sin(length(c) * 30.0 - t * 18.0) * 0.02 * (1.0 - t);
-    } else if (uMode == 4) {
-      vec2 d = abs(vUv - 0.5) * 2.0;
-      if (max(d.x, d.y) > t) discard;
-      alpha = 1.0;
+    vec4 color = texture2D(uMap, vUv);
+
+    if (uMode == 0) {
+      // 巻かれた筒が円柱に見えるよう、光を当てる。正面を向いた面がちょうど元の明るさになるよう割る
+      vec3 l = normalize(LIGHT);
+      vec3 n = normalize(vNormal) * (gl_FrontFacing ? 1.0 : -1.0);
+      float diffuse = max(dot(n, l), 0.0) / l.z;
+      float specular = pow(max(dot(n, normalize(l + vec3(0.0, 0.0, 1.0))), 0.0), 40.0);
+      vec3 base = gl_FrontFacing ? color.rgb : BACK;
+      vec3 lit = base * (0.35 + 0.65 * diffuse) + specular * 0.45 * (1.0 - t);
+      gl_FragColor = vec4(lit, color.a * smoothstep(0.0, 0.08, t));
+      return;
     }
-    vec4 color = texture2D(uMap, uv);
-    // 裏側は暗く見せる（巻物とねじれで見える）
-    float shade = gl_FrontFacing ? vShade : vShade * 0.45;
-    gl_FragColor = vec4(color.rgb * shade, color.a * alpha);
+
+    // 真ん中から四角く開く
+    vec2 d = abs(vUv - 0.5) * 2.0;
+    if (max(d.x, d.y) > t) discard;
+    // 切るときは白く光って、点になってから消える
+    vec3 rgb = mix(color.rgb, vec3(1.0), smoothstep(0.1, 0.5, uClose) * 0.9);
+    gl_FragColor = vec4(rgb, color.a * (1.0 - smoothstep(0.85, 1.0, uClose)));
   }
 `
 
@@ -132,6 +141,10 @@ export const createGlPreview = (
   onFrame: (frame: PreviewFrame) => void,
   mode: string = 'roll',
 ) => {
+  // 知らない名前なら巻物にする
+  const enterMode: EnterMode = ENTER_MODES.includes(mode as EnterMode)
+    ? (mode as EnterMode)
+    : 'roll'
   let renderer: THREE.WebGLRenderer
   try {
     renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
@@ -142,7 +155,7 @@ export const createGlPreview = (
   renderer.setClearColor(0x000000, 0)
 
   const scene = new THREE.Scene()
-  // 巻いたりねじったりした奥行きが見えるよう、遠近を付ける。z = 0 の面で 1 単位が 1px になる距離に置く
+  // 巻いた奥行きが見えるよう、遠近を付ける。z = 0 の面で 1 単位が 1px になる距離に置く
   const FOV = 30
   const camera = new THREE.PerspectiveCamera(FOV, 1, 1, 10000)
   const uniforms = {
@@ -150,8 +163,8 @@ export const createGlPreview = (
     uVelocity: { value: new THREE.Vector2() },
     uMap: { value: null as THREE.Texture | null },
     uProgress: { value: 0 },
-    // 知らない名前なら巻物にする
-    uMode: { value: Math.max(0, ENTER_MODES.indexOf(mode as EnterMode)) },
+    uClose: { value: 0 },
+    uMode: { value: ENTER_MODES.indexOf(enterMode) },
   }
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(1, 1),
@@ -202,6 +215,8 @@ export const createGlPreview = (
   let active = false
   // 開き具合（0〜1）。一定の速さで進め、シェーダーには曲線をかけて渡す
   let open = 0
+  // 四角を切るときの進み具合（0〜1）
+  let close = 0
   let frame = 0
   let last = 0
 
@@ -221,12 +236,14 @@ export const createGlPreview = (
     const dt = Math.max(0, Math.min((now - last) / 1000, 0.1))
     last = now
     step(dt)
-    open = THREE.MathUtils.clamp(
-      open + (active ? dt / ENTER : -dt / LEAVE),
-      0,
-      1,
-    )
+    if (active) open = Math.min(1, open + dt / ENTER[enterMode])
+    else if (enterMode === 'rect') {
+      // 切るときは開き具合をそのままにして、つぶす動きだけを進める
+      close = Math.min(1, close + dt / CLOSE)
+      if (close === 1) open = 0
+    } else open = Math.max(0, open - dt / LEAVE)
     uniforms.uProgress.value = 1 - Math.pow(1 - open, 3)
+    uniforms.uClose.value = close
 
     const speed = Math.hypot(vel.x, vel.y)
     const k = speed > MAX_SPEED ? MAX_SPEED / speed : 1
@@ -275,6 +292,11 @@ export const createGlPreview = (
         pos.y = target.y
         vel.x = 0
         vel.y = 0
+      }
+      if (!active && close > 0) {
+        // 切っている途中か切ったあとなら、もう一度はじめから開く
+        open = 0
+        close = 0
       }
       active = true
       mesh.visible = true
