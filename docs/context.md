@@ -8,7 +8,7 @@
 
 | 場所 | 役割 | 公開先 | 今の状態 |
 | --- | --- | --- | --- |
-| `uto-usui/laboobal-dev`（ここ） | 動くデモ。1 デモ 1 ページ。説明は書かず、lab の記事へのリンクだけ置く | [labobal.dev](https://labobal.dev) | Astro の 46 デモ（2026-11-02 に作り直した） |
+| `uto-usui/laboobal-dev`（ここ） | 動くデモ。1 デモ 1 ページ。説明は書かず、lab の記事へのリンクだけ置く | [labobal.dev](https://labobal.dev) | Astro の 47 デモ（2026-11-02 に作り直した） |
 | [`uto-usui/webmanab`](https://github.com/uto-usui/webmanab) | ブログ webmanab.com のサイトのコード。lab の記事がデモを `<iframe>` で埋め込む | [webmanab.com](https://webmanab.com) | Astro 7。動いている |
 | 作者の Obsidian の vault（非公開） | webmanab の記事の原稿。lab の記事もここで書く | なし。push すると webmanab に写る | 動いている |
 | [`uto-usui/laboobal`](https://github.com/uto-usui/laboobal) | なくす。デモを移し終えたら、リポジトリをアーカイブする | laboobal.netlify.app | 2021-05 から止まっている |
@@ -62,7 +62,8 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 
 - Astro 7.4（静的出力）、TypeScript、GLSL、pnpm 10。Node は 26（`.nvmrc`）
 - 作り直す前の Nuxt 2 のコードは、タグ `nuxt2-final` に残しています
-- デモは 46 本です。`src/demos/<slug>/` に 1 本ずつあり、`/<slug>/` のページとトップの一覧に出ます。laboobal から移す候補のうち 19 本は下げました。理由は `docs/dropped/` にあります
+- デモは 47 本です。`src/demos/<slug>/` に 1 本ずつあり、`/<slug>/` のページとトップの一覧に出ます。laboobal から移す候補のうち 19 本は下げました。理由は `docs/dropped/` にあります
+- 移すのではなく、ここで新しく作ったデモは `batch: 'new'` にします。今は particle-photo（WebGPU）の 1 本です。WebGPU のデモは meta に `webgpu: true` を付け、使えないブラウザでは一行の案内を出します
 - 前からある 7 本は、パスを変えずに作り直しました
 
 | デモ | 公開中のパス |

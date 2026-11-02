@@ -222,7 +222,7 @@ export default defineDemo({
   slug: 'drag-pinch-simple',        // フォルダ名と同じ。URL になる
   title: 'つまんで離す',
   category: 'drag',                 // トップの一覧での分け方
-  batch: 'A',                       // 担当の区切り。'current' | 'A' | 'B1' | 'B2' | 'F6'（6 章の 2-1〜2-5）
+  batch: 'A',                       // 担当の区切り。'current' | 'A' | 'B1' | 'B2' | 'F6'（6 章の 2-1〜2-5）。新しく作ったデモは 'new'
   article: undefined,               // lab の記事の URL。記事が出るまでは空
   origin: 'laboobal/docs/basic/drag.md',
   credits: [],                      // ほかの人のコードや素材をもとにしたときの { label, url }

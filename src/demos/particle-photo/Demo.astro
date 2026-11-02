@@ -1,0 +1,161 @@
+<div class="particle-photo">
+  <canvas
+    class="view"
+    aria-label="写真を細かい筆の粒に分けて描いた絵。ドラッグすると粒が吹き飛び、ダブルクリックするとその場所から次の写真へ移る"
+  ></canvas>
+  <div class="strip">
+    <button
+      class="add"
+      type="button"
+      aria-label="写真を足す"
+      title="写真を足す（ドロップ・貼り付けでも足せる）"
+    >
+      ＋
+    </button>
+  </div>
+  <input type="file" accept="image/*" multiple hidden />
+  <div class="drop" aria-hidden="true">
+    ここに写真をドロップ
+  </div>
+  <p class="unsupported">このブラウザは WebGPU に対応していません</p>
+  <pre class="error" hidden></pre>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .particle-photo {
+    --paper: #f4f2ee;
+    --ink: #141414;
+    --line: rgb(20 20 20 / 12%);
+    --card: rgb(255 255 255 / 85%);
+
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    color: var(--ink);
+    background: var(--paper);
+  }
+
+  .particle-photo.is-night {
+    --paper: #050506;
+    --ink: #ecebe8;
+    --line: rgb(255 255 255 / 14%);
+    --card: rgb(18 18 20 / 85%);
+  }
+
+  .view {
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    cursor: crosshair;
+  }
+
+  /* 右下は labobal.dev のリンクがあるので、写真の列は左下に置く */
+  .strip {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    display: flex;
+    gap: 6px;
+    max-width: calc(100% - 160px);
+    padding: 5px;
+    overflow-x: auto;
+    background: var(--card);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  .strip :global(button) {
+    all: unset;
+    position: relative;
+    flex: none;
+    width: 46px;
+    height: 32px;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: 4px;
+    outline: 1px solid var(--line);
+  }
+
+  .strip :global(button:focus-visible) {
+    outline: 2px solid var(--ink);
+  }
+
+  .strip :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .strip :global(.is-current) {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+  }
+
+  /* 割り当てを計算している間は薄くする */
+  .strip :global(.is-busy)::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+    background: color-mix(in srgb, var(--paper) 55%, transparent);
+  }
+
+  .add {
+    display: grid;
+    place-items: center;
+    font-size: 16px;
+    opacity: 0.6;
+  }
+
+  .drop {
+    position: absolute;
+    inset: 0;
+    display: none;
+    place-items: center;
+    font-size: 14px;
+    background: color-mix(in srgb, var(--paper) 70%, transparent);
+    border: 2px dashed var(--ink);
+  }
+
+  .is-dragging .drop {
+    display: grid;
+  }
+
+  .unsupported {
+    position: absolute;
+    inset: 0;
+    display: none;
+    place-items: center;
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.7;
+  }
+
+  .is-unsupported .unsupported {
+    display: grid;
+  }
+
+  .is-unsupported .strip {
+    display: none;
+  }
+
+  .error {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    margin: 0;
+    padding: 12px;
+    font-size: 11px;
+    white-space: pre-wrap;
+    color: #b00020;
+    background: #fff;
+    border: 1px solid rgb(176 0 32 / 27%);
+    border-radius: 8px;
+  }
+</style>
