@@ -1,0 +1,173 @@
+---
+import '@fontsource/molle/400-italic.css'
+
+const lorem =
+  'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quasi a veritatis porro soluta deleniti cum id pariatur aut voluptatibus, sint sunt reiciendis itaque excepturi asperiores minus nesciunt voluptates delectus labore!'
+const sections = [
+  ['child 1-1', 'child 1-2'],
+  ['child 2-1'],
+  ['child 3-1', 'child 3-2'],
+  ['child 4-1', 'child 4-2'],
+]
+---
+
+<div class="toc-demo">
+  <h1>Generate toc from titles</h1>
+  <article class="article">
+    {sections.map((children, i) => (
+      <>
+        <h2>section {i + 1}</h2>
+        <p>{lorem}</p>
+        {children.map((child) => (
+          <>
+            <h3>{child}</h3>
+            <p>{lorem}</p>
+          </>
+        ))}
+      </>
+    ))}
+  </article>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .toc-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+    padding: 24px 16px 50dvh;
+    font-family: system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #292b2c;
+    color-scheme: light;
+    background-image: linear-gradient(60deg, #f7cac9 15%, #91a8d0 85%);
+  }
+
+  h1,
+  h2,
+  h3 {
+    margin: 0;
+    font-family: Molle, cursive;
+    font-style: italic;
+    font-weight: 400;
+    color: rgb(255 255 255 / 85%);
+  }
+
+  h1 {
+    font-size: 40px;
+  }
+
+  .article {
+    width: min(480px, 100%);
+    padding: 16px;
+    border: 6px double currentcolor;
+  }
+
+  h2 {
+    font-size: 42px;
+  }
+
+  h3 {
+    font-size: 24px;
+  }
+
+  /* 目次で飛んだとき、見出しが画面の上にくっつかないよう 15px 空ける */
+  h2,
+  h3 {
+    scroll-margin-top: 15px;
+  }
+
+  p {
+    margin: 0 0 16px;
+    text-align: justify;
+  }
+
+  /* 目次は script で作るので、:global で当てる */
+  .toc-demo :global(.toc) {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 1;
+    max-height: calc(100dvh - 32px);
+    padding: 16px;
+    overflow: auto;
+    border: 2px solid currentcolor;
+    opacity: 0.3;
+    transition: 0.25s ease-out;
+    transition-property: opacity, background-color, border-color, box-shadow;
+  }
+
+  .toc-demo :global(.toc:hover),
+  .toc-demo :global(.toc:focus-within),
+  .toc-demo :global(.toc.is-open) {
+    opacity: 1;
+  }
+
+  .toc-demo :global(.toc.is-open) {
+    background-color: rgb(255 255 255 / 45%);
+    border-color: transparent;
+    box-shadow: 0 0 20px rgb(0 0 0 / 10%);
+  }
+
+  .toc-demo :global(.toc-toggle) {
+    display: block;
+    padding: 0;
+    font: inherit;
+    font-size: 20px;
+    line-height: 1.2;
+    color: inherit;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  /*
+   * 開け閉めは高さ 0 と中身の高さのあいだで動かす。grid の行の 0fr と 1fr は transition できるので、
+   * 中身の高さを測らなくてよい
+   */
+  .toc-demo :global(.toc-body) {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.25s ease-out;
+  }
+
+  .toc-demo :global(.toc.is-open .toc-body) {
+    grid-template-rows: 1fr;
+  }
+
+  .toc-demo :global(.toc-body > ul) {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .toc-demo :global(.toc ul) {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .toc-demo :global(.toc a) {
+    color: inherit;
+  }
+
+  .toc-demo :global(.toc-item) {
+    margin-top: 16px;
+    font-size: 20px;
+    font-style: italic;
+    text-transform: capitalize;
+    letter-spacing: 0.1em;
+  }
+
+  .toc-demo :global(.toc-child) {
+    padding-left: 16px;
+    font-size: 14px;
+  }
+</style>
