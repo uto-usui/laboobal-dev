@@ -1,6 +1,7 @@
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js'
 
-export type Batch = 'current' | 'A' | 'B1' | 'B2' | 'F6'
+/** 'new' は移植ではなく、ここで新しく作ったデモ */
+export type Batch = 'current' | 'A' | 'B1' | 'B2' | 'F6' | 'new'
 export type Interaction = 'drag' | 'hover' | 'scroll' | 'click' | 'none'
 
 export interface DemoMeta {
@@ -17,13 +18,15 @@ export interface DemoMeta {
   /** ほかの人のコードや素材をもとにしたとき */
   credits: { label: string; url: string }[]
   webgl: boolean
+  /** WebGPU で描く。対応していないブラウザでは、代わりに一行の案内を出す */
+  webgpu?: boolean
   /** テストでマウスをどう動かすか */
   interaction: Interaction
 }
 
 export const defineDemo = (meta: DemoMeta) => meta
 
-const BATCHES: Batch[] = ['current', 'A', 'B1', 'B2', 'F6']
+const BATCHES: Batch[] = ['current', 'A', 'B1', 'B2', 'F6', 'new']
 const INTERACTIONS: Interaction[] = ['drag', 'hover', 'scroll', 'click', 'none']
 
 // meta.ts はこのファイルの defineDemo を import するので、eager にすると循環する。読むのは collect の中で
