@@ -109,10 +109,27 @@ const countOf = (key: string) =>
             preview.style.width = `${f.width}px`
             preview.style.transform = `translate3d(${f.x}px, ${f.y}px, 0) translate(-50%, -50%) rotate(${f.tilt}rad) translate(${f.cornerX}px, ${f.cornerY}px)`
           },
-          // 見比べるための仮の切り替え。決まったら 1 つに絞る
-          new URLSearchParams(location.search).get('enter') ?? undefined,
+          (slug) => {
+            caption.textContent =
+              list.querySelector<HTMLAnchorElement>(`[data-slug="${slug}"]`)
+                ?.dataset.title ?? ''
+          },
         )
-    if (gl) preview.classList.add('is-gl')
+    if (gl) {
+      preview.classList.add('is-gl')
+      // 項目を替えたときにすぐ出せるよう、手が空いたらポスターを読んでおく
+      // requestIdleCallback がない Safari では、読み込みが落ち着いてから
+      const idle =
+        window.requestIdleCallback ??
+        ((callback: () => void) => setTimeout(callback, 1500))
+      idle(() =>
+        gl.prefetch(
+          [...list.querySelectorAll<HTMLAnchorElement>('.link')].map(
+            (link) => link.dataset.slug!,
+          ),
+        ),
+      )
+    }
     let hideTimer = 0
 
     const place = (x: number, y: number) => {
@@ -128,9 +145,11 @@ const countOf = (key: string) =>
       const show = () => {
         clearTimeout(hideTimer)
         const slug = link.dataset.slug!
-        caption.textContent = link.dataset.title ?? ''
         if (gl) gl.show(slug)
-        else video.poster = `/previews/${slug}.jpg`
+        else {
+          caption.textContent = link.dataset.title ?? ''
+          video.poster = `/previews/${slug}.jpg`
+        }
         preview.classList.add('is-active')
       }
       // 名前と名前のすき間を通るたびに閉じると、ちらつく。少し待ち、隣に移ったら開いたまま中身だけ替える

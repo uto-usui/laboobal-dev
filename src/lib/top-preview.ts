@@ -18,69 +18,32 @@ const DAMPING = 13
 const BEND = 0.012
 const MAX_SPEED = 2500
 const TILT = 0.00002
-// 開くのにかける秒数。巻物は転がる様子を見せたいので長め
-const ENTER = { roll: 1.1, rect: 0.8 }
-// 巻物は開いたのを逆に巻き戻して閉じる。四角は昔のテレビを切ったように、短くパツンと閉じる
-const LEAVE = 0.45
+// 秒数。開くのはじわっと、切るのは昔のテレビのようにパツンと、項目を替えるのはチャンネルを回すように短く
+const OPEN = 0.8
 const CLOSE = 0.28
-
-export const ENTER_MODES = ['roll', 'rect'] as const
-export type EnterMode = (typeof ENTER_MODES)[number]
+const SWAP = 0.3
+// 切り替えのうち、横線までつぶれる割合。ここで中身を入れ替え、残りで広げる
+const SWAP_AT = 0.35
 
 const vertexShader = /* glsl */ `
   uniform vec2 uSize;
   uniform vec2 uVelocity;
-  uniform float uProgress;
   uniform float uClose;
-  uniform int uMode;
+  uniform float uSqueeze;
+
   varying vec2 vUv;
-  varying vec3 vNormal;
-
-  vec3 rotateY(vec3 v, float a) {
-    float c = cos(a), s = sin(a);
-    return vec3(c * v.x + s * v.z, v.y, -s * v.x + c * v.z);
-  }
-
-  vec3 rotateX(vec3 v, float a) {
-    float c = cos(a), s = sin(a);
-    return vec3(v.x, c * v.y - s * v.z, s * v.y + c * v.z);
-  }
 
   void main() {
     vUv = uv;
     vec3 p = position;
-    vec3 normal = vec3(0.0, 0.0, 1.0);
-    float t = uProgress;
-    float w = uSize.x;
 
-    if (uMode == 0) {
-      // 巻物。front より右は、左の端を芯にした渦巻きに巻かれている。開くにつれて front が右へ進む
-      float r0 = w * 0.11;
-      float x = p.x + w * 0.5;
-      float front = t * w;
-      if (x > front) {
-        float a = (x - front) / r0;
-        // 内側ほど細く巻いて、何重にも重なって見せる
-        float r = r0 * exp(-a * 0.07);
-        x = front + r * sin(a);
-        p.z = r0 - r * cos(a);
-        normal = vec3(-sin(a), 0.0, cos(a));
-      }
-      float k = 1.0 - t;
-      // 筒はカーソルの近くから転がり出す
-      p.x = x - w * 0.5 + k * w * 0.35;
-      // 斜めに傾いて手前に浮いたところから、開くにつれて正面に起き上がる
-      p = rotateX(rotateY(p, -0.8 * k), 0.45 * k);
-      normal = rotateX(rotateY(normal, -0.8 * k), 0.45 * k);
-      p.z += k * w * 0.3;
-    } else if (uClose > 0.0) {
-      // 昔のテレビを切ったときのように、縦につぶれて横線になり、横線が点に縮んで消える
-      float k1 = smoothstep(0.0, 0.5, uClose);
-      float k2 = smoothstep(0.45, 1.0, uClose);
-      p.y *= mix(1.0, 2.0 / uSize.y, k1 * k1);
-      p.x *= mix(1.0 + 0.08 * k1, 0.004, k2 * k2);
-    }
-    vNormal = normal;
+    // 切るとき: 縦につぶれて横線になり、横線が点に縮んで消える
+    float k1 = smoothstep(0.0, 0.5, uClose);
+    float k2 = smoothstep(0.45, 1.0, uClose);
+    // 項目を替えるとき: 横線までつぶれてから広がる（uSqueeze は 0〜1〜0）
+    float squash = max(k1 * k1, uSqueeze);
+    p.y *= mix(1.0, 2.0 / uSize.y, squash);
+    p.x *= mix(1.0 + 0.08 * max(k1, uSqueeze), 0.004, k2 * k2);
 
     // 真ん中が先に進み、上下（左右）の端ほど遅れて、帆のようにたわむ
     vec2 n = position.xy / uSize;
@@ -92,38 +55,34 @@ const vertexShader = /* glsl */ `
 
 const fragmentShader = /* glsl */ `
   uniform sampler2D uMap;
-  uniform float uProgress;
+  uniform float uOpen;
   uniform float uClose;
-  uniform int uMode;
-  varying vec2 vUv;
-  varying vec3 vNormal;
+  uniform float uSqueeze;
+  uniform float uStatic;
+  uniform float uTime;
+  uniform vec2 uSize;
 
-  const vec3 LIGHT = vec3(-0.4, 0.7, 0.8);
-  // 紙の裏の色
-  const vec3 BACK = vec3(0.92, 0.93, 0.95);
+  varying vec2 vUv;
+
+  float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+  }
 
   void main() {
-    float t = uProgress;
-    vec4 color = texture2D(uMap, vUv);
-
-    if (uMode == 0) {
-      // 巻かれた筒が円柱に見えるよう、光を当てる。正面を向いた面がちょうど元の明るさになるよう割る
-      vec3 l = normalize(LIGHT);
-      vec3 n = normalize(vNormal) * (gl_FrontFacing ? 1.0 : -1.0);
-      float diffuse = max(dot(n, l), 0.0) / l.z;
-      float specular = pow(max(dot(n, normalize(l + vec3(0.0, 0.0, 1.0))), 0.0), 40.0);
-      vec3 base = gl_FrontFacing ? color.rgb : BACK;
-      vec3 lit = base * (0.35 + 0.65 * diffuse) + specular * 0.45 * (1.0 - t);
-      gl_FragColor = vec4(lit, color.a * smoothstep(0.0, 0.08, t));
-      return;
-    }
-
     // 真ん中から四角く開く
     vec2 d = abs(vUv - 0.5) * 2.0;
-    if (max(d.x, d.y) > t) discard;
-    // 切るときは白く光って、点になってから消える
-    vec3 rgb = mix(color.rgb, vec3(1.0), smoothstep(0.1, 0.5, uClose) * 0.9);
-    gl_FragColor = vec4(rgb, color.a * (1.0 - smoothstep(0.85, 1.0, uClose)));
+    if (max(d.x, d.y) > uOpen) discard;
+
+    vec3 rgb = texture2D(uMap, vUv).rgb;
+    // 切り替えの途中だけ、砂嵐と走査線をかぶせる
+    vec2 cell = floor(vUv * uSize / 2.0);
+    float noise = hash(cell + floor(uTime * 60.0));
+    float scan = 0.85 + 0.15 * sin(vUv.y * uSize.y * 1.5);
+    rgb = mix(rgb, vec3(noise) * scan, uStatic * 0.6);
+    // 横線に近いほど白く光る
+    float flash = max(smoothstep(0.1, 0.5, uClose), uSqueeze);
+    rgb = mix(rgb, vec3(1.0), flash * 0.9);
+    gl_FragColor = vec4(rgb, 1.0 - smoothstep(0.85, 1.0, uClose));
   }
 `
 
@@ -132,6 +91,8 @@ const sizeOf = () => {
   return { width, height: (width * 10) / 16 }
 }
 
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
+
 /**
  * トップで名前に触れたときの動画を、WebGL の板に貼ってカーソルを追わせる。
  * WebGL が使えなければ null を返す（呼ぶ側は DOM の動画に戻す）
@@ -139,12 +100,9 @@ const sizeOf = () => {
 export const createGlPreview = (
   canvas: HTMLCanvasElement,
   onFrame: (frame: PreviewFrame) => void,
-  mode: string = 'roll',
+  /** 中身が slug のものに入れ替わったとき。切り替えでは横線になった瞬間に呼ぶ */
+  onLoad: (slug: string) => void,
 ) => {
-  // 知らない名前なら巻物にする
-  const enterMode: EnterMode = ENTER_MODES.includes(mode as EnterMode)
-    ? (mode as EnterMode)
-    : 'roll'
   let renderer: THREE.WebGLRenderer
   try {
     renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
@@ -155,26 +113,21 @@ export const createGlPreview = (
   renderer.setClearColor(0x000000, 0)
 
   const scene = new THREE.Scene()
-  // 巻いた奥行きが見えるよう、遠近を付ける。z = 0 の面で 1 単位が 1px になる距離に置く
-  const FOV = 30
-  const camera = new THREE.PerspectiveCamera(FOV, 1, 1, 10000)
+  // 1 単位を 1px にして、画面の座標をそのまま使う
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -10, 10)
   const uniforms = {
     uSize: { value: new THREE.Vector2(1, 1) },
     uVelocity: { value: new THREE.Vector2() },
     uMap: { value: null as THREE.Texture | null },
-    uProgress: { value: 0 },
+    uOpen: { value: 0 },
     uClose: { value: 0 },
-    uMode: { value: ENTER_MODES.indexOf(enterMode) },
+    uSqueeze: { value: 0 },
+    uStatic: { value: 0 },
+    uTime: { value: 0 },
   }
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(1, 1),
-    new THREE.ShaderMaterial({
-      uniforms,
-      vertexShader,
-      fragmentShader,
-      transparent: true,
-      side: THREE.DoubleSide,
-    }),
+    new THREE.ShaderMaterial({ uniforms, vertexShader, fragmentShader }),
   )
   mesh.visible = false
   scene.add(mesh)
@@ -182,13 +135,14 @@ export const createGlPreview = (
   let size = sizeOf()
   const resize = () => {
     renderer.setSize(innerWidth, innerHeight, false)
-    camera.aspect = innerWidth / innerHeight
-    camera.position.z =
-      innerHeight / 2 / Math.tan(THREE.MathUtils.degToRad(FOV / 2))
+    camera.left = -innerWidth / 2
+    camera.right = innerWidth / 2
+    camera.top = innerHeight / 2
+    camera.bottom = -innerHeight / 2
     camera.updateProjectionMatrix()
     size = sizeOf()
     mesh.geometry.dispose()
-    // 曲げるので細かく分ける
+    // たわませるので細かく分ける
     mesh.geometry = new THREE.PlaneGeometry(size.width, size.height, 32, 20)
     uniforms.uSize.value.set(size.width, size.height)
   }
@@ -205,18 +159,45 @@ export const createGlPreview = (
   const loader = new THREE.TextureLoader()
   let current = ''
 
+  const loading = new Set<string>()
+  /** 読み終えたポスターを返す。まだなら読み始め、読み終えたときに今の項目ならすぐ出す */
+  const poster = (slug: string) => {
+    const cached = posters.get(slug)
+    if (cached || loading.has(slug)) return cached
+    loading.add(slug)
+    loader.load(`/previews/${slug}.jpg`, (texture) => {
+      posters.set(slug, texture)
+      if (current === slug && uniforms.uMap.value !== videoTexture)
+        uniforms.uMap.value = texture
+    })
+    return undefined
+  }
+
   video.addEventListener('playing', () => {
     if (video.dataset.slug === current) uniforms.uMap.value = videoTexture
   })
+
+  /** 中身を slug のものにする。ポスターを先に出し、動画が流れ始めたら差し替える */
+  const load = (slug: string) => {
+    current = slug
+    onLoad(slug)
+    const cached = poster(slug)
+    if (cached) uniforms.uMap.value = cached
+    video.dataset.slug = slug
+    video.src = `/previews/${slug}.webm`
+    video.play().catch(() => {})
+  }
 
   const target = { x: innerWidth / 2, y: innerHeight / 2 }
   const pos = { ...target }
   const vel = { x: 0, y: 0 }
   let active = false
-  // 開き具合（0〜1）。一定の速さで進め、シェーダーには曲線をかけて渡す
+  // それぞれの進み具合（0〜1）。一定の速さで進め、曲線はかけてから渡す
   let open = 0
-  // 四角を切るときの進み具合（0〜1）
   let close = 0
+  // 0 なら切り替えていない
+  let swap = 0
+  let pending = ''
   let frame = 0
   let last = 0
 
@@ -236,14 +217,31 @@ export const createGlPreview = (
     const dt = Math.max(0, Math.min((now - last) / 1000, 0.1))
     last = now
     step(dt)
-    if (active) open = Math.min(1, open + dt / ENTER[enterMode])
-    else if (enterMode === 'rect') {
-      // 切るときは開き具合をそのままにして、つぶす動きだけを進める
+    uniforms.uTime.value = now / 1000
+
+    if (active) open = Math.min(1, open + dt / OPEN)
+    else {
       close = Math.min(1, close + dt / CLOSE)
       if (close === 1) open = 0
-    } else open = Math.max(0, open - dt / LEAVE)
-    uniforms.uProgress.value = 1 - Math.pow(1 - open, 3)
+    }
+
+    if (swap > 0) {
+      const before = swap
+      swap += dt / SWAP
+      if (before < SWAP_AT && swap >= SWAP_AT) load(pending)
+      if (swap >= 1) swap = 0
+    }
+    // つぶれるのは加速して、広がるのは減速して
+    const squeeze =
+      swap === 0
+        ? 0
+        : swap < SWAP_AT
+          ? Math.pow(swap / SWAP_AT, 2)
+          : 1 - easeOutCubic((swap - SWAP_AT) / (1 - SWAP_AT))
+    uniforms.uOpen.value = easeOutCubic(open)
     uniforms.uClose.value = close
+    uniforms.uSqueeze.value = squeeze
+    uniforms.uStatic.value = swap >= SWAP_AT ? squeeze : 0
 
     const speed = Math.hypot(vel.x, vel.y)
     const k = speed > MAX_SPEED ? MAX_SPEED / speed : 1
@@ -264,9 +262,10 @@ export const createGlPreview = (
       cornerY: -vy * BEND,
     })
 
-    // 閉じきって止まったら回さない
+    // 切りきって止まったら回さない
     if (!active && open === 0) {
       mesh.visible = false
+      swap = 0
       renderer.render(scene, camera)
       frame = 0
       return
@@ -286,39 +285,39 @@ export const createGlPreview = (
       target.y = y
     },
     show(slug: string) {
-      if (!active && !mesh.visible) {
+      const showing = active && open > 0
+      if (!active && close > 0) {
+        // 切っている途中か切ったあとなら、はじめから開く
+        open = 0
+        close = 0
+        swap = 0
+      }
+      if (!mesh.visible) {
         // 閉じていたところから開くときは、遠くから飛んでこないよう今の位置から始める
         pos.x = target.x
         pos.y = target.y
         vel.x = 0
         vel.y = 0
       }
-      if (!active && close > 0) {
-        // 切っている途中か切ったあとなら、もう一度はじめから開く
-        open = 0
-        close = 0
-      }
       active = true
       mesh.visible = true
-      if (slug !== current) {
-        current = slug
-        const poster = posters.get(slug)
-        uniforms.uMap.value = poster ?? uniforms.uMap.value
-        if (!poster)
-          loader.load(`/previews/${slug}.jpg`, (texture) => {
-            posters.set(slug, texture)
-            if (current === slug && uniforms.uMap.value !== videoTexture)
-              uniforms.uMap.value = texture
-          })
-        video.dataset.slug = slug
-        video.src = `/previews/${slug}.webm`
-      }
-      video.play().catch(() => {})
+
+      if (showing && slug !== (swap > 0 ? pending : current)) {
+        // 開いているところで項目が替わったら、チャンネルを回すように切り替える。
+        // 広がっている途中なら、またつぶすところから
+        pending = slug
+        if (swap === 0 || swap >= SWAP_AT) swap = Number.EPSILON
+      } else if (!showing && slug !== current) load(slug)
+      else video.play().catch(() => {})
       start()
     },
     hide() {
       active = false
       video.pause()
+    },
+    /** 切り替えたときにすぐ出せるよう、ポスターを先に読んでおく */
+    prefetch(slugs: string[]) {
+      slugs.forEach((slug) => poster(slug))
     },
   }
 }
