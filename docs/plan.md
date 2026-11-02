@@ -430,6 +430,79 @@ slug は webmanab の lab の記事と同じにします。4 本とも記事に�
 | tweenmax-visual-range-animation-class | j5tp2cw2 | TweenMax。`source.unsplash.com` が止まって画像が出ない |
 | css-embed-images-scroll-the-screen-iphone6-outline-mockup | 656k72Lf | `placekitten.com` が止まって画像が出ない |
 
+### F6 の残り 43 本（次の PR、下げない）
+
+2026-11-02 にエディタの画面から 43 本のソースを取り出しました（context.md の 4 章のやり方を Playwright で）。context.md の 4 章は数を 7、22、14 と書いていましたが、取り出したソースで依存を見直すと 8、24、11 でした。`post-1564` は Processing.js を、`move-a-node-with-springiness` は CreateJS を使っていました。
+
+43 本とも、#53 の決まりどおり下げません。移す理由は jsfiddle のライブラリへの依存を外すことなので、動きのデモでないもの（文字数を数える、表、フォーム）も小さなページとして移します。slug は記事と同じにします。
+
+作り直したあとにすること:
+
+- `node scripts/capture-previews.mjs <slug>` でトップの動画とポスターを撮って、コミットする。撮らないと、トップで触れても何も出ない
+- vault の記事の iframe と `demoUrl` を、F6 の 1 番目の 4 本と同じ形に書き換える
+
+#### 2-6 jsfiddle の jQuery (edge) の 8 本（F6 の 2 番目）
+
+jsfiddle の「jQuery (edge)」は、その時点の最新の jQuery を読みます。jQuery の版が上がると動かなくなるので、先に移します。
+
+| slug | fiddle | 旧デモの依存 | メモ |
+| --- | --- | --- | --- |
+| count-textarea | 58v2d54d | jQuery (edge)、Bootstrap 4 alpha | 入力欄の文字数を数える。動きのデモではないが、小さなページとして移す |
+| css-background-clip-text | tg2h1ety | jQuery (edge)、Bootstrap 4 alpha | CSS だけ |
+| flex-responsive-table | pLfa203m | jQuery (edge)、Bootstrap 4 alpha | 表のレイアウト。小さなページとして移す |
+| hover-effect-to-change-the-background-colo | 5b5cpyd3 | jQuery (edge)、Bootstrap 4 alpha | CSS だけ。slug は記事のまま（末尾が切れている） |
+| jqueryui-simple-calender | ykqu87wo | jQuery (edge)、jQuery UI | jQuery UI のカレンダー。jQuery UI を使わずに作るか、作者と決める |
+| styling-input | 0j1qxgmL | jQuery (edge)、Bootstrap 4 alpha | フォームの見た目。小さなページとして移す |
+| toc | n7gr16v6 | jQuery (edge)、Bootstrap 4 alpha | 見出しから目次を作る |
+| tweenmax-easing-of-scroll-parallax | ab42k442 | jQuery (edge)、TweenMax 1.19 | スクロールのパララックス |
+
+#### 2-7 jsfiddle の Processing.js と CreateJS の 24 本（F6 の 3 番目）
+
+Processing.js と CreateJS は、jsfiddle のライブラリの選択肢から読んでいます。選択肢から消えると動かなくなります。Canvas 2D でそのまま書けるものが多いです。
+
+| slug | fiddle | 旧デモの依存 | メモ |
+| --- | --- | --- | --- |
+| processing-js-circle | zfbL36h3 | Processing.js |  |
+| processing-js-circle-at-the-mouse-position | 14w0mxjx | Processing.js |  |
+| processing-js-draw-countless-circles-draw-function | khdb9r0c | Processing.js |  |
+| processing-js-gradation-dot | o6bfp7s1 | Processing.js |  |
+| processing-js-line-and-point | d2y41xkn | Processing.js |  |
+| processing-js-random-square | nyeu0bu2 | Processing.js |  |
+| processing-js-random-walk | 5xfqs4a0 | Processing.js |  |
+| processing-js-rect-in-a-circle | 3nLbap1g | Processing.js |  |
+| processing-js-rect-spiral | 3c6v5rn5 | Processing.js |  |
+| processing-js-square | qk8sc068 | Processing.js |  |
+| processing-js-star | te5e6jt6 | Processing.js |  |
+| processing-js-triangle | x33ezzq7 | Processing.js |  |
+| news-ticker-infinite-loop | fLyu4qjs | jQuery、Processing.js | 記事は lab/post-1564（slug が「無限ループするニュースティッカー-『javascript』」）。日本語の slug は URL にできないので、この slug を新しく切る |
+| create-js-line-motion-trigonometric-sin | 7s1wt0y1 | CreateJS |  |
+| createjs-beat-motion-trigonometric | swsha6gf | CreateJS |  |
+| createjs-gravity-and-friction | omnrhpx0 | CreateJS |  |
+| createjs-node-motion | grbz1m8q | CreateJS |  |
+| createjs-revolution-trigonometric | 74yzsoyj | CreateJS |  |
+| createjs-round-motion-trigonometric | 4dL339yw | CreateJS |  |
+| random-color-circle-createjs | vjj3xuam | CreateJS |  |
+| random-color-square-createjs | gjorzf2w | CreateJS |  |
+| star-random-color-createjs | b31yvc1u | CreateJS |  |
+| star-rotate-animation-createjs | 6h97y09b | CreateJS |  |
+| move-a-node-with-springiness | x6buvc9o | CreateJS（jsDelivr から） |  |
+
+#### 2-8 jsfiddle の残りの 11 本（F6 の 4 番目）
+
+| slug | fiddle | 旧デモの依存 | メモ |
+| --- | --- | --- | --- |
+| circular-motion-with-depth | 91zjtj4g | jQuery、TweenMax 1.20 |  |
+| customize-easing-of-mouse-scroll | pkme3arj | SmoothScroll 1.4 | ホイールのスクロールを滑らかにする |
+| effects-to-youtube-videos | opfs6phu | jQuery、jquery.mb.YTPlayer | YouTube の動画を背景に流してエフェクトをかける。実行時に YouTube を読むので 2 章の決まりに合わない。手元の短い動画に差し替えて、同じエフェクトをかける案 |
+| give-speed-and-angle-as-separate-random-values | L4806xs6 | jQuery、TweenMax 1.20 |  |
+| move-an-object-while-drawing-a-circle | 5n1a0hjy | jQuery、TweenMax 1.20 |  |
+| rotate-elements-arranged-on-the-circumference | 74uzrxL6 | jQuery、TweenMax 1.20 |  |
+| smooth-movement-using-sin-wave | skrxqb9j | jQuery、TweenMax 1.20 |  |
+| css-cube-animation | gre2a7tm | なし | CSS だけ |
+| hover-text-effect | yn1zsrvx | なし | CSS だけ |
+| noise-glitch | o5pp8s9f | なし | Canvas 2D |
+| vue-todo | 6t7780ua | Vue 2 | Vue の ToDo。Vue を入れずに作るか、作者と決める |
+
 ## 8. リスクと手当て
 
 | リスク | 起きたときのこと | 手当て |
