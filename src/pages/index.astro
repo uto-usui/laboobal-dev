@@ -5,6 +5,20 @@ import { getDemos } from '../lib/demos'
 
 const demos = await getDemos()
 
+// 何をすると動くかで絞る。meta.ts の interaction はテストでも使っていて、どのデモにも確かに入っている
+const FILTERS = [
+  { key: 'all', label: 'all' },
+  { key: 'hover', label: 'hover' },
+  { key: 'drag', label: 'drag' },
+  { key: 'scroll', label: 'scroll' },
+  { key: 'click', label: 'click' },
+  { key: 'none', label: 'watch' },
+] as const
+const countOf = (key: string) =>
+  key === 'all'
+    ? demos.length
+    : demos.filter((demo) => demo.interaction === key).length
+
 // 旧トップの雰囲気（暗い背景、後ろに薄く Molle、線だけの大きな名前）を残し、locomotive をやめて素のスクロールにした案。
 // 見た目は作者に見てもらってから決める（docs/plan.md の 3 章）
 ---
@@ -19,10 +33,28 @@ const demos = await getDemos()
       動きの実験のデモ。説明は{' '}
       <a href="https://webmanab.com/lab/">webmanab の lab</a> に。
     </p>
+    <nav class="filters" aria-label="何をすると動くかで絞る">
+      {FILTERS.map((filter) => (
+        <button
+          class="filter"
+          type="button"
+          data-filter={filter.key}
+          aria-pressed={filter.key === 'all' ? 'true' : 'false'}
+        >
+          {filter.label}
+          <sup>{countOf(filter.key)}</sup>
+        </button>
+      ))}
+    </nav>
     <ul class="list">
       {demos.map((demo) => (
-        <li class="item">
-          <a class="link" href={`/${demo.slug}/`}>
+        <li class="item" data-interaction={demo.interaction}>
+          <a
+            class="link"
+            href={`/${demo.slug}/`}
+            data-slug={demo.slug}
+            data-title={demo.title}
+          >
             <span class="slug">{demo.slug}</span>
             <span class="title">{demo.title}</span>
           </a>
@@ -30,7 +62,115 @@ const demos = await getDemos()
       ))}
     </ul>
   </main>
+  <canvas class="preview-canvas" aria-hidden="true"></canvas>
+  <figure class="preview" aria-hidden="true">
+    <video muted loop playsinline preload="none"></video>
+    <figcaption></figcaption>
+  </figure>
 </Base>
+
+<script>
+  import { isCoarsePointer, prefersReducedMotion } from '../shared/dom'
+
+  const list = document.querySelector<HTMLElement>('.list')!
+  const items = [...list.querySelectorAll<HTMLElement>('.item')]
+  const filters = [...document.querySelectorAll<HTMLButtonElement>('.filter')]
+
+  filters.forEach((button) =>
+    button.addEventListener('click', () => {
+      const key = button.dataset.filter
+      filters.forEach((b) =>
+        b.setAttribute('aria-pressed', String(b === button)),
+      )
+      const apply = () =>
+        items.forEach((item) => {
+          item.hidden = key !== 'all' && item.dataset.interaction !== key
+        })
+      // 並びが詰まる動きは、対応するブラウザでだけ付ける
+      if (document.startViewTransition && !prefersReducedMotion())
+        document.startViewTransition(apply)
+      else apply()
+    }),
+  )
+
+  // 触れたときの動画。タッチの端末では出さない（触れた時点で開くので見る間がない）
+  const preview = document.querySelector<HTMLElement>('.preview')!
+  const video = preview.querySelector('video')!
+  const caption = preview.querySelector('figcaption')!
+  if (!isCoarsePointer()) {
+    // ふだんは WebGL の板に貼って、ばねで追わせて曲げる（src/lib/top-preview.ts）。
+    // 動きを減らす設定のときと WebGL が使えないときは、DOM の画像をカーソルの位置にそのまま出す
+    const gl = prefersReducedMotion()
+      ? null
+      : (await import('../lib/top-preview')).createGlPreview(
+          document.querySelector<HTMLCanvasElement>('.preview-canvas')!,
+          (f) => {
+            // 名前の帯は板の左下の角に付いていく
+            preview.style.width = `${f.width}px`
+            preview.style.transform = `translate3d(${f.x}px, ${f.y}px, 0) translate(-50%, -50%) rotate(${f.tilt}rad) translate(${f.cornerX}px, ${f.cornerY}px)`
+          },
+          (slug) => {
+            caption.textContent =
+              list.querySelector<HTMLAnchorElement>(`[data-slug="${slug}"]`)
+                ?.dataset.title ?? ''
+          },
+        )
+    if (gl) {
+      preview.classList.add('is-gl')
+      // 項目を替えたときにすぐ出せるよう、手が空いたらポスターを読んでおく
+      // requestIdleCallback がない Safari では、読み込みが落ち着いてから
+      const idle =
+        window.requestIdleCallback ??
+        ((callback: () => void) => setTimeout(callback, 1500))
+      idle(() =>
+        gl.prefetch(
+          [...list.querySelectorAll<HTMLAnchorElement>('.link')].map(
+            (link) => link.dataset.slug!,
+          ),
+        ),
+      )
+    }
+    let hideTimer = 0
+
+    const place = (x: number, y: number) => {
+      if (gl) gl.setTarget(x, y)
+      else
+        preview.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`
+    }
+    addEventListener('pointermove', (event) =>
+      place(event.clientX, event.clientY),
+    )
+
+    list.querySelectorAll<HTMLAnchorElement>('.link').forEach((link) => {
+      const show = () => {
+        clearTimeout(hideTimer)
+        const slug = link.dataset.slug!
+        if (gl) gl.show(slug)
+        else {
+          caption.textContent = link.dataset.title ?? ''
+          video.poster = `/previews/${slug}.jpg`
+        }
+        preview.classList.add('is-active')
+      }
+      // 名前と名前のすき間を通るたびに閉じると、ちらつく。少し待ち、隣に移ったら開いたまま中身だけ替える
+      const hide = () => {
+        hideTimer = window.setTimeout(() => {
+          preview.classList.remove('is-active')
+          gl?.hide()
+        }, 150)
+      }
+      link.addEventListener('pointerenter', show)
+      link.addEventListener('pointerleave', hide)
+      // キーボードで移ったときは、名前の右寄りに出す
+      link.addEventListener('focus', () => {
+        const rect = link.getBoundingClientRect()
+        place(rect.left + rect.width * 0.75, rect.top + rect.height / 2)
+        show()
+      })
+      link.addEventListener('blur', hide)
+    })
+  }
+</script>
 
 <style>
   .mark {
@@ -130,5 +270,114 @@ const demos = await getDemos()
     .title {
       opacity: 1;
     }
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    justify-content: center;
+    margin: 0 0 6vh;
+  }
+
+  .filter {
+    padding: 4px 0;
+    font: inherit;
+    font-size: 12px;
+    color: var(--color-muted);
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid transparent;
+  }
+
+  .filter[aria-pressed='true'] {
+    color: var(--color-accent);
+    border-bottom-color: currentcolor;
+  }
+
+  .filter sup {
+    margin-left: 2px;
+    font-size: 9px;
+  }
+
+  .item {
+    view-transition-name: match-element;
+  }
+
+  /* 一覧の上に浮かせる。名前の上に乗っても触れたままでいられるよう、ポインタを通す */
+  .preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: min(36vw, 400px);
+    aspect-ratio: 16 / 10;
+    margin: 0;
+    overflow: hidden;
+    pointer-events: none;
+    clip-path: inset(50% 50% 50% 50%);
+    opacity: 0;
+    transition:
+      clip-path 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.3s;
+  }
+
+  .preview.is-active {
+    clip-path: inset(0);
+    opacity: 1;
+  }
+
+  .preview-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  /* WebGL のときは、板は canvas が描く。DOM の側は名前の帯だけ */
+  .preview.is-gl {
+    overflow: visible;
+    clip-path: none;
+    transition: opacity 0.15s;
+  }
+
+  .preview.is-gl video {
+    visibility: hidden;
+  }
+
+  .preview figcaption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 6px 10px;
+    font-size: 11px;
+    color: #fff;
+    letter-spacing: 0.08em;
+    background: rgb(0 0 0 / 0.55);
+  }
+
+  /* 触れている間は動画の帯に出すので、名前の下には出さない */
+  @media (pointer: fine) {
+    .title {
+      display: none;
+    }
+  }
+
+  .preview video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* 動画が名前の線と重なると読めないので、触れている名前は動画より手前に出す。
+     .item は view-transition-name で重なりの範囲を作るので、.link ではなく .item に付ける */
+  .item:has(.link:hover) {
+    position: relative;
+    z-index: 2;
   }
 </style>
