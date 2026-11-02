@@ -87,7 +87,8 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 ### Netlify
 
 - サイト `labobal-dev` は、このリポジトリの master につながっています。ビルドの設定は `netlify.toml` にあります（`pnpm build`、公開フォルダは `dist`）
-- master に入ると本番のビルドが動き、そのまま公開されます。PR ごとにデプロイプレビューが出ます
+- master に入ると本番のビルドが動き、そのまま公開されます
+- PR のデプロイプレビューは 2026-11-02 に止めました（Netlify の Branches and deploy contexts で「Don't deploy pull requests」）。PR のたびにビルド時間を使わないためです。PR は CI と手元のビルド（`pnpm build && pnpm preview`）で確かめます。plan.md の中のデプロイプレビューで確かめる手順は、作り直しのときのものです
 - docs やテストだけの変更では、`scripts/netlify-ignore.sh` がビルドを止めます。キャッシュがないビルドでは前のコミットと比べられないので、止めずにビルドします（#11。これがなかったため、#10 のマージのビルドが止まりました）
 - Netlify の無料枠のビルド時間は、webmanab と同じアカウントで分け合っています
 
