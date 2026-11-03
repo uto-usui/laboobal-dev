@@ -51,3 +51,34 @@ html[data-offscreen] * {
   color: color-mix(in srgb, var(--color-fg) 70%, var(--color-bg));
   background: var(--color-bg);
 }
+
+/* いくつかのデモで使う小さな部品。左上の「scroll」の添え書き（scroll-reveal の 3 本）と、左下のもう一度ボタン（reveal の 2 本） */
+.demo-hint {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  margin: 0;
+  font-size: 11px;
+  color: var(--color-muted);
+  letter-spacing: 0.1em;
+}
+
+.demo-replay {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 4px 8px;
+  font: inherit;
+  font-size: 11px;
+  color: var(--color-fg);
+  cursor: pointer;
+  background: none;
+  border: 1px solid currentcolor;
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+.demo-replay:hover,
+.demo-replay:focus-visible {
+  opacity: 1;
+}
