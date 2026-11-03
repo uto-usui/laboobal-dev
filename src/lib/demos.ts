@@ -41,8 +41,27 @@ const components = import.meta.glob('../demos/*/Demo.astro', {
   query: '?raw',
   import: 'default',
 })
+// デモのページ。デモごとに src/pages/<slug>.astro を置き、その Demo.astro を静的に import する。
+// 1 つの動的ルートから引くと、どのページにも全デモの CSS が付く。中身は、別のデモを読んでいないかを見るためだけに読む
+const pages = import.meta.glob<string>('../pages/*.astro', {
+  query: '?raw',
+  import: 'default',
+})
+/** src/pages の .astro のうち、デモのページでないもの */
+const NON_DEMO_PAGES = ['index']
+
+const pageTemplate = (slug: string) => `---
+import DemoLayout from '../layouts/DemoLayout.astro'
+import Demo from '../demos/${slug}/Demo.astro'
+import meta from '../demos/${slug}/meta'
+---
+
+<DemoLayout demo={meta}>
+  <Demo />
+</DemoLayout>`
 
 const folderOf = (path: string) => path.split('/').at(-2)!
+const pageSlugOf = (path: string) => path.match(/([^/]+)\.astro$/)![1]
 
 /**
  * meta.ts を集めて確かめる。決まりに合わないものがあればビルドを落とす（docs/plan.md の 5 章）。
@@ -65,6 +84,13 @@ const collect = async () => {
   const seen = new Set<string>()
   const noteFolders = new Set(Object.keys(notes).map(folderOf))
   const componentFolders = new Set(Object.keys(components).map(folderOf))
+  const pageSources = new Map(
+    await Promise.all(
+      Object.entries(pages)
+        .filter(([path]) => !NON_DEMO_PAGES.includes(pageSlugOf(path)))
+        .map(async ([path, load]) => [pageSlugOf(path), await load()] as const),
+    ),
+  )
 
   const list = Object.entries(metas).map(([path, meta]) => {
     const folder = folderOf(path)
@@ -95,12 +121,33 @@ const collect = async () => {
       fail(folder, `src/demos/${folder}/notes.md がない`)
     if (!componentFolders.has(folder))
       fail(folder, `src/demos/${folder}/Demo.astro がない`)
+    const page = pageSources.get(folder)
+    const pageRefs = new Set(
+      [...(page ?? '').matchAll(/\.\.\/demos\/([^/'"]+)\//g)].map((m) => m[1]),
+    )
+    if (page === undefined)
+      fail(
+        folder,
+        `src/pages/${folder}.astro がない。次の中身で置く:\n${pageTemplate(folder)}`,
+      )
+    else if (pageRefs.size !== 1 || !pageRefs.has(folder))
+      fail(
+        folder,
+        `src/pages/${folder}.astro が src/demos/${folder}/ の Demo.astro と meta を読んでいない。次の中身にする:\n${pageTemplate(folder)}`,
+      )
     return meta
   })
 
   for (const folder of new Set([...noteFolders, ...componentFolders])) {
     if (!Object.keys(metas).some((path) => folderOf(path) === folder))
       fail(folder, `src/demos/${folder}/meta.ts がない`)
+  }
+  for (const slug of pageSources.keys()) {
+    if (!Object.keys(metas).some((path) => folderOf(path) === slug))
+      fail(
+        slug,
+        `src/pages/${slug}.astro に合うデモがない（src/demos/${slug}/meta.ts がない）`,
+      )
   }
 
   if (errors.length > 0) {

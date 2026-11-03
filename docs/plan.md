@@ -194,10 +194,10 @@ src/
     assets/         このデモだけが使う画像、動画、シェーダー
   shared/           複数のデモで使う関数（math、noise、文字の分割など）。統合役だけが触る
   shared/<batch>/   その担当の中だけで使い回す関数（batch を小文字にした名前のフォルダ）
-  lib/demos.ts      demos/*/meta.ts を import.meta.glob で集めて一覧にする
+  lib/demos.ts      demos/*/meta.ts を import.meta.glob で集めて一覧にし、ページがそろっているかを確かめる
   layouts/DemoLayout.astro
   pages/index.astro
-  pages/[slug].astro
+  pages/<slug>.astro  デモのページ。DemoLayout と、そのデモの Demo.astro と meta を import するだけ
 docs/
   ideas.md          デモをまたいだ考え方。統合役が書く
   dropped/<batch>.md  下げたデモの記録。担当ごと
@@ -208,8 +208,8 @@ e2e/
 netlify.toml
 ```
 
-- デモの担当が触るのは、自分の `src/demos/<slug>/`、`src/shared/<batch>/`、`docs/dropped/<batch>.md` だけです
-- 一覧は `lib/demos.ts` がフォルダから集めるので、デモを足すときに共有のファイルを書き換えません
+- デモの担当が触るのは、自分の `src/demos/<slug>/`、`src/pages/<slug>.astro`、`src/shared/<batch>/`、`docs/dropped/<batch>.md` だけです
+- 一覧は `lib/demos.ts` がフォルダから集めるので、デモを足すときに共有のファイルを書き換えません。ページだけはデモごとに `src/pages/<slug>.astro` を置きます。1 つの動的ルートから引くと、全デモの CSS がどのページにも付くためです。中身は README の「デモを足す」の形です
 - `src/shared/` の直下は統合役だけが触ります。ほかの担当とも使い回したい関数や、直下のファイルを変えたいときは、統合役に頼みます。同じ名前のファイルを別々の担当が作って上書きし合うのを防ぐためです
 - `package.json` と `pnpm-lock.yaml` は統合役だけが触ります。足りない依存があれば統合役に頼みます
 
