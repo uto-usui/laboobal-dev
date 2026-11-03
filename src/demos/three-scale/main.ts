@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { gsap } from 'gsap'
+import { gsap } from '../../shared/gsap'
 import { onResize } from '../../shared/dom'
 import { createRenderer } from '../../shared/b2/gl'
 import vertexShader from './assets/scale.vert?raw'

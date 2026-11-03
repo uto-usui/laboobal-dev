@@ -32,3 +32,9 @@ svg {
   display: block;
   max-width: 100%;
 }
+
+/* 画面の外やタブが裏にある間は止める（src/shared/visibility.ts）。
+   デモの animation の一括指定は play-state を running に戻すうえ、デモの style の方が詳細度が高いので !important にする */
+html[data-offscreen] * {
+  animation-play-state: paused !important;
+}

@@ -1,4 +1,4 @@
-import { gsap } from 'gsap'
+import { gsap } from '../../shared/gsap'
 import { prefersReducedMotion } from '../../shared/dom'
 
 const card = document.querySelector<HTMLElement>('[data-card]')!

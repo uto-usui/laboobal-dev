@@ -1,4 +1,4 @@
-import gsap from 'gsap'
+import gsap from '../gsap'
 import * as THREE from 'three'
 import { onResize, prefersReducedMotion } from '../dom'
 import noise from '../glsl/simplex-noise.glsl?raw'
@@ -149,5 +149,10 @@ export const createDistortionSlider = ({
 
   // ホイールでは進めない。記事に埋め込むと、スクロールで通り過ぎるたびに切り替わってしまう
   root.addEventListener('click', go)
-  if (!prefersReducedMotion()) setInterval(go, interval * 1000)
+  // setInterval ではなく GSAP の時計で数える。画面の外で GSAP を止めている間（shared/gsap.ts）は進まない
+  const autoplay = () => {
+    gsap.delayedCall(interval, autoplay)
+    go()
+  }
+  if (!prefersReducedMotion()) gsap.delayedCall(interval, autoplay)
 }

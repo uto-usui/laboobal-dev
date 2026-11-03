@@ -30,6 +30,11 @@ const { demo } = Astro.props
   </nav>
 </Base>
 
+<script>
+  // 画面の外やタブが裏にある間、デモの動きを止める
+  import '../shared/visibility'
+</script>
+
 <style>
   .demo {
     position: relative;
