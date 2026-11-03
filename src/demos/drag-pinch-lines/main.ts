@@ -1,4 +1,4 @@
-import { loop, onResize } from '../../shared/dom'
+import { changeGate, loop, onResize } from '../../shared/dom'
 import { damp, map, random } from '../../shared/math'
 import { lambdaFromEase } from '../../shared/a/ease'
 import { trackPull } from '../../shared/a/pull'
@@ -19,7 +19,7 @@ const lines = [...stage.querySelectorAll<HTMLElement>('.line')].map((el) => {
   // 画面の外まで少しはみ出して置く。端で線が途切れて見えないように
   el.style.left = `${random(-5, 105)}%`
   el.style.top = `${random(-5, 105)}%`
-  return { el, ratio: random(0.25, 2), x: 0, y: 0 }
+  return { el, ratio: random(0.25, 2), x: 0, y: 0, changed: changeGate() }
 })
 const lineLambda = lambdaFromEase(0.075)
 
@@ -27,12 +27,14 @@ const ballRatio = 0.5
 const ballLambda = lambdaFromEase(0.1)
 let ballX = 0
 let ballY = 0
+const ballChanged = changeGate()
 
 loop((dt) => {
   for (const line of lines) {
     line.x = damp(line.x, pull.x * line.ratio, lineLambda, dt)
     line.y = damp(line.y, pull.y * line.ratio, lineLambda, dt)
     const { x, y } = line
+    if (!line.changed(x, y, height)) continue
     // 縦の線を、引っぱっている向きに倒す
     const angle = 90 + (Math.atan2(y, x) * 180) / Math.PI
     const length = 1 + (Math.abs(x) + Math.abs(y)) * 0.2
@@ -46,6 +48,7 @@ loop((dt) => {
   // 真ん中の玉は、引っぱるほど小さくなって遠ざかる
   ballX = damp(ballX, pull.x * ballRatio, ballLambda, dt)
   ballY = damp(ballY, pull.y * ballRatio, ballLambda, dt)
+  if (!ballChanged(ballX, ballY, width, height)) return
   const t = map(
     Math.hypot(ballX, ballY),
     0,

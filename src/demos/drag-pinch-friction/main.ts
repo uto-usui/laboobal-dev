@@ -1,4 +1,4 @@
-import { loop } from '../../shared/dom'
+import { changeGate, loop } from '../../shared/dom'
 import { damp, map } from '../../shared/math'
 import { lambdaFromEase } from '../../shared/a/ease'
 import { trackPull } from '../../shared/a/pull'
@@ -12,10 +12,12 @@ const ratio = 0.5
 const lambda = lambdaFromEase(0.25)
 let x = 0
 let y = 0
+const changed = changeGate()
 
 loop((dt) => {
   x = damp(x, pull.x * ratio, lambda, dt)
   y = damp(y, pull.y * ratio, lambda, dt)
+  if (!changed(x, y)) return
 
   const distance = Math.hypot(x, y)
   // x と y の積なので、斜めに引いたときだけ回る。向きは象限で変わる

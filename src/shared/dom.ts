@@ -80,6 +80,24 @@ export const loop = (callback: (dt: number, elapsed: number) => void) => {
 }
 
 /**
+ * 前に通したときから、どれかの値が eps 以上変わったかを返す関数を作る。
+ * 追いつきかけて動きがとても小さくなったフレームで style を書かず、レイアウトを走らせないために使う。
+ * 比べる相手は最後に true を返したときの値なので、少しずつの変化も積もれば書く
+ */
+export const changeGate = (eps = 0.001) => {
+  let last: number[] = []
+  return (...values: number[]) => {
+    if (
+      values.length === last.length &&
+      values.every((value, i) => Math.abs(value - last[i]) < eps)
+    )
+      return false
+    last = values
+    return true
+  }
+}
+
+/**
  * デモの上に一行の案内を出す（WebGL が使えないときなど）。見た目は particle-photo の WebGPU の案内に合わせ、
  * デモの中身を覆う。形は base.css の .demo-fallback
  */

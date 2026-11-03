@@ -1,4 +1,4 @@
-import { loop } from '../../shared/dom'
+import { changeGate, loop } from '../../shared/dom'
 import { trackPointer } from '../../shared/pointer'
 
 const stage = document.querySelector<HTMLElement>('.stage')!
@@ -12,6 +12,7 @@ const balls = [0.8, 0.3].map((power, i) => ({
   y: pointer.y,
   vx: 0,
   vy: 0,
+  changed: changeGate(),
 }))
 
 // 旧デモの式は 1 フレームを 1 歩として書かれている。画面の速さに左右されないよう、60 分の 1 秒ずつ進める
@@ -30,6 +31,7 @@ loop((dt) => {
     }
   }
   for (const ball of balls) {
+    if (!ball.changed(ball.x, ball.y)) continue
     ball.el.style.transform = `translate(${ball.x}px, ${ball.y}px) translate(-50%, -50%)`
   }
 })

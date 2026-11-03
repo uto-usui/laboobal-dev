@@ -1,4 +1,4 @@
-import { loop } from '../../shared/dom'
+import { changeGate, loop } from '../../shared/dom'
 import { damp } from '../../shared/math'
 import { lambdaFromEase } from '../../shared/a/ease'
 import { trackPointer } from '../../shared/pointer'
@@ -12,12 +12,14 @@ const lights = [0.1, 0.08].map((ease, i) => ({
   lambda: lambdaFromEase(ease),
   x: pointer.x,
   y: pointer.y,
+  changed: changeGate(),
 }))
 
 loop((dt) => {
   for (const light of lights) {
     light.x = damp(light.x, pointer.x, light.lambda, dt)
     light.y = damp(light.y, pointer.y, light.lambda, dt)
+    if (!light.changed(light.x, light.y)) continue
     light.el.style.transform = `translate(${light.x}px, ${light.y}px) translate(-50%, -50%)`
   }
 })

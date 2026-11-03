@@ -1,4 +1,4 @@
-import { loop } from '../../shared/dom'
+import { changeGate, loop } from '../../shared/dom'
 import { damp, map } from '../../shared/math'
 import { lambdaFromEase } from '../../shared/a/ease'
 import { viewProgress } from '../../shared/a/view-progress'
@@ -9,10 +9,14 @@ const target = document.querySelector<HTMLElement>('.target')!
 
 const lambda = lambdaFromEase(0.1)
 const current = { scaleY: 1, rotateX: 60, y: 100 }
+const targetChanged = changeGate()
+const originChanged = changeGate()
 
 loop((dt) => {
+  // 読みを先に済ませてから書く。書いた直後に getBoundingClientRect を読むと、毎フレーム強制レイアウトになる
   // 画面に入る 150px 手前から数え始める
   const progress = viewProgress(slot, -150)
+  const slotTop = slot.getBoundingClientRect().top
   const goal = {
     // 真ん中で 1 倍、入り口と出口で少しのびる
     scaleY: map(Math.abs(progress - 0.5), 0, 0.5, 1, 1.1),
@@ -24,9 +28,10 @@ loop((dt) => {
   current.scaleY = damp(current.scaleY, goal.scaleY, lambda, dt)
   current.rotateX = damp(current.rotateX, goal.rotateX, lambda, dt)
   current.y = damp(current.y, goal.y, lambda, dt)
-  target.style.transform = `translateY(${current.y}px) rotateX(${current.rotateX}deg) scaleY(${current.scaleY})`
+  if (targetChanged(current.scaleY, current.rotateX, current.y))
+    target.style.transform = `translateY(${current.y}px) rotateX(${current.rotateX}deg) scaleY(${current.scaleY})`
 
   // スクロールしても、いつも画面の真ん中から見ているようにする
-  const slotTop = slot.getBoundingClientRect().top
-  slot.style.perspectiveOrigin = `50% ${innerHeight / 2 - slotTop}px`
+  if (originChanged(slotTop, innerHeight))
+    slot.style.perspectiveOrigin = `50% ${innerHeight / 2 - slotTop}px`
 })

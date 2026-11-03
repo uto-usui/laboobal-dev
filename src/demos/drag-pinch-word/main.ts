@@ -1,4 +1,4 @@
-import { loop, onResize } from '../../shared/dom'
+import { changeGate, loop, onResize } from '../../shared/dom'
 import { damp, map, random } from '../../shared/math'
 import { lambdaFromEase } from '../../shared/a/ease'
 import { trackPull } from '../../shared/a/pull'
@@ -18,6 +18,7 @@ const words = [...stage.querySelectorAll<HTMLElement>('.word')].map((el) => ({
   ratio: random(0.1, 1),
   x: 0,
   y: 0,
+  changed: changeGate(),
 }))
 const lambda = lambdaFromEase(0.2)
 
@@ -25,6 +26,8 @@ loop((dt) => {
   for (const word of words) {
     word.x = damp(word.x, pull.x * word.ratio, lambda, dt)
     word.y = damp(word.y, pull.y * word.ratio, lambda, dt)
+    // 毎フレーム font-size を書くとレイアウトが走る。止まっているときは書かない
+    if (!word.changed(word.x, word.y, reach)) continue
     const distance = Math.hypot(word.x, word.y)
     word.el.style.letterSpacing = `${map(distance, 0, reach, 0.02, 3)}em`
     word.el.style.fontSize = `${map(distance, 0, reach, 1, 20)}em`
