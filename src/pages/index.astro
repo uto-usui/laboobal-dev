@@ -1,5 +1,5 @@
 ---
-import '@fontsource/molle/400-italic.css'
+import '../fonts/molle-mark.css'
 import Base from '../layouts/Base.astro'
 import { getDemos } from '../lib/demos'
 
@@ -14,6 +14,16 @@ const FILTERS = [
   { key: 'click', label: 'click' },
   { key: 'none', label: 'watch' },
 ] as const
+const SPECULATION = {
+  prefetch: [
+    {
+      where: {
+        and: [{ href_matches: '/*' }, { selector_matches: '.list a' }],
+      },
+      eagerness: 'moderate',
+    },
+  ],
+}
 const countOf = (key: string) =>
   key === 'all'
     ? demos.length
@@ -24,6 +34,13 @@ const countOf = (key: string) =>
 ---
 
 <Base title="labobal.dev">
+  <!-- 名前に少しとどまったら、そのデモのページを先に取っておく。prerender は WebGL を裏で動かすことになるのでしない -->
+  <script
+    slot="head"
+    type="speculationrules"
+    is:inline
+    set:html={JSON.stringify(SPECULATION)}
+  />
   <p class="mark" aria-hidden="true">
     labobal.dev
   </p>
@@ -71,6 +88,7 @@ const countOf = (key: string) =>
 
 <script>
   import { isCoarsePointer, prefersReducedMotion } from '../shared/dom'
+  import type { createGlPreview } from '../lib/top-preview'
 
   const list = document.querySelector<HTMLElement>('.list')!
   const items = [...list.querySelectorAll<HTMLElement>('.item')]
@@ -100,39 +118,64 @@ const countOf = (key: string) =>
   if (!isCoarsePointer()) {
     // ふだんは WebGL の板に貼って、ばねで追わせて曲げる（src/lib/top-preview.ts）。
     // 動きを減らす設定のときと WebGL が使えないときは、DOM の画像をカーソルの位置にそのまま出す
-    const gl = prefersReducedMotion()
-      ? null
-      : (await import('../lib/top-preview')).createGlPreview(
-          document.querySelector<HTMLCanvasElement>('.preview-canvas')!,
-          (f) => {
-            // 名前の帯は板の左下の角に付いていく
-            preview.style.width = `${f.width}px`
-            preview.style.transform = `translate3d(${f.x}px, ${f.y}px, 0) translate(-50%, -50%) rotate(${f.tilt}rad) translate(${f.cornerX}px, ${f.cornerY}px)`
-          },
-          (slug) => {
-            caption.textContent =
-              list.querySelector<HTMLAnchorElement>(`[data-slug="${slug}"]`)
-                ?.dataset.title ?? ''
-          },
-        )
-    if (gl) {
+    type GlPreview = NonNullable<ReturnType<typeof createGlPreview>>
+    // 使っている板。読み終えても、DOM の画像を出している間は替えない
+    let gl: GlPreview | null = null
+    let loaded: GlPreview | null = null
+    const pointer = { x: innerWidth / 2, y: innerHeight / 2 }
+
+    // 項目を替えたときにすぐ出せるよう、画面に入った名前のポスターだけ読んでおく
+    const prefetcher = new IntersectionObserver((entries) =>
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+        const link = entry.target as HTMLAnchorElement
+        gl?.prefetch([link.dataset.slug!])
+        prefetcher.unobserve(link)
+      }),
+    )
+
+    const useGl = () => {
+      if (!loaded || gl) return
+      gl = loaded
       preview.classList.add('is-gl')
-      // 項目を替えたときにすぐ出せるよう、手が空いたらポスターを読んでおく
-      // requestIdleCallback がない Safari では、読み込みが落ち着いてから
-      const idle =
-        window.requestIdleCallback ??
-        ((callback: () => void) => setTimeout(callback, 1500))
-      idle(() =>
-        gl.prefetch(
-          [...list.querySelectorAll<HTMLAnchorElement>('.link')].map(
-            (link) => link.dataset.slug!,
-          ),
-        ),
+      gl.setTarget(pointer.x, pointer.y)
+      list
+        .querySelectorAll<HTMLAnchorElement>('.link')
+        .forEach((link) => prefetcher.observe(link))
+    }
+
+    // three は大きいので、ページを開いただけでは読まない。マウスを動かすかキーボードで移ったら読み始める
+    const loadGl = async () => {
+      removeEventListener('pointermove', loadGl)
+      removeEventListener('focusin', loadGl)
+      // 読めなければ DOM の画像のまま
+      const lib = await import('../lib/top-preview').catch(() => null)
+      if (!lib) return
+      loaded = lib.createGlPreview(
+        document.querySelector<HTMLCanvasElement>('.preview-canvas')!,
+        (f) => {
+          // 名前の帯は板の左下の角に付いていく
+          preview.style.width = `${f.width}px`
+          preview.style.transform = `translate3d(${f.x}px, ${f.y}px, 0) translate(-50%, -50%) rotate(${f.tilt}rad) translate(${f.cornerX}px, ${f.cornerY}px)`
+        },
+        (slug) => {
+          caption.textContent =
+            list.querySelector<HTMLAnchorElement>(`[data-slug="${slug}"]`)
+              ?.dataset.title ?? ''
+        },
       )
+      // DOM の画像を出している最中なら、次に項目が替わったときに板へ移る
+      if (!preview.classList.contains('is-active')) useGl()
+    }
+    if (!prefersReducedMotion()) {
+      addEventListener('pointermove', loadGl)
+      addEventListener('focusin', loadGl)
     }
     let hideTimer = 0
 
     const place = (x: number, y: number) => {
+      pointer.x = x
+      pointer.y = y
       if (gl) gl.setTarget(x, y)
       else
         preview.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`
@@ -144,11 +187,12 @@ const countOf = (key: string) =>
     list.querySelectorAll<HTMLAnchorElement>('.link').forEach((link) => {
       const show = () => {
         clearTimeout(hideTimer)
+        useGl()
         const slug = link.dataset.slug!
         if (gl) gl.show(slug)
         else {
           caption.textContent = link.dataset.title ?? ''
-          video.poster = `/previews/${slug}.jpg`
+          video.poster = `/previews/${slug}.webp`
         }
         preview.classList.add('is-active')
       }
@@ -178,7 +222,7 @@ const countOf = (key: string) =>
     top: 50%;
     left: 50%;
     margin: 0;
-    font-family: Molle, cursive;
+    font-family: 'Molle Mark', cursive;
     font-size: 18vw;
     font-style: italic;
     white-space: nowrap;
@@ -198,6 +242,8 @@ const countOf = (key: string) =>
     height: 1px;
     overflow: hidden;
     clip-path: inset(50%);
+    /* h1 の太字のままだと、見えない字のために Montserrat 700 を読みに行く */
+    font-weight: inherit;
     white-space: nowrap;
   }
 

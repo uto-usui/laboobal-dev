@@ -1,3 +1,11 @@
+---
+// 1 枚目の写真を、JS を待たずに HTML から読み始める。main.ts は fetch() で読むので as="fetch"。
+// as="image" だと fetch() の読み込みに使われず、2 回読むことになる
+import firstPhoto from './assets/01.jpg?url'
+---
+
+<link rel="preload" href={firstPhoto} as="fetch" crossorigin="anonymous" />
+
 <div class="particle-photo">
   <canvas
     class="view"
@@ -67,6 +75,14 @@
     backdrop-filter: blur(14px);
     border: 1px solid var(--line);
     border-radius: 8px;
+  }
+
+  /* 狭い幅では右下のリンク（高さ約 20px）と横に並びきらないので、リンクの上へ上げる */
+  @media (width < 560px) {
+    .strip {
+      bottom: 36px;
+      max-width: calc(100% - 16px);
+    }
   }
 
   .strip :global(button) {

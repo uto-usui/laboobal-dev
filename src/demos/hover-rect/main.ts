@@ -1,4 +1,4 @@
-import gsap from 'gsap'
+import gsap from '../../shared/gsap'
 import { hoverControl } from '../../shared/a/hover-control'
 
 for (const cell of document.querySelectorAll<HTMLElement>('.cell')) {

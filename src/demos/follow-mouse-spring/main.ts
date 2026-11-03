@@ -1,8 +1,8 @@
-import { loop } from '../../shared/dom'
-import { trackPointer } from '../../shared/a/pointer'
+import { changeGate, loop } from '../../shared/dom'
+import { trackPointer } from '../../shared/pointer'
 
 const stage = document.querySelector<HTMLElement>('.stage')!
-const pointer = trackPointer(stage)
+const pointer = trackPointer(stage, { units: 'px', touch: 'follow' })
 
 // power ひとつで、引っぱる強さ（power）と速さの残り方（power の 2 乗）の両方が決まる
 const balls = [0.8, 0.3].map((power, i) => ({
@@ -12,6 +12,7 @@ const balls = [0.8, 0.3].map((power, i) => ({
   y: pointer.y,
   vx: 0,
   vy: 0,
+  changed: changeGate(),
 }))
 
 // 旧デモの式は 1 フレームを 1 歩として書かれている。画面の速さに左右されないよう、60 分の 1 秒ずつ進める
@@ -30,6 +31,7 @@ loop((dt) => {
     }
   }
   for (const ball of balls) {
+    if (!ball.changed(ball.x, ball.y)) continue
     ball.el.style.transform = `translate(${ball.x}px, ${ball.y}px) translate(-50%, -50%)`
   }
 })

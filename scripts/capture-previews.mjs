@@ -1,6 +1,8 @@
 // トップの一覧で、触れたときに出す短い動画とポスター画像を作る。
 // 手元で `pnpm build && pnpm preview --port 4322` を立ててから `node scripts/capture-previews.mjs [slug...]`。
-// Netlify のビルドには GPU も ffmpeg もないので、ここで作ったものを public/previews/ にコミットする
+// `--webp-only` を付けると撮らずに、今ある jpg から webp だけ作る。
+// Netlify のビルドには GPU も ffmpeg もないので、ここで作ったものを public/previews/ にコミットする。
+// jpg と webm（480×300）は webmanab の記事ページも URL で読んでいる。名前・形式・大きさを変えない。webp はトップだけが使う
 import { execFileSync } from 'node:child_process'
 import {
   existsSync,
@@ -19,6 +21,16 @@ const VIEW = { width: 800, height: 500 }
 // 読み込んで動き出すまで待ってから、この長さだけ切り出す
 const WARMUP = 1200
 const LENGTH = 3600
+// デモごとに撮り方を変えるもの。poster: 'brightest' は、切り出した中でいちばん明るいコマをポスターにする。
+// 暗い背景に字や写真が出たり消えたりするデモで、出そろったところを選ぶため
+const TUNE = {
+  // 写真を読み終えてから開く。開ききったところから撮り始める
+  'reveal-clip': { warmup: 2600, poster: 'brightest' },
+  // 字が上へ抜けて消え、戻ってくるのを繰り返す。決まった時刻だと字が消えたところに当たりやすい
+  splitting: { poster: 'brightest' },
+  // 粒が集まって写真になるまで 1 秒ほどかかる。ぼやけたままのポスターにならないよう待つ
+  'particle-photo': { warmup: 2400 },
+}
 
 const demos = readdirSync('src/demos')
   .filter((slug) => existsSync(`src/demos/${slug}/meta.ts`))
@@ -29,7 +41,8 @@ const demos = readdirSync('src/demos')
       interaction: source.match(/interaction:\s*'([^']+)'/)?.[1] ?? 'none',
     }
   })
-const only = process.argv.slice(2)
+const webpOnly = process.argv.includes('--webp-only')
+const only = process.argv.slice(2).filter((arg) => !arg.startsWith('--'))
 const targets = only.length ? demos.filter((d) => only.includes(d.slug)) : demos
 
 const wait = (page, ms) => page.waitForTimeout(ms)
@@ -98,6 +111,24 @@ const act = async (page, interaction) => {
   }
 }
 
+const ffmpeg = (...args) =>
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...args])
+// トップ用。ffmpeg の webp は入っていないことが多いので cwebp で作る
+const webp = (input, slug) =>
+  execFileSync('cwebp', [
+    '-quiet',
+    '-q',
+    '80',
+    input,
+    '-o',
+    join(OUT, `${slug}.webp`),
+  ])
+
+if (webpOnly) {
+  for (const demo of targets) webp(join(OUT, `${demo.slug}.jpg`), demo.slug)
+  process.exit(0)
+}
+
 mkdirSync(OUT, { recursive: true })
 mkdirSync(TMP, { recursive: true })
 const browser = await chromium.launch({
@@ -114,9 +145,12 @@ for (const demo of targets) {
   const started = Date.now()
   const page = await context.newPage()
   await page.goto(`${BASE}/${demo.slug}/`)
-  // 隅のリンクは一覧のサムネイルには要らない
-  await page.addStyleTag({ content: '.links { display: none !important }' })
-  await wait(page, WARMUP)
+  // 隅のリンクと lil-gui のパネルは一覧のサムネイルには要らない
+  await page.addStyleTag({
+    content: '.links, .lil-gui { display: none !important }',
+  })
+  const tune = TUNE[demo.slug] ?? {}
+  await wait(page, tune.warmup ?? WARMUP)
   const offset = (Date.now() - started) / 1000
   await act(page, demo.interaction)
   await context.close()
@@ -125,8 +159,6 @@ for (const demo of targets) {
     readdirSync(dir).find((f) => f.endsWith('.webm')),
   )
 
-  const ffmpeg = (...args) =>
-    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...args])
   ffmpeg(
     '-ss',
     String(offset),
@@ -147,19 +179,43 @@ for (const demo of targets) {
     '1',
     join(OUT, `${demo.slug}.webm`),
   )
+  // ポスターは劣化のない png に 1 コマ抜いてから、jpg と webp にする
+  const frame = join(dir, 'poster.png')
+  let at = offset + 0.2
+  if (tune.poster === 'brightest') {
+    // 0.1 秒ごとに明るさの平均（YAVG）を出し、いちばん明るいコマの時刻を取る
+    const stats = join(dir, 'stats.txt')
+    ffmpeg(
+      '-ss',
+      String(offset),
+      '-t',
+      String(LENGTH / 1000),
+      '-i',
+      raw,
+      '-vf',
+      `fps=10,signalstats,metadata=print:key=lavfi.signalstats.YAVG:file=${stats}`,
+      '-f',
+      'null',
+      '-',
+    )
+    const text = readFileSync(stats, 'utf8')
+    const times = [...text.matchAll(/pts_time:([\d.]+)/g)].map((m) => +m[1])
+    const values = [...text.matchAll(/YAVG=([\d.]+)/g)].map((m) => +m[1])
+    at = offset + times[values.indexOf(Math.max(...values))]
+  }
   ffmpeg(
     '-ss',
-    String(offset + 0.2),
+    String(at),
     '-i',
     raw,
     '-frames:v',
     '1',
     '-vf',
     'scale=480:300',
-    '-q:v',
-    '4',
-    join(OUT, `${demo.slug}.jpg`),
+    frame,
   )
+  ffmpeg('-i', frame, '-q:v', '4', join(OUT, `${demo.slug}.jpg`))
+  webp(frame, demo.slug)
   console.log(`${demo.slug} (${demo.interaction})`)
 }
 

@@ -1,4 +1,5 @@
-import gsap from 'gsap'
+import gsap from '../../shared/gsap'
+import { whenVisible } from '../../shared/visibility'
 
 const stage = document.querySelector<HTMLElement>('.stage')!
 const photo = stage.querySelector<HTMLImageElement>('.photo')!
@@ -26,4 +27,6 @@ const replay = () => {
 }
 
 stage.addEventListener('click', replay)
-photo.decode().then(() => gsap.delayedCall(0.5, show), show)
+// 記事の中で画面に入ってから再生する。読み込んだ時点で再生すると、読む人が来る前に終わっている
+const start = () => whenVisible(() => gsap.delayedCall(0.5, show))
+photo.decode().then(start, start)

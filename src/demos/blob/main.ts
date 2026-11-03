@@ -1,4 +1,4 @@
-import { gsap } from 'gsap'
+import { gsap } from '../../shared/gsap'
 import {
   BufferAttribute,
   Color,
@@ -9,10 +9,10 @@ import {
   MeshPhongMaterial,
   PerspectiveCamera,
   Scene,
-  WebGLRenderer,
 } from 'three'
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js'
 import { loop, onResize, prefersReducedMotion } from '../../shared/dom'
+import { createGlStage } from '../../shared/gl'
 import { damp, map } from '../../shared/math'
 import { createNoise } from '../../shared/noise'
 
@@ -20,8 +20,11 @@ const canvas = document.querySelector<HTMLCanvasElement>('.blob canvas')!
 let width = 0
 let height = 0
 
-const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true })
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+const renderer = createGlStage(canvas, {
+  antialias: true,
+  alpha: true,
+  onRestore: () => update(0, now),
+})
 
 const scene = new Scene()
 const camera = new PerspectiveCamera(100, 1, 0.1, 10000)
@@ -93,30 +96,35 @@ const update = (dt: number, elapsed: number) => {
   angle = damp(angle, target, 0.3, dt)
   camera.position.set(400 * Math.sin(angle), 0, 400 * Math.cos(angle))
   camera.lookAt(0, 0, 0)
-  renderer.render(scene, camera)
+  renderer?.render(scene, camera)
 }
 
-window.addEventListener('pointermove', (event) => {
-  mouse.x = event.clientX
-  gsap.to(force, {
-    duration: 0.3,
-    y: event.clientY / height,
-    ease: 'power3.out',
-  })
-  gsap.to(shape.position, {
-    duration: 2,
-    x: map(event.clientX, 0, width, -100, 100),
-    y: map(event.clientY, 0, height, -100, 100),
-    ease: 'power3.out',
-  })
+// マウスが動くたびに、今の値から新しい値へ向かい直す。gsap.to を毎回作ると tween が積み重なる
+const forceY = gsap.quickTo(force, 'y', { duration: 0.3, ease: 'power3.out' })
+const shapeX = gsap.quickTo(shape.position, 'x', {
+  duration: 2,
+  ease: 'power3.out',
+})
+const shapeY = gsap.quickTo(shape.position, 'y', {
+  duration: 2,
+  ease: 'power3.out',
 })
 
-onResize(canvas, (size) => {
-  ;({ width, height } = size)
-  renderer.setSize(width, height, false)
-  camera.aspect = width / height
-  camera.updateProjectionMatrix()
-  update(0, now)
-})
+if (renderer) {
+  window.addEventListener('pointermove', (event) => {
+    mouse.x = event.clientX
+    forceY(event.clientY / height)
+    shapeX(map(event.clientX, 0, width, -100, 100))
+    shapeY(map(event.clientY, 0, height, -100, 100))
+  })
 
-if (!prefersReducedMotion()) loop(update)
+  onResize(canvas, (size) => {
+    ;({ width, height } = size)
+    renderer.setSize(width, height, false)
+    camera.aspect = width / height
+    camera.updateProjectionMatrix()
+    update(0, now)
+  })
+
+  if (!prefersReducedMotion()) loop(update)
+}

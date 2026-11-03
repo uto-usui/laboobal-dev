@@ -1,17 +1,11 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { loop, onResize } from '../../shared/dom'
-import { createRenderer } from '../../shared/b2/gl'
+import { createGlStage } from '../../shared/gl'
 
 const stage = document.querySelector<HTMLElement>('.video-demo')!
 const canvas = stage.querySelector<HTMLCanvasElement>('canvas')!
 const video = stage.querySelector<HTMLVideoElement>('video')!
-
-// 音のない動画は自動で再生できる。止められても、形と影は描けるので握りつぶす
-video.play().catch(() => {})
-
-const renderer = createRenderer(canvas, { antialias: true })
-renderer.shadowMap.enabled = true
 
 const scene = new THREE.Scene()
 scene.background = new THREE.Color(0xbb0000)
@@ -66,15 +60,23 @@ const mesh = new THREE.Mesh(
 mesh.castShadow = true
 scene.add(mesh)
 
-onResize(stage, ({ width, height }) => {
-  renderer.setSize(width, height, false)
-  camera.aspect = width / height
-  camera.updateProjectionMatrix()
-})
+const renderer = createGlStage(canvas, { antialias: true })
 
-loop((dt) => {
-  // 旧デモは毎フレーム 0.01 rad。60fps で 1 秒に 0.6 rad
-  mesh.rotation.x += 0.6 * dt
-  controls.update()
-  renderer.render(scene, camera)
-})
+if (renderer) {
+  renderer.shadowMap.enabled = true
+  // 音のない動画は自動で再生できる。止められても、形と影は描けるので握りつぶす
+  video.play().catch(() => {})
+
+  onResize(stage, ({ width, height }) => {
+    renderer.setSize(width, height, false)
+    camera.aspect = width / height
+    camera.updateProjectionMatrix()
+  })
+
+  loop((dt) => {
+    // 旧デモは毎フレーム 0.01 rad。60fps で 1 秒に 0.6 rad
+    mesh.rotation.x += 0.6 * dt
+    controls.update()
+    renderer.render(scene, camera)
+  })
+}

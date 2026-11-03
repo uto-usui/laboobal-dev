@@ -1,6 +1,6 @@
 # 作業の前提
 
-このリポジトリで作業する人（エージェントを含む）向けに、まわりのリポジトリとの関係、決まっていること、今の状態、作業の流れ、参考にするものをまとめます。2026-11-01 時点の内容です。
+このリポジトリで作業する人（エージェントを含む）向けに、まわりのリポジトリとの関係、決まっていること、今の状態、作業の流れ、参考にするものをまとめます。2026-11-01 時点の内容で、本数などは 2026-11-03 に直しました。
 
 ## 1. 場所と役割
 
@@ -8,7 +8,7 @@
 
 | 場所 | 役割 | 公開先 | 今の状態 |
 | --- | --- | --- | --- |
-| `uto-usui/laboobal-dev`（ここ） | 動くデモ。1 デモ 1 ページ。説明は書かず、lab の記事へのリンクだけ置く | [labobal.dev](https://labobal.dev) | Astro の 47 デモ（2026-11-02 に作り直した） |
+| `uto-usui/laboobal-dev`（ここ） | 動くデモ。1 デモ 1 ページ。説明は書かず、lab の記事へのリンクだけ置く | [labobal.dev](https://labobal.dev) | Astro の 55 デモ（2026-11-02 に作り直した） |
 | [`uto-usui/webmanab`](https://github.com/uto-usui/webmanab) | ブログ webmanab.com のサイトのコード。lab の記事がデモを `<iframe>` で埋め込む | [webmanab.com](https://webmanab.com) | Astro 7。動いている |
 | 作者の Obsidian の vault（非公開） | webmanab の記事の原稿。lab の記事もここで書く | なし。push すると webmanab に写る | 動いている |
 | [`uto-usui/laboobal`](https://github.com/uto-usui/laboobal) | なくす。デモを移し終えたら、リポジトリをアーカイブする | laboobal.netlify.app | 2021-05 から止まっている |
@@ -31,7 +31,7 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 - リポジトリはこのまま使う。Netlify のサイト（`labobal-dev`）とドメインのつながりは触らない
 - 今の 7 デモの URL は残す（3 章の小文字のパス）
 - lab の記事からは `<iframe>` で埋め込む。埋め込んでよい相手は labobal.dev 側の `frame-ancestors` で webmanab に絞る
-- lab の記事の frontmatter の `demoUrl` に labobal.dev の URL を入れ、lab のページで `demoUrl` を出す。lab のページで出す実装は webmanab 側でまだしていない
+- lab の記事の frontmatter の `demoUrl` に labobal.dev の URL を入れ、lab のページで `demoUrl` を出す。lab のページでは webmanab の `EntryDemo` が `demoUrl` を出す（webmanab#74 で入った）。labobal.dev の URL のときは、`https://labobal.dev/previews/<slug>.webm` と `.jpg` を読んで動画を付ける
 - 新しく書く lab の記事は 7 本（drag、follow、hover、scroll、マウスで傾ける、reveal、distortion）。下書きは Claude が書き、1 本目を作者に見てもらってから残りに進む
 - laboobal の画像（`docs/.vuepress/public/images/girl`、3MB）はフリー素材。規約を確かめてから移す
 - `polyfill.io` の読み込みは作り直しを待たずに外した（[#9](https://github.com/uto-usui/laboobal-dev/issues/9)）
@@ -54,7 +54,7 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 - 作り直す道具。計画書は Astro を推しています。webmanab と道具をそろえられることと、デモの一覧とページを 1 つのリストから作れることが理由です
 - デモだけのもの（記事を作らないもの）32 個の見せ方
 - トップの見た目。見た目は作者が決めるので、案を作ってスクショで見てもらう
-- 計測を入れるか
+- 計測を入れるか。[plan.md](plan.md) の 3 章では「入れない」と決めた。ただ、記事のないデモやトップの読まれ方は webmanab の側からは見えないので、見直すかを考えている
 
 ## 3. 今の状態（2026-11-02）
 
@@ -62,8 +62,9 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 
 - Astro 7.4（静的出力）、TypeScript、GLSL、pnpm 10。Node は 26（`.nvmrc`）
 - 作り直す前の Nuxt 2 のコードは、タグ `nuxt2-final` に残しています
-- デモは 47 本です。`src/demos/<slug>/` に 1 本ずつあり、`/<slug>/` のページとトップの一覧に出ます。laboobal から移す候補のうち 19 本は下げました。理由は `docs/dropped/` にあります
-- 移すのではなく、ここで新しく作ったデモは `batch: 'new'` にします。今は particle-photo（WebGPU）の 1 本です。WebGPU のデモは meta に `webgpu: true` を付け、使えないブラウザでは一行の案内を出します
+- デモは 55 本です。`src/demos/<slug>/` に 1 本ずつあり、`/<slug>/` のページとトップの一覧に出ます。laboobal から移す候補のうち 19 本は下げました。理由は `docs/dropped/` にあります
+- 移すのではなく、ここで新しく作ったデモは `batch: 'new'` にします。今は particle-photo（WebGPU）の 1 本です。WebGPU のデモは meta に `webgpu: true` を付けます。今はどこからも読んでいない目印で、使えないブラウザで一行の案内を出すのはデモの側の処理です
+- `public/previews/<slug>.webm` と `.jpg`（480×300）は、トップの一覧と webmanab の記事のページの両方が使います。webmanab は URL で直接読むので、名前と大きさを変えません
 - 前からある 7 本は、パスを変えずに作り直しました
 
 | デモ | 公開中のパス |
@@ -176,7 +177,7 @@ webmanab の lab の記事 47 本が jsfiddle を埋め込んでいます。2026
 - ソースは、ブラウザで `https://jsfiddle.net/yutousui/<id>/` を開き、エディタの `<form>` の `code_html`、`code_css`、`code_js`、`js_lib`、`panel_css`（1 なら SCSS）を読んで取り出します。`curl` には 403 を返します
 - jQuery や TweenMax、Processing.js、CreateJS は使わず、最新の書き方で、記事の説明にある動きを再現します。記事の本文のコードの抜粋は古い書き方のまま残るので、違いはデモのメモに書きます
 - 作り直したら記事の iframe の `src` と `demoUrl` だけを書き換えます。fiddle は消しません
-- 順番は、壊れている 4 本、jQuery (edge) を使う 7 本、Processing.js と CreateJS の 22 本、残り 14 本です。jQuery (edge) と、jsfiddle のライブラリの選択肢に頼っているものは、jsfiddle の都合で止まりうるためです
+- 順番は、壊れている 4 本、jQuery (edge) を使う 8 本、Processing.js と CreateJS の 24 本、残り 11 本です（取り出したソースで数え直した数。[plan.md](plan.md) の 7 章）。2026-11-03 の時点で、はじめの 2 つ（12 本）は済んでいます。jQuery (edge) と、jsfiddle のライブラリの選択肢に頼っているものは、jsfiddle の都合で止まりうるためです
 
 ## 5. 作り直すときの設定
 

@@ -32,3 +32,53 @@ svg {
   display: block;
   max-width: 100%;
 }
+
+/* 画面の外やタブが裏にある間は止める（src/shared/visibility.ts）。
+   デモの animation の一括指定は play-state を running に戻すうえ、デモの style の方が詳細度が高いので !important にする */
+html[data-offscreen] * {
+  animation-play-state: paused !important;
+}
+
+/* WebGL が使えないときの一行の案内（showFallback）。particle-photo の WebGPU の案内と同じ見た目 */
+.demo-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 2147483646;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  font-size: 13px;
+  color: color-mix(in srgb, var(--color-fg) 70%, var(--color-bg));
+  background: var(--color-bg);
+}
+
+/* いくつかのデモで使う小さな部品。左上の「scroll」の添え書き（scroll-reveal の 3 本）と、左下のもう一度ボタン（reveal の 2 本） */
+.demo-hint {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  margin: 0;
+  font-size: 11px;
+  color: var(--color-muted);
+  letter-spacing: 0.1em;
+}
+
+.demo-replay {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 4px 8px;
+  font: inherit;
+  font-size: 11px;
+  color: var(--color-fg);
+  cursor: pointer;
+  background: none;
+  border: 1px solid currentcolor;
+  border-radius: 2px;
+  opacity: 0.6;
+}
+
+.demo-replay:hover,
+.demo-replay:focus-visible {
+  opacity: 1;
+}
