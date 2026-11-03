@@ -69,6 +69,14 @@
     border-radius: 8px;
   }
 
+  /* 狭い幅では右下のリンク（高さ約 20px）と横に並びきらないので、リンクの上へ上げる */
+  @media (width < 560px) {
+    .strip {
+      bottom: 36px;
+      max-width: calc(100% - 16px);
+    }
+  }
+
   .strip :global(button) {
     all: unset;
     position: relative;
