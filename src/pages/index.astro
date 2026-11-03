@@ -14,6 +14,16 @@ const FILTERS = [
   { key: 'click', label: 'click' },
   { key: 'none', label: 'watch' },
 ] as const
+const SPECULATION = {
+  prefetch: [
+    {
+      where: {
+        and: [{ href_matches: '/*' }, { selector_matches: '.list a' }],
+      },
+      eagerness: 'moderate',
+    },
+  ],
+}
 const countOf = (key: string) =>
   key === 'all'
     ? demos.length
@@ -24,6 +34,13 @@ const countOf = (key: string) =>
 ---
 
 <Base title="labobal.dev">
+  <!-- 名前に少しとどまったら、そのデモのページを先に取っておく。prerender は WebGL を裏で動かすことになるのでしない -->
+  <script
+    slot="head"
+    type="speculationrules"
+    is:inline
+    set:html={JSON.stringify(SPECULATION)}
+  />
   <p class="mark" aria-hidden="true">
     labobal.dev
   </p>
