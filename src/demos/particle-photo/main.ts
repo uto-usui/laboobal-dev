@@ -51,7 +51,12 @@ const P = {
   bloom: 0.9,
   impasto: 1,
   shadow: 1,
-  count: 262144,
+  // 指で触る端末と画面の小さい端末（スマホ）は、GPU が非力なことが多いので少ない粒から始める
+  count:
+    matchMedia('(pointer: coarse)').matches ||
+    Math.min(screen.width, screen.height) < 600
+      ? 65536
+      : 262144,
   night: false,
   auto: !prefersReducedMotion(),
 }
