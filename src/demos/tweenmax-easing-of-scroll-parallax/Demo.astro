@@ -1,0 +1,81 @@
+---
+import '@fontsource/molle/400-italic.css'
+
+// 速さの倍率。1 より大きいものはスクロールより速く、小さいものは遅く動く
+const ratios = [1.05, 0.8, 2.5, 1.1, 1.8]
+---
+
+<div class="slow-scroll">
+  <h1>
+    parallax scroll
+    <br />ー
+  </h1>
+  <section class="stage">
+    {ratios.map((ratio, i) => (
+      <div class="layer" data-parallax={ratio} style={`--i: ${i}`}>
+        <span />
+      </div>
+    ))}
+  </section>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .slow-scroll {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    padding: 32px 16px;
+    color: #292b2c;
+    color-scheme: light;
+    background-image: linear-gradient(60deg, #f7cac9 15%, #91a8d0 85%);
+  }
+
+  h1 {
+    align-self: flex-start;
+    margin: 0;
+    font-family: Molle, cursive;
+    font-size: 40px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.2;
+    color: rgb(255 255 255 / 85%);
+  }
+
+  .stage {
+    position: relative;
+    width: 320px;
+    height: 1000px;
+    overflow: hidden;
+    background-color: rgb(0 0 0 / 90%);
+    border: 6px double currentcolor;
+  }
+
+  /* 左上から右下へ、斜めに 1 つずつずらして置く */
+  .layer {
+    position: absolute;
+    top: calc(1000px / 5 * var(--i));
+    left: calc(320px / 5 * var(--i));
+    width: 50px;
+    height: 50px;
+  }
+
+  .layer > span {
+    display: block;
+    width: 50%;
+    height: 50%;
+    background-color: rgb(238 238 238 / 45%);
+    border-radius: 48% / 39%;
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+</style>

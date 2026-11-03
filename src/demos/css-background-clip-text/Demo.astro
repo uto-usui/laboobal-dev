@@ -1,0 +1,59 @@
+---
+import '@fontsource/molle/400-italic.css'
+import photo from './assets/photo.jpg'
+---
+
+<div class="clip-text" style={`--photo: url(${photo.src})`}>
+  <h1>clip text</h1>
+  <section class="frame">
+    <p class="clip">CLIP TEXT</p>
+  </section>
+</div>
+
+<style>
+  .clip-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    color: #232931;
+    color-scheme: light;
+    background-image: linear-gradient(60deg, #f7cac9 15%, #91a8d0 85%);
+    container-type: size;
+  }
+
+  h1 {
+    margin: 0;
+    font-family: Molle, cursive;
+    font-size: clamp(28px, 7cqh, 48px);
+    font-style: italic;
+    font-weight: 400;
+    color: rgb(255 255 255 / 85%);
+  }
+
+  .frame {
+    width: min(480px, 100%);
+    padding: 16px;
+    background-color: rgb(255 255 255 / 50%);
+    border: 6px double currentcolor;
+  }
+
+  /* 文字の色を透明にして、背景の写真を文字の形でだけ見せる */
+  .clip {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    font-size: clamp(56px, min(18cqw, 22cqh), 128px);
+    font-weight: 900;
+    line-height: 1.05;
+    color: transparent;
+    text-align: center;
+    background-image: var(--photo);
+    background-position: center 55%;
+    background-size: cover;
+    background-clip: text;
+  }
+</style>

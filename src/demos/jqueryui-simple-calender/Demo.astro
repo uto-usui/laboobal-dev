@@ -1,0 +1,162 @@
+---
+import '@fontsource/molle/400-italic.css'
+---
+
+<div class="calendar-demo">
+  <h1>simple calender</h1>
+  <div class="panels">
+    <section class="frame range">
+      <label>
+        FROM:
+        <input type="date" class="from" />
+      </label>
+      <label>
+        TO:
+        <input type="date" class="to" />
+      </label>
+    </section>
+    <section class="frame">
+      <div class="calendar"></div>
+      <input type="text" class="output" readonly aria-label="選んだ日" />
+    </section>
+  </div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .calendar-demo {
+    --line: #ccc;
+    --paper: #fafafa;
+
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: center;
+    min-height: 100dvh;
+    padding: 24px 16px 48px;
+    font-family: system-ui, sans-serif;
+    font-size: 16px;
+    color: #292b2c;
+    color-scheme: light;
+    background-image: linear-gradient(60deg, #f7cac9 15%, #91a8d0 85%);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: Molle, cursive;
+    font-size: 40px;
+    font-style: italic;
+    font-weight: 400;
+    color: rgb(255 255 255 / 85%);
+  }
+
+  /* 広い画面では 2 つの枠を横に並べる。縦に積むと、低い iframe ではカレンダーが下に隠れる */
+  .panels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .frame {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: min(360px, 100%);
+    padding: 16px;
+    border: 6px double currentcolor;
+  }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  input {
+    height: 50px;
+    padding: 0 1em;
+    font: inherit;
+    color: inherit;
+    background: #fff;
+    border: 1px solid rgb(0 0 0 / 15%);
+  }
+
+  /* ここから下は、jQuery UI のカレンダーに当てていた見た目を、自前のカレンダーに移したもの */
+  .calendar-demo :global(.calendar) {
+    text-align: center;
+    background: var(--paper);
+    border: 2px solid var(--line);
+    box-shadow: 0 0 120px rgb(0 0 0 / 20%);
+  }
+
+  .calendar-demo :global(.calendar-head) {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
+    align-items: center;
+    padding: 15px;
+    color: var(--line);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .calendar-demo :global(.calendar-head button) {
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-transform: inherit;
+    letter-spacing: inherit;
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  .calendar-demo :global(.calendar-head button:hover) {
+    color: #999;
+  }
+
+  .calendar-demo :global(.calendar table) {
+    width: 100%;
+    font-size: 14px;
+    color: var(--line);
+    table-layout: fixed;
+    border-collapse: collapse;
+  }
+
+  .calendar-demo :global(.calendar th) {
+    padding: 10px 0;
+    border-top: 2px solid var(--line);
+  }
+
+  .calendar-demo :global(.calendar :is(th, td)) {
+    border: 1px solid rgb(204 204 204 / 50%);
+  }
+
+  .calendar-demo :global(.calendar td) {
+    padding: 0;
+  }
+
+  .calendar-demo :global(.calendar td button) {
+    display: block;
+    width: 100%;
+    padding: 10px 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  .calendar-demo :global(.calendar td button:is(:hover, :focus-visible)),
+  .calendar-demo :global(.calendar td button[aria-pressed='true']) {
+    color: var(--paper);
+    background-color: var(--line);
+    outline: 0;
+  }
+</style>

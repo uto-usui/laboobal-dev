@@ -1,0 +1,72 @@
+---
+import '@fontsource/molle/400-italic.css'
+---
+
+<div class="count-text">
+  <h1>count text number</h1>
+  <div class="field">
+    <textarea id="count-text-input" aria-label="本文"></textarea>
+    <p class="length">
+      <output for="count-text-input">
+        <strong>0</strong>
+      </output>
+      ／2000文字
+    </p>
+  </div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .count-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    color: #232931;
+    color-scheme: light;
+    background-image: linear-gradient(45deg, #f7cac9 15%, #91a8d0 85%);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: Molle, cursive;
+    font-size: 40px;
+    font-style: italic;
+    font-weight: 400;
+    color: rgb(255 255 255 / 85%);
+  }
+
+  .field {
+    width: min(300px, 100%);
+  }
+
+  textarea {
+    display: block;
+    width: 100%;
+    height: 200px;
+    padding: 0.6em;
+    font: inherit;
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgb(0 0 0 / 60%);
+    resize: vertical;
+    background-color: rgb(255 255 255 / 65%);
+    border: 0;
+  }
+
+  /* flex にして、数と「／2000文字」のあいだの改行の空白を消す */
+  .length {
+    display: flex;
+    justify-content: flex-end;
+    margin: 8px 0 0;
+    font-size: 14px;
+    text-align: right;
+  }
+</style>
