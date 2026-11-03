@@ -7,7 +7,18 @@ const root = document.querySelector<HTMLElement>('.sm')!
 const reduced = prefersReducedMotion()
 
 const scroll = new LocomotiveScroll({
-  lenisOptions: { smoothWheel: !reduced },
+  lenisOptions: {
+    smoothWheel: !reduced,
+    // Lenis は端まで来ていても wheel を preventDefault する。端からさらに外へ回したときは false を返して
+    // Lenis に渡さず、記事の iframe の外のページへスクロールを渡す
+    virtualScroll: ({ deltaY }) => {
+      const max = document.documentElement.scrollHeight - innerHeight
+      return !(
+        (deltaY < 0 && scrollY <= 0) ||
+        (deltaY > 0 && scrollY >= max - 1)
+      )
+    },
+  },
   // ページの背景の色相を、スクロールの進み具合で 2 周させる
   scrollCallback: ({ progress }) => {
     root.style.setProperty('--turn', String(progress || 0))
