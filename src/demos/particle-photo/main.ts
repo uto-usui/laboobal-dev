@@ -401,10 +401,9 @@ try {
   bindInput()
   buildGui()
   loop(frame)
-  for (const url of PHOTOS) {
-    const blob = await (await fetch(url)).blob()
-    await addImage(blob, url)
-  }
+  // 6 枚を一度に読み始め、足すのは並びの順にする（1 枚目は Demo.astro の preload で先に読んでいる）
+  const blobs = PHOTOS.map((url) => fetch(url).then((res) => res.blob()))
+  for (const [i, blob] of blobs.entries()) await addImage(await blob, PHOTOS[i])
 } catch (error) {
   if (error instanceof Unsupported) stage.classList.add('is-unsupported')
   else showError(error instanceof Error ? error.message : String(error))

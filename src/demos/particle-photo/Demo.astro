@@ -1,3 +1,11 @@
+---
+// 1 枚目の写真を、JS を待たずに HTML から読み始める。main.ts は fetch() で読むので as="fetch"。
+// as="image" だと fetch() の読み込みに使われず、2 回読むことになる
+import firstPhoto from './assets/01.jpg?url'
+---
+
+<link rel="preload" href={firstPhoto} as="fetch" crossorigin="anonymous" />
+
 <div class="particle-photo">
   <canvas
     class="view"
