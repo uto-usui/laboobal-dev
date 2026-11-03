@@ -1,7 +1,10 @@
 import * as THREE from 'three'
 import { loop, onResize, pixelRatio } from '../../shared/dom'
-import { FULLSCREEN_VERTEX, createFullscreenScene } from '../../shared/b2/gl'
-import { createGlStage } from '../../shared/gl'
+import {
+  FULLSCREEN_VERTEX,
+  createFullscreenScene,
+  createGlStage,
+} from '../../shared/gl'
 import noise from '../../shared/glsl/simplex-noise.glsl?raw'
 import typo from './assets/typo.frag?raw'
 

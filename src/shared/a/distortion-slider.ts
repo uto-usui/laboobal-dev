@@ -1,7 +1,12 @@
 import gsap from '../gsap'
 import * as THREE from 'three'
 import { onResize, prefersReducedMotion } from '../dom'
-import { createGlStage } from '../gl'
+import {
+  FULLSCREEN_VERTEX,
+  coverScale,
+  createFullscreenScene,
+  createGlStage,
+} from '../gl'
 import noise from '../glsl/simplex-noise.glsl?raw'
 import distortion from './glsl/distortion.glsl?raw'
 
@@ -25,14 +30,6 @@ interface Options {
   interval?: number
 }
 
-const vertex = /* glsl */ `
-  varying vec2 vUv;
-  void main() {
-    vUv = uv;
-    gl_Position = vec4(position.xy, 0.0, 1.0);
-  }
-`
-
 /**
  * 2 枚の写真を、模様でゆがませながら入れ替えるスライダー。
  * 描くのは切り替えている間と、大きさが変わったときだけ
@@ -55,10 +52,6 @@ export const createDistortionSlider = ({
   if (!renderer) return
   renderer.setClearColor(0x111111)
 
-  const scene = new THREE.Scene()
-  // 頂点シェーダーで -1〜1 の面をそのまま画面に置くので、カメラは形だけ
-  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
-
   const loader = new THREE.TextureLoader()
   const textures = photos.map((photo) => {
     const texture = loader.load(photo.src, render)
@@ -77,29 +70,27 @@ export const createDistortionSlider = ({
   }
   const material = new THREE.ShaderMaterial({
     uniforms,
-    vertexShader: vertex,
+    vertexShader: FULLSCREEN_VERTEX,
     fragmentShader: `${noise}\n${distortion}\n${fragment}`,
   })
-  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material))
+  const { scene, camera } = createFullscreenScene(material)
 
-  let aspect = 1
-  const coverScale = (photo: Photo, target: THREE.Vector2) => {
-    const ratio = aspect / (photo.width / photo.height)
-    return ratio > 1 ? target.set(1, 1 / ratio) : target.set(ratio, 1)
-  }
+  let size = { width: 1, height: 1 }
+  const cover = (photo: Photo, target: THREE.Vector2) =>
+    coverScale(size.width, size.height, photo.width, photo.height, target)
 
   let current = 0
   const next = () => (current + 1) % photos.length
   const setPair = () => {
     uniforms.uTexture1.value = textures[current]
     uniforms.uTexture2.value = textures[next()]
-    coverScale(photos[current], uniforms.uCover1.value)
-    coverScale(photos[next()], uniforms.uCover2.value)
+    cover(photos[current], uniforms.uCover1.value)
+    cover(photos[next()], uniforms.uCover2.value)
   }
   setPair()
 
   onResize(root, ({ width, height }) => {
-    aspect = width / height
+    size = { width, height }
     renderer.setSize(width, height, false)
     setPair()
     render()

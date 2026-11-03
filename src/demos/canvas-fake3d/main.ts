@@ -5,8 +5,8 @@ import {
   FULLSCREEN_VERTEX,
   coverScale,
   createFullscreenScene,
-} from '../../shared/b2/gl'
-import { createGlStage } from '../../shared/gl'
+  createGlStage,
+} from '../../shared/gl'
 import { pointerOrWander, trackPointer } from '../../shared/pointer'
 import fragmentShader from './assets/fake3d.frag?raw'
 import { HEIGHT, WIDTH, paintScene } from './scene'

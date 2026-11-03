@@ -6,8 +6,8 @@ import {
   coverScale,
   createFullscreenScene,
   loadTexture,
-} from '../../shared/b2/gl'
-import { createGlStage } from '../../shared/gl'
+  createGlStage,
+} from '../../shared/gl'
 import { pointerOrWander, trackPointer } from '../../shared/pointer'
 import photo from './assets/photo.jpg'
 import fragmentShader from './assets/shift.frag?raw'

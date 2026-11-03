@@ -5,8 +5,8 @@ import {
   coverScale,
   createFullscreenScene,
   loadTexture,
-} from '../../shared/b2/gl'
-import { createGlStage } from '../../shared/gl'
+  createGlStage,
+} from '../../shared/gl'
 import noise from '../../shared/glsl/simplex-noise.glsl?raw'
 import photo from './assets/photo.jpg'
 import glitch from './assets/glitch.frag?raw'

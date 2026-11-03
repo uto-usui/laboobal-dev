@@ -1,10 +1,8 @@
 import { loop, onResize, prefersReducedMotion } from '../../shared/dom'
-import { map, random } from '../../shared/math'
+import { map, random, toRadian } from '../../shared/math'
 
 const stage = document.querySelector<HTMLElement>('[data-stage]')!
 const ball = document.querySelector<HTMLElement>('[data-ball]')!
-
-const toRadian = (degree: number) => (degree * Math.PI) / 180
 
 /**
  * x、y、z、色相、perspective を、それぞれ別の角度と速さの sin で動かす。速さは 1 秒に進む角度。

@@ -1,35 +1,24 @@
-import {
-  Mesh,
-  OrthographicCamera,
-  PlaneGeometry,
-  Scene,
-  ShaderMaterial,
-} from 'three'
+import { ShaderMaterial } from 'three'
 import noise from '../../shared/glsl/simplex-noise.glsl?raw'
 import { loop, onResize, prefersReducedMotion } from '../../shared/dom'
-import { createGlStage } from '../../shared/gl'
+import {
+  FULLSCREEN_VERTEX,
+  createFullscreenScene,
+  createGlStage,
+} from '../../shared/gl'
 import fragmentShader from './assets/amoeba.frag?raw'
 
 const canvas = document.querySelector<HTMLCanvasElement>('.amoeba canvas')!
 
-// 2×2 の板を、-1〜1 を写すカメラで見ると、ちょうど画面いっぱいになる
-const scene = new Scene()
-const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1)
 const material = new ShaderMaterial({
   uniforms: {
     time: { value: 0 },
     aspectRatio: { value: 1 },
   },
-  vertexShader: /* glsl */ `
-    varying vec2 vUv;
-    void main() {
-      vUv = uv;
-      gl_Position = vec4(position.xy, 0.0, 1.0);
-    }
-  `,
+  vertexShader: FULLSCREEN_VERTEX,
   fragmentShader: noise + fragmentShader,
 })
-scene.add(new Mesh(new PlaneGeometry(2, 2), material))
+const { scene, camera } = createFullscreenScene(material)
 
 const render = () => renderer?.render(scene, camera)
 const renderer = createGlStage(canvas, { antialias: false, onRestore: render })
