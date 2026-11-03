@@ -18,4 +18,18 @@ pnpm verify       # lint、整形、型、ビルド、E2E をまとめて
 
 ## デモを足す
 
-`src/demos/<slug>/` に `meta.ts`、`Demo.astro`、`notes.md` を置くと、`/<slug>/` のページとトップの一覧に出ます。共有のファイルは書き換えません。決まりは [docs/plan.md](docs/plan.md) の 5 章、見本は `src/demos/marquee/` です。
+`src/demos/<slug>/` に `meta.ts`、`Demo.astro`、`notes.md` を置き、`src/pages/<slug>.astro` にページを置くと、`/<slug>/` のページとトップの一覧に出ます。ページの中身は次の形で、`<slug>` のところだけを替えます。
+
+```astro
+---
+import DemoLayout from '../layouts/DemoLayout.astro'
+import Demo from '../demos/<slug>/Demo.astro'
+import meta from '../demos/<slug>/meta'
+---
+
+<DemoLayout demo={meta}>
+  <Demo />
+</DemoLayout>
+```
+
+ページを 1 つの動的ルート（`[slug].astro`）にまとめないのは、まとめると全デモの CSS がどのページにも付くためです。ページがない、別のデモを読んでいる、デモのないページがある、のどれかがあるとビルドが落ち、置くべき中身がエラーに出ます。そのほかの共有のファイルは書き換えません。決まりは [docs/plan.md](docs/plan.md) の 5 章、見本は `src/demos/marquee/` と `src/pages/marquee.astro` です。
