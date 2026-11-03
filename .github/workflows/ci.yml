@@ -4,12 +4,18 @@ on:
     paths-ignore:
       - 'docs/**'
       - 'README.md'
+      - 'CLAUDE.md'
+      - 'AGENTS.md'
+      - '.claude/**'
       - 'src/demos/*/notes.md'
   push:
     branches: [master]
     paths-ignore:
       - 'docs/**'
       - 'README.md'
+      - 'CLAUDE.md'
+      - 'AGENTS.md'
+      - '.claude/**'
       - 'src/demos/*/notes.md'
 
 permissions:
