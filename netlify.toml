@@ -26,3 +26,10 @@
   for = "/_astro/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# トップと webmanab の記事ページが読む動画とポスター。名前にハッシュがなく、撮り直すと同じ名前で中身が変わるので
+# immutable にはせず 1 日にとどめる
+[[headers]]
+  for = "/previews/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
