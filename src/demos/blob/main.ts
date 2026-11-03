@@ -99,20 +99,23 @@ const update = (dt: number, elapsed: number) => {
   renderer?.render(scene, camera)
 }
 
+// マウスが動くたびに、今の値から新しい値へ向かい直す。gsap.to を毎回作ると tween が積み重なる
+const forceY = gsap.quickTo(force, 'y', { duration: 0.3, ease: 'power3.out' })
+const shapeX = gsap.quickTo(shape.position, 'x', {
+  duration: 2,
+  ease: 'power3.out',
+})
+const shapeY = gsap.quickTo(shape.position, 'y', {
+  duration: 2,
+  ease: 'power3.out',
+})
+
 if (renderer) {
   window.addEventListener('pointermove', (event) => {
     mouse.x = event.clientX
-    gsap.to(force, {
-      duration: 0.3,
-      y: event.clientY / height,
-      ease: 'power3.out',
-    })
-    gsap.to(shape.position, {
-      duration: 2,
-      x: map(event.clientX, 0, width, -100, 100),
-      y: map(event.clientY, 0, height, -100, 100),
-      ease: 'power3.out',
-    })
+    forceY(event.clientY / height)
+    shapeX(map(event.clientX, 0, width, -100, 100))
+    shapeY(map(event.clientY, 0, height, -100, 100))
   })
 
   onResize(canvas, (size) => {
