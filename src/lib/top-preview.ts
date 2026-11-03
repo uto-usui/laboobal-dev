@@ -165,7 +165,7 @@ export const createGlPreview = (
     const cached = posters.get(slug)
     if (cached || loading.has(slug)) return cached
     loading.add(slug)
-    loader.load(`/previews/${slug}.jpg`, (texture) => {
+    loader.load(`/previews/${slug}.webp`, (texture) => {
       posters.set(slug, texture)
       if (current === slug && uniforms.uMap.value !== videoTexture)
         uniforms.uMap.value = texture
