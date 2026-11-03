@@ -1,6 +1,7 @@
 import gsap from '../gsap'
 import * as THREE from 'three'
 import { onResize, prefersReducedMotion } from '../dom'
+import { createGlStage } from '../gl'
 import noise from '../glsl/simplex-noise.glsl?raw'
 import distortion from './glsl/distortion.glsl?raw'
 
@@ -44,16 +45,19 @@ export const createDistortionSlider = ({
   duration = 2.5,
   interval = 3,
 }: Options) => {
-  const renderer = new THREE.WebGLRenderer({ antialias: false })
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  const canvas = document.createElement('canvas')
+  root.prepend(canvas)
+  const render = () => renderer?.render(scene, camera)
+  const renderer = createGlStage(canvas, {
+    antialias: false,
+    onRestore: render,
+  })
+  if (!renderer) return
   renderer.setClearColor(0x111111)
-  root.prepend(renderer.domElement)
 
   const scene = new THREE.Scene()
   // 頂点シェーダーで -1〜1 の面をそのまま画面に置くので、カメラは形だけ
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
-
-  const render = () => renderer.render(scene, camera)
 
   const loader = new THREE.TextureLoader()
   const textures = photos.map((photo) => {

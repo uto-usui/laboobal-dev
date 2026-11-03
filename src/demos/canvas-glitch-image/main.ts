@@ -4,9 +4,9 @@ import {
   FULLSCREEN_VERTEX,
   coverScale,
   createFullscreenScene,
-  createRenderer,
   loadTexture,
 } from '../../shared/b2/gl'
+import { createGlStage } from '../../shared/gl'
 import noise from '../../shared/glsl/simplex-noise.glsl?raw'
 import photo from './assets/photo.jpg'
 import glitch from './assets/glitch.frag?raw'
@@ -30,17 +30,19 @@ const material = new THREE.ShaderMaterial({
   fragmentShader: noise + glitch,
 })
 const { scene, camera } = createFullscreenScene(material)
-const renderer = createRenderer(canvas)
+const renderer = createGlStage(canvas)
 
-onResize(stage, ({ width, height }) => {
-  renderer.setSize(width, height, false)
-  // ずれの量は px で書いているので、CSS の px の大きさを渡す
-  uniforms.uResolution.value.set(width, height)
-  coverScale(width, height, photo.width, photo.height, uniforms.uCover.value)
-})
+if (renderer) {
+  onResize(stage, ({ width, height }) => {
+    renderer.setSize(width, height, false)
+    // ずれの量は px で書いているので、CSS の px の大きさを渡す
+    uniforms.uResolution.value.set(width, height)
+    coverScale(width, height, photo.width, photo.height, uniforms.uCover.value)
+  })
 
-loop((_dt, elapsed) => {
-  // time * time を使う式があるので、大きくなりすぎないよう 10 分で戻す（3 秒の周期の倍数）
-  uniforms.uTime.value = elapsed % 600
-  renderer.render(scene, camera)
-})
+  loop((_dt, elapsed) => {
+    // time * time を使う式があるので、大きくなりすぎないよう 10 分で戻す（3 秒の周期の倍数）
+    uniforms.uTime.value = elapsed % 600
+    renderer.render(scene, camera)
+  })
+}

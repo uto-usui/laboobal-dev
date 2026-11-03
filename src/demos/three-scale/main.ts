@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { gsap } from '../../shared/gsap'
 import { onResize } from '../../shared/dom'
-import { createRenderer } from '../../shared/b2/gl'
+import { createGlStage } from '../../shared/gl'
 import vertexShader from './assets/scale.vert?raw'
 import fragmentShader from './assets/scale.frag?raw'
 
@@ -18,7 +18,6 @@ const uniforms = {
   uColor: { value: new THREE.Color() },
 }
 
-const renderer = createRenderer(canvas, { alpha: true, antialias: true })
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100)
 camera.position.z = 50
@@ -65,7 +64,12 @@ const fitMeshTo = (item: HTMLElement) => {
   uniforms.uViewSize.value.set(view.width * 1.01, view.height * 1.01)
 }
 
-const render = () => renderer.render(scene, camera)
+const render = () => renderer?.render(scene, camera)
+const renderer = createGlStage(canvas, {
+  alpha: true,
+  antialias: true,
+  onRestore: render,
+})
 
 const play = (item: HTMLButtonElement, index: number) => {
   if (active) return
@@ -96,15 +100,17 @@ const play = (item: HTMLButtonElement, index: number) => {
     })
 }
 
-items.forEach((item, index) =>
-  item.addEventListener('click', () => play(item, index)),
-)
+if (renderer) {
+  items.forEach((item, index) =>
+    item.addEventListener('click', () => play(item, index)),
+  )
 
-onResize(stage, ({ width, height }) => {
-  size = { width, height }
-  renderer.setSize(width, height, false)
-  camera.aspect = width / height
-  camera.updateProjectionMatrix()
-  if (active) fitMeshTo(active)
-  render()
-})
+  onResize(stage, ({ width, height }) => {
+    size = { width, height }
+    renderer.setSize(width, height, false)
+    camera.aspect = width / height
+    camera.updateProjectionMatrix()
+    if (active) fitMeshTo(active)
+    render()
+  })
+}

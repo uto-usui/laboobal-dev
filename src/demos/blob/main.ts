@@ -9,10 +9,10 @@ import {
   MeshPhongMaterial,
   PerspectiveCamera,
   Scene,
-  WebGLRenderer,
 } from 'three'
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js'
 import { loop, onResize, prefersReducedMotion } from '../../shared/dom'
+import { createGlStage } from '../../shared/gl'
 import { damp, map } from '../../shared/math'
 import { createNoise } from '../../shared/noise'
 
@@ -20,8 +20,11 @@ const canvas = document.querySelector<HTMLCanvasElement>('.blob canvas')!
 let width = 0
 let height = 0
 
-const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true })
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+const renderer = createGlStage(canvas, {
+  antialias: true,
+  alpha: true,
+  onRestore: () => update(0, now),
+})
 
 const scene = new Scene()
 const camera = new PerspectiveCamera(100, 1, 0.1, 10000)
@@ -93,30 +96,32 @@ const update = (dt: number, elapsed: number) => {
   angle = damp(angle, target, 0.3, dt)
   camera.position.set(400 * Math.sin(angle), 0, 400 * Math.cos(angle))
   camera.lookAt(0, 0, 0)
-  renderer.render(scene, camera)
+  renderer?.render(scene, camera)
 }
 
-window.addEventListener('pointermove', (event) => {
-  mouse.x = event.clientX
-  gsap.to(force, {
-    duration: 0.3,
-    y: event.clientY / height,
-    ease: 'power3.out',
+if (renderer) {
+  window.addEventListener('pointermove', (event) => {
+    mouse.x = event.clientX
+    gsap.to(force, {
+      duration: 0.3,
+      y: event.clientY / height,
+      ease: 'power3.out',
+    })
+    gsap.to(shape.position, {
+      duration: 2,
+      x: map(event.clientX, 0, width, -100, 100),
+      y: map(event.clientY, 0, height, -100, 100),
+      ease: 'power3.out',
+    })
   })
-  gsap.to(shape.position, {
-    duration: 2,
-    x: map(event.clientX, 0, width, -100, 100),
-    y: map(event.clientY, 0, height, -100, 100),
-    ease: 'power3.out',
+
+  onResize(canvas, (size) => {
+    ;({ width, height } = size)
+    renderer.setSize(width, height, false)
+    camera.aspect = width / height
+    camera.updateProjectionMatrix()
+    update(0, now)
   })
-})
 
-onResize(canvas, (size) => {
-  ;({ width, height } = size)
-  renderer.setSize(width, height, false)
-  camera.aspect = width / height
-  camera.updateProjectionMatrix()
-  update(0, now)
-})
-
-if (!prefersReducedMotion()) loop(update)
+  if (!prefersReducedMotion()) loop(update)
+}

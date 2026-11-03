@@ -1,17 +1,5 @@
 import * as THREE from 'three'
 
-/** 画素比は fitCanvas と同じく 2 で止める。重くなりすぎないため */
-export const pixelRatio = () => Math.min(window.devicePixelRatio, 2)
-
-export const createRenderer = (
-  canvas: HTMLCanvasElement,
-  options: THREE.WebGLRendererParameters = {},
-) => {
-  const renderer = new THREE.WebGLRenderer({ canvas, ...options })
-  renderer.setPixelRatio(pixelRatio())
-  return renderer
-}
-
 /** 頂点シェーダーで position をそのまま出す、画面いっぱいの板。カメラの行列を使わない */
 export const FULLSCREEN_VERTEX = /* glsl */ `
 varying vec2 vUv;

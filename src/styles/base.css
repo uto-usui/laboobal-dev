@@ -38,3 +38,16 @@ svg {
 html[data-offscreen] * {
   animation-play-state: paused !important;
 }
+
+/* WebGL が使えないときの一行の案内（showFallback）。particle-photo の WebGPU の案内と同じ見た目 */
+.demo-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 2147483646;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  font-size: 13px;
+  color: color-mix(in srgb, var(--color-fg) 70%, var(--color-bg));
+  background: var(--color-bg);
+}

@@ -22,15 +22,18 @@ export const onResize = (
   return () => observer.disconnect()
 }
 
+/** 描画の解像度に使う devicePixelRatio。重くなりすぎないよう 2 で止める */
+export const pixelRatio = () => Math.min(window.devicePixelRatio, 2)
+
 /**
  * canvas の描画の解像度を、表示の大きさと devicePixelRatio に合わせる。
- * 2D の描画は CSS ピクセルの座標で書けるよう、変換も合わせて設定する。dpr は重くなりすぎないよう 2 で止める
+ * 2D の描画は CSS ピクセルの座標で書けるよう、変換も合わせて設定する
  */
 export const fitCanvas = (
   canvas: HTMLCanvasElement,
   ctx?: CanvasRenderingContext2D | null,
 ) => {
-  const dpr = Math.min(window.devicePixelRatio, 2)
+  const dpr = pixelRatio()
   const { width, height } = canvas.getBoundingClientRect()
   canvas.width = Math.round(width * dpr)
   canvas.height = Math.round(height * dpr)
@@ -73,3 +76,13 @@ export const loop = (callback: (dt: number, elapsed: number) => void) => {
   }
 }
 
+/**
+ * デモの上に一行の案内を出す（WebGL が使えないときなど）。見た目は particle-photo の WebGPU の案内に合わせ、
+ * デモの中身を覆う。形は base.css の .demo-fallback
+ */
+export const showFallback = (message: string) => {
+  const note = document.createElement('p')
+  note.className = 'demo-fallback'
+  note.textContent = message
+  ;(document.querySelector('main.demo') ?? document.body).append(note)
+}
