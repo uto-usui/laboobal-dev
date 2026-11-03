@@ -1,6 +1,8 @@
 // トップの一覧で、触れたときに出す短い動画とポスター画像を作る。
 // 手元で `pnpm build && pnpm preview --port 4322` を立ててから `node scripts/capture-previews.mjs [slug...]`。
-// Netlify のビルドには GPU も ffmpeg もないので、ここで作ったものを public/previews/ にコミットする
+// `--webp-only` を付けると撮らずに、今ある jpg から webp だけ作る。
+// Netlify のビルドには GPU も ffmpeg もないので、ここで作ったものを public/previews/ にコミットする。
+// jpg と webm（480×300）は webmanab の記事ページも URL で読んでいる。名前・形式・大きさを変えない。webp はトップだけが使う
 import { execFileSync } from 'node:child_process'
 import {
   existsSync,
@@ -29,7 +31,8 @@ const demos = readdirSync('src/demos')
       interaction: source.match(/interaction:\s*'([^']+)'/)?.[1] ?? 'none',
     }
   })
-const only = process.argv.slice(2)
+const webpOnly = process.argv.includes('--webp-only')
+const only = process.argv.slice(2).filter((arg) => !arg.startsWith('--'))
 const targets = only.length ? demos.filter((d) => only.includes(d.slug)) : demos
 
 const wait = (page, ms) => page.waitForTimeout(ms)
@@ -98,6 +101,24 @@ const act = async (page, interaction) => {
   }
 }
 
+const ffmpeg = (...args) =>
+  execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...args])
+// トップ用。ffmpeg の webp は入っていないことが多いので cwebp で作る
+const webp = (input, slug) =>
+  execFileSync('cwebp', [
+    '-quiet',
+    '-q',
+    '80',
+    input,
+    '-o',
+    join(OUT, `${slug}.webp`),
+  ])
+
+if (webpOnly) {
+  for (const demo of targets) webp(join(OUT, `${demo.slug}.jpg`), demo.slug)
+  process.exit(0)
+}
+
 mkdirSync(OUT, { recursive: true })
 mkdirSync(TMP, { recursive: true })
 const browser = await chromium.launch({
@@ -125,8 +146,6 @@ for (const demo of targets) {
     readdirSync(dir).find((f) => f.endsWith('.webm')),
   )
 
-  const ffmpeg = (...args) =>
-    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...args])
   ffmpeg(
     '-ss',
     String(offset),
@@ -147,6 +166,8 @@ for (const demo of targets) {
     '1',
     join(OUT, `${demo.slug}.webm`),
   )
+  // ポスターは劣化のない png に 1 コマ抜いてから、jpg と webp にする
+  const frame = join(dir, 'poster.png')
   ffmpeg(
     '-ss',
     String(offset + 0.2),
@@ -156,10 +177,10 @@ for (const demo of targets) {
     '1',
     '-vf',
     'scale=480:300',
-    '-q:v',
-    '4',
-    join(OUT, `${demo.slug}.jpg`),
+    frame,
   )
+  ffmpeg('-i', frame, '-q:v', '4', join(OUT, `${demo.slug}.jpg`))
+  webp(frame, demo.slug)
   console.log(`${demo.slug} (${demo.interaction})`)
 }
 
