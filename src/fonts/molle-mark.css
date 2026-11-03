@@ -1,0 +1,9 @@
+/* トップの背景の「labobal.dev」専用。字を絞ってあるので、ほかの文字には使えない（scripts/subset-fonts.sh） */
+@font-face {
+  font-family: 'Molle Mark';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  /* 小さいので Vite が data: URL にして CSS に埋め、CSS が HTML に収まらず別のファイルになる。ファイルのまま出す */
+  src: url('./molle-mark.woff2?no-inline') format('woff2');
+}

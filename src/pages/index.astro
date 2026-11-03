@@ -1,5 +1,5 @@
 ---
-import '@fontsource/molle/400-italic.css'
+import '../fonts/molle-mark.css'
 import Base from '../layouts/Base.astro'
 import { getDemos } from '../lib/demos'
 
@@ -205,7 +205,7 @@ const countOf = (key: string) =>
     top: 50%;
     left: 50%;
     margin: 0;
-    font-family: Molle, cursive;
+    font-family: 'Molle Mark', cursive;
     font-size: 18vw;
     font-style: italic;
     white-space: nowrap;
@@ -225,6 +225,8 @@ const countOf = (key: string) =>
     height: 1px;
     overflow: hidden;
     clip-path: inset(50%);
+    /* h1 の太字のままだと、見えない字のために Montserrat 700 を読みに行く */
+    font-weight: inherit;
     white-space: nowrap;
   }
 
