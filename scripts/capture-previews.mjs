@@ -21,6 +21,16 @@ const VIEW = { width: 800, height: 500 }
 // 読み込んで動き出すまで待ってから、この長さだけ切り出す
 const WARMUP = 1200
 const LENGTH = 3600
+// デモごとに撮り方を変えるもの。poster: 'brightest' は、切り出した中でいちばん明るいコマをポスターにする。
+// 暗い背景に字や写真が出たり消えたりするデモで、出そろったところを選ぶため
+const TUNE = {
+  // 写真を読み終えてから開く。開ききったところから撮り始める
+  'reveal-clip': { warmup: 2600, poster: 'brightest' },
+  // 字が上へ抜けて消え、戻ってくるのを繰り返す。決まった時刻だと字が消えたところに当たりやすい
+  splitting: { poster: 'brightest' },
+  // 粒が集まって写真になるまで 1 秒ほどかかる。ぼやけたままのポスターにならないよう待つ
+  'particle-photo': { warmup: 2400 },
+}
 
 const demos = readdirSync('src/demos')
   .filter((slug) => existsSync(`src/demos/${slug}/meta.ts`))
@@ -135,9 +145,12 @@ for (const demo of targets) {
   const started = Date.now()
   const page = await context.newPage()
   await page.goto(`${BASE}/${demo.slug}/`)
-  // 隅のリンクは一覧のサムネイルには要らない
-  await page.addStyleTag({ content: '.links { display: none !important }' })
-  await wait(page, WARMUP)
+  // 隅のリンクと lil-gui のパネルは一覧のサムネイルには要らない
+  await page.addStyleTag({
+    content: '.links, .lil-gui { display: none !important }',
+  })
+  const tune = TUNE[demo.slug] ?? {}
+  await wait(page, tune.warmup ?? WARMUP)
   const offset = (Date.now() - started) / 1000
   await act(page, demo.interaction)
   await context.close()
@@ -168,9 +181,31 @@ for (const demo of targets) {
   )
   // ポスターは劣化のない png に 1 コマ抜いてから、jpg と webp にする
   const frame = join(dir, 'poster.png')
+  let at = offset + 0.2
+  if (tune.poster === 'brightest') {
+    // 0.1 秒ごとに明るさの平均（YAVG）を出し、いちばん明るいコマの時刻を取る
+    const stats = join(dir, 'stats.txt')
+    ffmpeg(
+      '-ss',
+      String(offset),
+      '-t',
+      String(LENGTH / 1000),
+      '-i',
+      raw,
+      '-vf',
+      `fps=10,signalstats,metadata=print:key=lavfi.signalstats.YAVG:file=${stats}`,
+      '-f',
+      'null',
+      '-',
+    )
+    const text = readFileSync(stats, 'utf8')
+    const times = [...text.matchAll(/pts_time:([\d.]+)/g)].map((m) => +m[1])
+    const values = [...text.matchAll(/YAVG=([\d.]+)/g)].map((m) => +m[1])
+    at = offset + times[values.indexOf(Math.max(...values))]
+  }
   ffmpeg(
     '-ss',
-    String(offset + 0.2),
+    String(at),
     '-i',
     raw,
     '-frames:v',
