@@ -7,7 +7,7 @@ import photo from './assets/photo.jpg'
     <img class="photo" src={photo.src} alt="" />
     <div class="mask"></div>
   </div>
-  <button class="replay" type="button">
+  <button class="demo-replay" type="button">
     replay
   </button>
 </div>
@@ -47,25 +47,5 @@ import photo from './assets/photo.jpg'
     inset: 0;
     background: #25ecb7;
     clip-path: inset(0% 0% 0% 100%);
-  }
-
-  .replay {
-    position: absolute;
-    bottom: 8px;
-    left: 8px;
-    padding: 4px 8px;
-    font: inherit;
-    font-size: 11px;
-    color: var(--color-fg);
-    cursor: pointer;
-    background: none;
-    border: 1px solid currentcolor;
-    border-radius: 2px;
-    opacity: 0.6;
-  }
-
-  .replay:hover,
-  .replay:focus-visible {
-    opacity: 1;
   }
 </style>

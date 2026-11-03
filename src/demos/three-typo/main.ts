@@ -1,11 +1,10 @@
 import * as THREE from 'three'
-import { loop, onResize } from '../../shared/dom'
+import { loop, onResize, pixelRatio } from '../../shared/dom'
 import {
   FULLSCREEN_VERTEX,
   createFullscreenScene,
-  createRenderer,
-  pixelRatio,
-} from '../../shared/b2/gl'
+  createGlStage,
+} from '../../shared/gl'
 import noise from '../../shared/glsl/simplex-noise.glsl?raw'
 import typo from './assets/typo.frag?raw'
 
@@ -52,16 +51,19 @@ const material = new THREE.ShaderMaterial({
   fragmentShader: noise + typo,
 })
 const { scene, camera } = createFullscreenScene(material)
-const renderer = createRenderer(canvas)
-renderer.setClearColor(0x000000)
+const renderer = createGlStage(canvas)
 
-onResize(stage, ({ width, height }) => {
-  renderer.setSize(width, height, false)
-  uniforms.uResolution.value.set(width, height)
-  drawText(width, height)
-})
+if (renderer) {
+  renderer.setClearColor(0x000000)
 
-loop((_dt, elapsed) => {
-  uniforms.uTime.value = elapsed
-  renderer.render(scene, camera)
-})
+  onResize(stage, ({ width, height }) => {
+    renderer.setSize(width, height, false)
+    uniforms.uResolution.value.set(width, height)
+    drawText(width, height)
+  })
+
+  loop((_dt, elapsed) => {
+    uniforms.uTime.value = elapsed
+    renderer.render(scene, camera)
+  })
+}

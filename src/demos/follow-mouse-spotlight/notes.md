@@ -14,7 +14,7 @@
 
 ## 作り方
 
-follow-mouse と同じく、requestAnimationFrame と `damp` で書いている。マウスの位置は `src/shared/a/pointer.ts` で取る。
+follow-mouse と同じく、requestAnimationFrame と `damp` で書いている。マウスの位置は `src/shared/pointer.ts` で取る。
 
 写真は `object-fit: cover` で入れ物いっぱいに敷き、顔が入るよう `object-position` で少し上に寄せている。光の円は写真の上に絶対配置で置き、`pointer-events: none` でマウスの邪魔をしないようにしている。
 

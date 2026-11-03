@@ -24,6 +24,8 @@ export const map = (
 export const damp = (a: number, b: number, lambda: number, dt: number) =>
   lerp(a, b, 1 - Math.exp(-lambda * dt))
 
+export const toRadian = (degree: number) => (degree * Math.PI) / 180
+
 export const distance = (x0: number, y0: number, x1: number, y1: number) =>
   Math.hypot(x1 - x0, y1 - y0)
 

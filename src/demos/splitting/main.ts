@@ -1,4 +1,4 @@
-import { gsap } from 'gsap'
+import { gsap } from '../../shared/gsap'
 import { prefersReducedMotion } from '../../shared/dom'
 import { splitText } from '../../shared/split-text'
 

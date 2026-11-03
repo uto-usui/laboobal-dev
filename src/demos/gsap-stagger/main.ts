@@ -1,4 +1,4 @@
-import { gsap } from 'gsap'
+import { gsap } from '../../shared/gsap'
 import { prefersReducedMotion } from '../../shared/dom'
 
 const cells = document.querySelectorAll<HTMLElement>('[data-cell]')

@@ -1,4 +1,4 @@
-import gsap from 'gsap'
+import gsap from '../../shared/gsap'
 
 const stage = document.querySelector<HTMLElement>('.stage')!
 const photo = stage.querySelector<HTMLElement>('.photo')!

@@ -1,4 +1,4 @@
-import { gsap } from 'gsap'
+import { gsap } from '../../shared/gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)

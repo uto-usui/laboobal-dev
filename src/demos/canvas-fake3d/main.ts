@@ -5,9 +5,9 @@ import {
   FULLSCREEN_VERTEX,
   coverScale,
   createFullscreenScene,
-  createRenderer,
-} from '../../shared/b2/gl'
-import { pointerOrWander, trackPointer } from '../../shared/b2/pointer'
+  createGlStage,
+} from '../../shared/gl'
+import { pointerOrWander, trackPointer } from '../../shared/pointer'
 import fragmentShader from './assets/fake3d.frag?raw'
 import { HEIGHT, WIDTH, paintScene } from './scene'
 
@@ -36,22 +36,28 @@ const material = new THREE.ShaderMaterial({
   fragmentShader,
 })
 const { scene, camera } = createFullscreenScene(material)
-const renderer = createRenderer(canvas)
+const renderer = createGlStage(canvas)
 
-onResize(stage, ({ width, height }) => {
-  renderer.setSize(width, height, false)
-  coverScale(width, height, WIDTH, HEIGHT, uniforms.uCover.value)
-})
+if (renderer) {
+  onResize(stage, ({ width, height }) => {
+    renderer.setSize(width, height, false)
+    coverScale(width, height, WIDTH, HEIGHT, uniforms.uCover.value)
+  })
 
-const pointer = trackPointer(stage)
-const mouse = { x: 0, y: 0 }
+  const pointer = trackPointer(stage, {
+    units: 'unit',
+    touch: 'ignore',
+    leave: 'center',
+  })
+  const mouse = { x: 0, y: 0 }
 
-loop((dt, elapsed) => {
-  const target = pointerOrWander(pointer, elapsed)
-  // 旧デモの「毎フレーム 5% だけ近づく」。ゆっくり追いつくので、見ている面が重く動く
-  mouse.x = damp(mouse.x, target.x, 3, dt)
-  mouse.y = damp(mouse.y, target.y, 3, dt)
-  // 手前がマウスの側へ寄るよう、横だけ向きを返す（uv の y は下から上）
-  uniforms.uMouse.value.set(-mouse.x, mouse.y)
-  renderer.render(scene, camera)
-})
+  loop((dt, elapsed) => {
+    const target = pointerOrWander(pointer, elapsed)
+    // 旧デモの「毎フレーム 5% だけ近づく」。ゆっくり追いつくので、見ている面が重く動く
+    mouse.x = damp(mouse.x, target.x, 3, dt)
+    mouse.y = damp(mouse.y, target.y, 3, dt)
+    // 手前がマウスの側へ寄るよう、横だけ向きを返す（uv の y は下から上）
+    uniforms.uMouse.value.set(-mouse.x, mouse.y)
+    renderer.render(scene, camera)
+  })
+}
