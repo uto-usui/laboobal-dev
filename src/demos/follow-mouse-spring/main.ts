@@ -1,8 +1,8 @@
 import { loop } from '../../shared/dom'
-import { trackPointer } from '../../shared/a/pointer'
+import { trackPointer } from '../../shared/pointer'
 
 const stage = document.querySelector<HTMLElement>('.stage')!
-const pointer = trackPointer(stage)
+const pointer = trackPointer(stage, { units: 'px', touch: 'follow' })
 
 // power ひとつで、引っぱる強さ（power）と速さの残り方（power の 2 乗）の両方が決まる
 const balls = [0.8, 0.3].map((power, i) => ({

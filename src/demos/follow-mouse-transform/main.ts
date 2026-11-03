@@ -1,10 +1,10 @@
 import { loop } from '../../shared/dom'
 import { damp, distance, map } from '../../shared/math'
 import { lambdaFromEase } from '../../shared/a/ease'
-import { trackPointer } from '../../shared/a/pointer'
+import { trackPointer } from '../../shared/pointer'
 
 const stage = document.querySelector<HTMLElement>('.stage')!
-const pointer = trackPointer(stage)
+const pointer = trackPointer(stage, { units: 'px', touch: 'follow' })
 
 const balls = [0.1, 0.5].map((ease, i) => ({
   el: stage.querySelectorAll<HTMLElement>('.ball')[i],

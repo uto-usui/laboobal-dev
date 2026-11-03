@@ -8,7 +8,7 @@ import {
   loadTexture,
 } from '../../shared/b2/gl'
 import { createGlStage } from '../../shared/gl'
-import { pointerOrWander, trackPointer } from '../../shared/b2/pointer'
+import { pointerOrWander, trackPointer } from '../../shared/pointer'
 import photo from './assets/photo.jpg'
 import fragmentShader from './assets/shift.frag?raw'
 
@@ -38,7 +38,11 @@ if (renderer) {
     coverScale(width, height, photo.width, photo.height, uniforms.uCover.value)
   })
 
-  const pointer = trackPointer(stage)
+  const pointer = trackPointer(stage, {
+    units: 'unit',
+    touch: 'ignore',
+    leave: 'center',
+  })
   const current = { x: 0, y: 0 }
   /** マウスが端にあるときの、赤のずれ（uv）。青はこの 4 倍ずれる */
   const MAX_SHIFT = 0.014

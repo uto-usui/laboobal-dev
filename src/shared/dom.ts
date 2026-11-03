@@ -3,6 +3,9 @@ import { isRunning, onRunningChange } from './visibility'
 /** タッチが主な端末か（ismobilejs の代わり）。ホバーを前提にした動きを切り替えるときに使う */
 export const isCoarsePointer = () => matchMedia('(pointer: coarse)').matches
 
+/** マウスを重ねられない端末か。タッチ画面付きの PC は、マウスがあるので false になる */
+export const isHoverless = () => matchMedia('(hover: none)').matches
+
 export const prefersReducedMotion = () =>
   matchMedia('(prefers-reduced-motion: reduce)').matches
 

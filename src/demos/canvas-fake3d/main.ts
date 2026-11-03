@@ -7,7 +7,7 @@ import {
   createFullscreenScene,
 } from '../../shared/b2/gl'
 import { createGlStage } from '../../shared/gl'
-import { pointerOrWander, trackPointer } from '../../shared/b2/pointer'
+import { pointerOrWander, trackPointer } from '../../shared/pointer'
 import fragmentShader from './assets/fake3d.frag?raw'
 import { HEIGHT, WIDTH, paintScene } from './scene'
 
@@ -44,7 +44,11 @@ if (renderer) {
     coverScale(width, height, WIDTH, HEIGHT, uniforms.uCover.value)
   })
 
-  const pointer = trackPointer(stage)
+  const pointer = trackPointer(stage, {
+    units: 'unit',
+    touch: 'ignore',
+    leave: 'center',
+  })
   const mouse = { x: 0, y: 0 }
 
   loop((dt, elapsed) => {
