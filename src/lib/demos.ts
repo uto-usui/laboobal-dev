@@ -1,5 +1,3 @@
-import type { AstroComponentFactory } from 'astro/runtime/server/index.js'
-
 /** 'new' は移植ではなく、ここで新しく作ったデモ */
 export type Batch = 'current' | 'A' | 'B1' | 'B2' | 'F6' | 'new'
 export type Interaction = 'drag' | 'hover' | 'scroll' | 'click' | 'none'
@@ -38,10 +36,11 @@ const notes = import.meta.glob('../demos/*/notes.md', {
   query: '?raw',
   import: 'default',
 })
-const components = import.meta.glob<AstroComponentFactory>(
-  '../demos/*/Demo.astro',
-  { import: 'default' },
-)
+// Demo.astro も中身は読まない。部品として glob すると、読み込まなくても全デモの CSS がこのファイルを使うページ（トップも）に付く
+const components = import.meta.glob('../demos/*/Demo.astro', {
+  query: '?raw',
+  import: 'default',
+})
 
 const folderOf = (path: string) => path.split('/').at(-2)!
 
@@ -124,6 +123,3 @@ let cache: Promise<DemoMeta[]> | undefined
 /** 全デモの一覧。batch の順、その中は slug の順。開発中は meta.ts の書き換えを拾うため毎回集め直す */
 export const getDemos = () =>
   import.meta.env.DEV ? collect() : (cache ??= collect())
-
-export const loadDemoComponent = (slug: string) =>
-  components[`../demos/${slug}/Demo.astro`]()
