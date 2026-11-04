@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { pixelRatio } from '../shared/dom'
 
 /** 板の今の位置と傾き。名前の帯（DOM）を板に合わせて動かすのに使う */
 export interface PreviewFrame {
@@ -109,7 +110,7 @@ export const createGlPreview = (
   } catch {
     return null
   }
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+  renderer.setPixelRatio(pixelRatio())
   renderer.setClearColor(0x000000, 0)
 
   const scene = new THREE.Scene()
