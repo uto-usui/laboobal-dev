@@ -176,6 +176,13 @@ const open = async (
       Object.fromEntries(data.variants.map((v) => [v.label, v.slug])),
     )
     .name('バリエーション')
+  const list = select.domElement.querySelector('select')!
+  // 切り替えたこと、読み込めなかったことを読み上げで伝える。見た目には出さない
+  const status = document.createElement('p')
+  status.setAttribute('role', 'status')
+  status.style.cssText =
+    'position:fixed;width:1px;height:1px;margin:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap'
+  document.body.append(status)
   let folder: InstanceType<typeof GUI> | undefined
   const showParams = () => {
     folder?.destroy()
@@ -223,6 +230,8 @@ const open = async (
       if (mine === ticket) {
         console.error(error)
         sync()
+        status.textContent = '読み込めませんでした'
+        list.focus()
       }
       return
     }
@@ -239,6 +248,9 @@ const open = async (
     )
     showInfo(loaded.doc)
     sync()
+    status.textContent =
+      loaded.doc.querySelector('#demo-info .info-title')?.textContent?.trim() ??
+      document.title
   }
   /** パラメーターを替えたら、同じバリエーションを最初から作り直す */
   function remount() {
@@ -255,7 +267,6 @@ const open = async (
   const pressing = new Set<number>()
   // select の一覧を開いている間は、外を押しても一覧が閉じるだけにする（外を押した操作がページに届く端末があるため）。
   // 選ぶか、select から外れたら終わり
-  const list = select.domElement.querySelector('select')!
   let listing = false
   list.addEventListener('pointerdown', () => {
     listing = true
@@ -280,6 +291,18 @@ const open = async (
   const release = (event: PointerEvent) => pressing.delete(event.pointerId)
   document.addEventListener('pointerup', release, true)
   document.addEventListener('pointercancel', release, true)
+  // info のパネルと同じく Escape で閉じる。欄の中にフォーカスがあれば題に戻す（閉じた欄の中に残すと body に落ちる）。
+  // lil-gui は欄の中のキーの伝わりを止めるので capture で聞く
+  document.addEventListener(
+    'keydown',
+    (event) => {
+      if (event.key !== 'Escape' || gui._closed) return
+      const inside = gui.domElement.contains(document.activeElement)
+      gui.close()
+      if (inside) gui.$title.focus()
+    },
+    true,
+  )
   toggle.remove()
   gui.$title.focus()
 }

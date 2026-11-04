@@ -548,4 +548,47 @@ test.describe('切り替えのしくみ', () => {
     await expect(toggle).toBeFocused()
     expect(errors).toEqual([])
   })
+
+  test('キーボードで開いて選び、Escape で閉じると「設定」にフォーカスが戻る。切り替えたことは読み上げで伝わる', async ({
+    page,
+  }) => {
+    const errors = watchErrors(page)
+    await page.goto(`/${a}/`)
+    await page.locator('.variant-toggle').focus()
+    await page.keyboard.press('Enter')
+    const title = page.locator('.variant-gui > .lil-title')
+    await expect(title).toBeFocused()
+    await page.keyboard.press('Tab')
+    const select = page.locator('.variant-gui select')
+    await expect(select).toBeFocused()
+    // 閉じた select の上下の矢印は、OS によって一覧を開くだけなので、選ぶところは selectOption で
+    await pick(page, b)
+    await expect(page.locator('main.demo')).toHaveAttribute('data-slug', b)
+    await expect(page.getByRole('status')).toHaveText(demoOf(b).title)
+    await expect(select).toBeFocused()
+
+    await page.keyboard.press('Escape')
+    await expect(page.locator('.variant-gui')).toHaveClass(/lil-closed/)
+    await expect(title).toBeFocused()
+    // 閉じたあとも Enter で開き直せる
+    await page.keyboard.press('Enter')
+    await expect(select).toBeVisible()
+    expect(errors).toEqual([])
+  })
+
+  test('読み込めなかったら、読み上げで伝え、フォーカスを select に戻す', async ({
+    page,
+  }) => {
+    await page.goto(`/${a}/`)
+    await openSwitcher(page)
+    await page.route(`/${b}/`, (route) =>
+      route.fulfill({ status: 404, body: 'not found' }),
+    )
+    const select = page.locator('.variant-gui select')
+    await select.focus()
+    await pick(page, b)
+    await expect(page.getByRole('status')).toHaveText('読み込めませんでした')
+    await expect(select).toBeFocused()
+    expect(await shown(page)).toEqual(expected(a))
+  })
 })
