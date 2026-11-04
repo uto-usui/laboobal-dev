@@ -67,7 +67,7 @@ export default defineDemo({
 | `webgl` | 要る | WebGL を使うか |
 | `webgpu` | 省略可 | WebGPU で描くなら `true` |
 | `interaction` | 要る | `'drag'`、`'hover'`、`'scroll'`、`'click'`、`'none'`。E2E とプレビューと SNS の動画を撮るときのマウスの動かし方と、トップの絞り込みに使う |
-| `created` | 要る | もとのデモを作った日。YYYY-MM-DD（日が分からなければ YYYY-MM）。トップの「新しい順」はこれで並ぶ |
+| `created` | 要る | もとのデモを作った日。YYYY-MM-DD（日が分からなければ YYYY-MM）。日本時間の日付にする（jsfiddle の dateCreated は UTC なので直す）。トップの latest はこれで並ぶ |
 | `added` | 要る | labobal.dev に出した日。YYYY-MM-DD。RSS（`/rss.xml`）、更新履歴（`/log/`）、新着はこれで決まる |
 | `description` | 要る | 何が起きるかを一文で。ページの description、OGP、info のパネルに出る |
 | `tags` | 要る | 何を見せるデモか。`src/lib/demos.ts` の `TAGS` の中から選ぶ |
