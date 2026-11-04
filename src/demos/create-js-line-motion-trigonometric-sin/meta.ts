@@ -16,4 +16,6 @@ export default defineDemo({
     'ペン先が右へ進みながら sin で上下に振れ、灰色の波の線を少しずつ描いていく。',
   tags: ['shape', 'trigonometry'],
   tech: ['canvas2d'],
+  group: 'trigonometry',
+  variant: '波の線',
 })
