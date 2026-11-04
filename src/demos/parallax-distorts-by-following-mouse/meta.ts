@@ -16,4 +16,6 @@ export default defineDemo({
     '重ねた写真と見出しの箱が、マウスの方へずれながら斜めに傾く。外に出るとゆっくり戻る。',
   tags: ['parallax', 'cursor', 'image'],
   tech: ['gsap'],
+  group: 'mouse-image',
+  variant: '重ねてゆがませる',
 })

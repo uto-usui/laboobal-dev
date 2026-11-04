@@ -16,4 +16,6 @@ export default defineDemo({
     '写真の上でマウスを動かすと、写真がマウスの方へ寄りながらひしゃげる。',
   tags: ['cursor', 'image', 'distortion'],
   tech: ['gsap'],
+  group: 'mouse-image',
+  variant: 'ゆがませる',
 })

@@ -16,4 +16,6 @@ export default defineDemo({
     'マウスを乗せると帯が左から赤く塗られ、外すと途中からでも戻る。CSS だけで書いた版。',
   tags: ['hover'],
   tech: ['css'],
+  group: 'hover-control',
+  variant: '帯（CSS だけ）',
 })
