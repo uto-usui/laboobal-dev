@@ -23,7 +23,8 @@ const WARMUP = 1200
 const LENGTH = 3600
 // デモごとに撮り方を変えるもの。poster: 'brightest' は、切り出した中でいちばん明るいコマをポスターにする。
 // 暗い背景に字や写真が出たり消えたりするデモで、出そろったところを選ぶため。
-// poster: 'late' は、切り出しの終わりの 0.4 秒前のコマにする。描き足していくデモで、始めのコマではほとんど何も映らないため
+// poster: 'late' は、切り出しの終わりの 0.4 秒前のコマにする。描き足していくデモで、始めのコマではほとんど何も映らないため。
+// poster に数を書くと、切り出しの始めからその秒数のコマにする
 const TUNE = {
   // 写真を読み終えてから開く。開ききったところから撮り始める
   'reveal-clip': { warmup: 2600, poster: 'brightest' },
@@ -34,6 +35,8 @@ const TUNE = {
   'processing-js-circle-at-the-mouse-position': { poster: 'late' },
   'processing-js-random-walk': { poster: 'late' },
   'news-ticker-infinite-loop': { poster: 'late' },
+  // スクロールで箱の色が緑から青へ変わる。始めのコマは緑のままなので、少し進んで色が変わりかけたところにする
+  'scroll-reveal-color': { poster: 0.8 },
 }
 
 const demos = readdirSync('src/demos')
@@ -189,6 +192,7 @@ for (const demo of targets) {
   const frame = join(dir, 'poster.png')
   let at = offset + 0.2
   if (tune.poster === 'late') at = offset + LENGTH / 1000 - 0.4
+  if (typeof tune.poster === 'number') at = offset + tune.poster
   if (tune.poster === 'brightest') {
     // 0.1 秒ごとに明るさの平均（YAVG）を出し、いちばん明るいコマの時刻を取る
     const stats = join(dir, 'stats.txt')
