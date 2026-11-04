@@ -132,6 +132,11 @@ const components = import.meta.glob<string>('../demos/*/Demo.astro', {
   query: '?raw',
   import: 'default',
 })
+// 組の共通の部品（src/groups/<group>/ の .astro）。Demo.astro と同じ理由で、部品ではなく文字として読む
+const groupParts = import.meta.glob<string>('../groups/**/*.astro', {
+  query: '?raw',
+  import: 'default',
+})
 // デモのページ。デモごとに src/pages/<slug>.astro を置き、その Demo.astro を静的に import する。
 // 1 つの動的ルートから引くと、どのページにも全デモの CSS が付く。中身は、別のデモを読んでいないかを見るためだけに読む
 const pages = import.meta.glob<string>('../pages/*.astro', {
@@ -161,7 +166,7 @@ const folderOf = (path: string) => path.split('/').at(-2)!
 const pageSlugOf = (path: string) => path.match(/([^/]+)\.astro$/)![1]
 
 /**
- * meta.ts を集めて確かめる。決まりに合わないものがあればビルドを落とす（docs/demo-guide.md の 1 章と 2 章）。
+ * meta.ts を集めて確かめる。決まりに合わないものがあればビルドを落とす（docs/demo-guide.md の 1 章、2 章、12 章）。
  * 組（src/groups/）も確かめる。開発サーバーでは、作りかけのデモがあっても全ページが 500 にならないよう、
  * そのデモだけ外して警告にする
  */
@@ -315,6 +320,16 @@ const collect = async () => {
         )
     }
     if (errors.length === before) groups.push(group)
+  }
+  // 部品の <script> は main.demo の中に出て、切り替えたときに 2 本目の script として import され、start() を取り違える
+  for (const [path, load] of Object.entries(groupParts)) {
+    if (!/<script\b/i.test(await load())) continue
+    const name = path.match(/\/groups\/([^/]+)\//)![1]
+    errors.push(
+      `${path.replace('../', 'src/')}: 組の共通の部品に <script> を書かない（切り替えたとき、バリエーションの script と一緒に import される）。動かす処理はバリエーションの main.ts の mount に書く`,
+    )
+    const group = groupList.find((g) => g.folder === name)?.group
+    for (const slug of group?.variants ?? []) broken.add(slug)
   }
   for (const meta of list) {
     if (!meta) continue
