@@ -1,5 +1,5 @@
 import { fitCanvas, loop, onResize } from '../../shared/dom'
-import { distance, random } from '../../shared/math'
+import { distance, pick, random } from '../../shared/math'
 
 interface Circle {
   x: number
@@ -55,7 +55,7 @@ const newColor = () =>
 
 /** でたらめな位置に円を置いてみる。すでにある円の中なら置かない */
 const trySpawn = () => {
-  const spot = spots[Math.floor(Math.random() * spots.length)]
+  const spot = pick(spots)
   for (const circle of circles) {
     if (distance(circle.x, circle.y, spot.x, spot.y) <= circle.r + 1) return
   }
@@ -76,7 +76,7 @@ const draw = () => {
 /** 前と違う文字を選ぶ */
 const pickLetter = () => {
   let next = letter
-  while (next === letter) next = LETTERS[Math.floor(random(0, LETTERS.length))]
+  while (next === letter) next = pick(LETTERS)
   return next
 }
 

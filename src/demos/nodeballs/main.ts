@@ -5,7 +5,7 @@ import {
   onResize,
   prefersReducedMotion,
 } from '../../shared/dom'
-import { distance, random } from '../../shared/math'
+import { distance, pick, random } from '../../shared/math'
 
 interface Ball {
   x: number
@@ -61,8 +61,6 @@ const canvas = document.querySelector<HTMLCanvasElement>('.nodeballs canvas')!
 const ctx = canvas.getContext('2d')!
 let width = 0
 let height = 0
-
-const pick = <T>(items: T[]) => items[Math.floor(Math.random() * items.length)]
 
 const createBall = (x: number, y: number, layer: Layer): Ball => {
   const angle = random(0, Math.PI * 2)
