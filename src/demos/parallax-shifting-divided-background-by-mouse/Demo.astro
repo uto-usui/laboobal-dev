@@ -19,7 +19,9 @@ const strips = Array.from({ length: 5 }, (_, i) => i)
 </div>
 
 <script>
-  import './main'
+  import { start } from '../../shared/variants'
+  import * as variant from './main'
+  start(variant)
 </script>
 
 <style>

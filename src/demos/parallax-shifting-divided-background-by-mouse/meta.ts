@@ -17,4 +17,6 @@ export default defineDemo({
     '画面いっぱいの写真を横 5 本の帯に切り、マウスに合わせて帯ごとに左右へずらす。',
   tags: ['parallax', 'cursor', 'image'],
   tech: ['gsap'],
+  group: 'mouse-image',
+  variant: '帯に切ってずらす',
 })
