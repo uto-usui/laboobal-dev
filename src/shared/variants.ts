@@ -19,7 +19,7 @@
  *   どれも止める関数か dispose を返す。window や document に足した listener も外す
  * - dispose のあとに、後から来る処理（写真の読み込みの完了、await の続き）で描かない
  * - CSS は切り替えたあとも残る。バリエーションの CSS は Demo.astro の <style>（scoped）に書き、:global だけの規則や
- *   <style is:global> を書かない（ほかのバリエーションにかかる）
+ *   <style is:global> を書かない（ほかのバリエーションにかかる）。@keyframes と @property は scoped にならないので、名前に slug を付ける
  */
 
 export type Dispose = () => void

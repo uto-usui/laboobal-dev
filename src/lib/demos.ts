@@ -137,6 +137,15 @@ const groupParts = import.meta.glob<string>('../groups/**/*.astro', {
   query: '?raw',
   import: 'default',
 })
+// 組のバリエーションの main.ts と、相対パスで読む .css。CSS の名前のぶつかりを見るためにだけ文字として読む
+const mains = import.meta.glob<string>('../demos/*/main.ts', {
+  query: '?raw',
+  import: 'default',
+})
+const cssFiles = import.meta.glob<string>(
+  ['../demos/**/*.css', '../groups/**/*.css', '../shared/**/*.css'],
+  { query: '?raw', import: 'default' },
+)
 // デモのページ。デモごとに src/pages/<slug>.astro を置き、その Demo.astro を静的に import する。
 // 1 つの動的ルートから引くと、どのページにも全デモの CSS が付く。中身は、別のデモを読んでいないかを見るためだけに読む
 const pages = import.meta.glob<string>('../pages/*.astro', {
@@ -163,6 +172,33 @@ const variantScript = `<script>
 </script>`
 
 const folderOf = (path: string) => path.split('/').at(-2)!
+
+/** glob の鍵（src/lib から見たパス）の場所から、import の相対パスを glob の鍵にする */
+const resolveFrom = (from: string, spec: string) =>
+  `..${new URL(spec, new URL(from, 'file:///src/lib/')).pathname.slice('/src'.length)}`
+/** import している .css（main.ts と .astro の frontmatter） */
+const cssImportsOf = (source: string) =>
+  [
+    ...source.matchAll(
+      /\bimport\s+(?:[^'"]*?\s+from\s+)?['"]([^'"?]+\.css)(?:\?[^'"]*)?['"]/g,
+    ),
+  ].map((m) => m[1])
+/** CSS の中の @keyframes と @property の名前。Astro はこの 2 つを scoped にしない */
+const unscopedNamesOf = (css: string) => {
+  const text = css.replace(/\/\*[\s\S]*?\*\//g, '')
+  return [
+    ...[...text.matchAll(/@(?:-webkit-)?keyframes\s+([\w-]+)/g)].map(
+      (m) => `@keyframes ${m[1]}`,
+    ),
+    ...[...text.matchAll(/@property\s+(--[\w-]+)/g)].map(
+      (m) => `@property ${m[1]}`,
+    ),
+  ]
+}
+const stylesOf = (astro: string) =>
+  [...astro.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)]
+    .map((m) => m[1])
+    .join('\n')
 const pageSlugOf = (path: string) => path.match(/([^/]+)\.astro$/)![1]
 
 /**
@@ -321,15 +357,76 @@ const collect = async () => {
     }
     if (errors.length === before) groups.push(group)
   }
-  // 部品の <script> は main.demo の中に出て、切り替えたときに 2 本目の script として import され、start() を取り違える
-  for (const [path, load] of Object.entries(groupParts)) {
-    if (!/<script\b/i.test(await load())) continue
+  const failParts = (path: string, message: string) => {
+    errors.push(`${path.replace('../', 'src/')}: ${message}`)
     const name = path.match(/\/groups\/([^/]+)\//)![1]
-    errors.push(
-      `${path.replace('../', 'src/')}: 組の共通の部品に <script> を書かない（切り替えたとき、バリエーションの script と一緒に import される）。動かす処理はバリエーションの main.ts の mount に書く`,
-    )
     const group = groupList.find((g) => g.folder === name)?.group
     for (const slug of group?.variants ?? []) broken.add(slug)
+  }
+  for (const [path, load] of Object.entries(groupParts)) {
+    const source = await load()
+    // 部品の <script> は main.demo の中に出て、切り替えたときに 2 本目の script として import され、start() を取り違える
+    if (/<script\b/i.test(source))
+      failParts(
+        path,
+        '組の共通の部品に <script> を書かない（切り替えたとき、バリエーションの script と一緒に import される）。動かす処理はバリエーションの main.ts の mount に書く',
+      )
+    if (
+      /<style[^>]*\bis:global\b/.test(source) ||
+      /^\s*:global\(/m.test(source)
+    )
+      failParts(
+        path,
+        '組の共通の部品に <style is:global> や :global(...) だけの規則を書かない（切り替えたあとも残り、ページ全体にかかる）',
+      )
+  }
+
+  // @keyframes と @property は scoped にならず、切り替えたあとも残る。同じ組の中で同じ名前を別のファイルに書くと、
+  // 後から足したほうが効く。バリエーションの Demo.astro の <style>、組の共通の部品、相対パスで読む .css を見る
+  for (const group of groups) {
+    const sources = new Map<string, string>()
+    const addCss = async (from: string, source: string, variant: boolean) => {
+      for (const spec of cssImportsOf(source)) {
+        if (!spec.startsWith('.')) {
+          // パッケージの CSS は中を見られない。部品で読めば、どのバリエーションにも同じものが付く
+          if (variant)
+            fail(
+              folderOf(from),
+              `${from.replace('../', 'src/')}: 組のバリエーションでパッケージの CSS（${spec}）を読まない。組の共通の部品（src/groups/${group.name}/）で読む`,
+            )
+          continue
+        }
+        const key = resolveFrom(from, spec)
+        const css = await cssFiles[key]?.()
+        if (css !== undefined) sources.set(key, css)
+      }
+    }
+    for (const slug of group.variants) {
+      const demo = `../demos/${slug}/Demo.astro`
+      const astro = (await components[demo]?.()) ?? ''
+      sources.set(demo, stylesOf(astro))
+      await addCss(demo, astro, true)
+      const main = `../demos/${slug}/main.ts`
+      await addCss(main, (await mains[main]?.()) ?? '', true)
+    }
+    for (const [path, load] of Object.entries(groupParts)) {
+      if (!path.startsWith(`../groups/${group.name}/`)) continue
+      const astro = await load()
+      sources.set(path, stylesOf(astro))
+      await addCss(path, astro, false)
+    }
+    const owners = new Map<string, string>()
+    for (const [path, css] of sources)
+      for (const name of new Set(unscopedNamesOf(css))) {
+        const owner = owners.get(name)
+        if (owner === undefined) owners.set(name, path)
+        else if (owner !== path) {
+          errors.push(
+            `組 "${group.name}" の ${owner.replace('../', 'src/')} と ${path.replace('../', 'src/')} に同じ ${name} がある。この 2 つは scoped にならず切り替えたあとも残るので、後から足したほうが効く。名前に slug を付けて分ける`,
+          )
+          for (const slug of group.variants) broken.add(slug)
+        }
+      }
   }
   for (const meta of list) {
     if (!meta) continue
