@@ -1,15 +1,15 @@
-import gsap from '../gsap'
 import * as THREE from 'three'
-import { onResize } from '../dom'
-import { onReducedMotion } from '../motion'
+import { onResize } from '../../shared/dom'
 import {
-  FULLSCREEN_VERTEX,
   coverScale,
   createFullscreenScene,
   createGlStage,
-} from '../gl'
-import noise from '../glsl/simplex-noise.glsl?raw'
-import distortion from './glsl/distortion.glsl?raw'
+  FULLSCREEN_VERTEX,
+} from '../../shared/gl'
+import noise from '../../shared/glsl/simplex-noise.glsl?raw'
+import gsap from '../../shared/gsap'
+import { onReducedMotion } from '../../shared/motion'
+import distortion from './distortion.glsl?raw'
 
 interface Photo {
   src: string

@@ -47,23 +47,23 @@ const groupData = group && {
     <slot />
   </main>
   {groupData && (
-      <>
-        <script
-          id="demo-group"
-          type="application/json"
-          is:inline
-          set:html={JSON.stringify(groupData).replaceAll('<', '\\u003c')}
-        />
-        <button
-          class="variant-toggle"
-          type="button"
-          aria-expanded="false"
-          data-capture-hide
-        >
-          設定
-        </button>
-      </>
-    )}
+    <>
+      <script
+        id="demo-group"
+        type="application/json"
+        is:inline
+        set:html={JSON.stringify(groupData).replaceAll('<', '\\u003c')}
+      />
+      <button
+        class="variant-toggle"
+        type="button"
+        aria-expanded="false"
+        data-capture-hide
+      >
+        設定
+      </button>
+    </>
+  )}
   <!-- links は e2e/demos.spec.ts と scripts/capture-previews.mjs が、canvas を写すときに隠すための名前 -->
   <div class="info links">
     <button
