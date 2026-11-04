@@ -16,4 +16,6 @@ export default defineDemo({
     '2 つの玉がマウスを追う。大きい玉はばねのように行き過ぎて、揺れ戻りながら止まる。',
   tags: ['cursor', 'physics'],
   tech: ['js'],
+  group: 'follow-mouse',
+  variant: 'ばね',
 })

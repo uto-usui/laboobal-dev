@@ -16,4 +16,6 @@ export default defineDemo({
     '大きい玉と小さい玉が、それぞれ少し遅れてマウスを追いかける。止めると同じ点に重なる。',
   tags: ['cursor'],
   tech: ['js'],
+  group: 'follow-mouse',
+  variant: '遅れて',
 })
