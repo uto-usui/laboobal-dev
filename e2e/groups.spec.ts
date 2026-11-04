@@ -67,8 +67,14 @@ const instrument = () => {
     if (i >= 0) live.splice(i, 1)
     return remove.call(this, type, listener, options)
   }
+  // main.demo そのものも数える。中身を入れ替えても残るので、作り直すたびに足して外し忘れると増える
   w.__globalListeners = () =>
-    live.filter((l) => l.target === window || l.target === document).length
+    live.filter(
+      (l) =>
+        l.target === window ||
+        l.target === document ||
+        l.target === document.querySelector('main.demo'),
+    ).length
   // 切り替える前の main.demo の中の要素。切り替えると main.demo から外れる
   let previous = new WeakSet<EventTarget>()
   w.__markStage = () => {
@@ -161,6 +167,40 @@ const isStill = async (page: Page, gap = 500) => {
 const openSwitcher = async (target: Page | Frame) => {
   await target.locator('.variant-toggle').click()
   await expect(target.locator('.variant-gui select')).toBeVisible()
+}
+
+/**
+ * パラメーターの欄の最初の項目を替えて、同じバリエーションを作り直させる（離したときに作り直す）。欄がなければ false。
+ * 数はスライダーの今の位置から離れたところを押す。値が変わらないと作り直さないため
+ */
+const changeParam = async (page: Page) => {
+  const controller = page
+    .locator('.variant-gui .lil-gui:not(.lil-root) .lil-controller')
+    .first()
+  if ((await controller.count()) === 0) return false
+  await page.evaluate(() => (window as unknown as Counters).__markStage())
+  const kind = (await controller.getAttribute('class'))!
+  if (kind.includes('lil-number')) {
+    const slider = controller.locator('.lil-slider')
+    const box = (await slider.boundingBox())!
+    const filled =
+      (await controller.locator('.lil-fill').boundingBox())!.width / box.width
+    await slider.click({
+      position: {
+        x: box.width * (filled < 0.5 ? 0.8 : 0.2),
+        y: box.height / 2,
+      },
+    })
+  } else if (kind.includes('lil-boolean'))
+    await controller.locator('input').click()
+  else {
+    const select = controller.locator('select')
+    const index = await select.evaluate(
+      (el: HTMLSelectElement) => el.selectedIndex,
+    )
+    await select.selectOption({ index: index === 0 ? 1 : 0 })
+  }
+  return true
 }
 
 const switchTo = async (target: Page | Frame, slug: string) => {
@@ -271,6 +311,38 @@ for (const group of groups) {
           ),
           `${where} で、外れた要素に残った listener`,
         ).toEqual([])
+
+        // パラメーターを替えて作り直しても、ループ、context、listener が増えない
+        if (round === 0) {
+          const listeners = await globalListeners()
+          if (await changeParam(page)) {
+            await page.waitForTimeout(500)
+            await expect
+              .poll(() => loopsPerFrame(page), {
+                message: `${where} で作り直したあとの rAF のループの数`,
+                timeout: 5000,
+              })
+              .toBeCloseTo(baseline.get(slug)!, 0)
+            if (gl)
+              await expect
+                .poll(() =>
+                  page.evaluate(() =>
+                    (window as unknown as Counters).__liveGl(),
+                  ),
+                )
+                .toBe(demo.webgl ? 1 : 0)
+            expect(
+              await page.evaluate(() =>
+                (window as unknown as Counters).__detachedListeners(),
+              ),
+              `${where} で作り直したあと、外れた要素に残った listener`,
+            ).toEqual([])
+            expect(
+              await globalListeners(),
+              `${where} で作り直したあとの window、document、main.demo の listener の数`,
+            ).toBe(listeners)
+          }
+        }
         if (round === 2)
           expect(
             await globalListeners(),
