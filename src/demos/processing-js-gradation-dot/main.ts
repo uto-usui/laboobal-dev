@@ -1,12 +1,15 @@
 import { hsb, paint, sketch } from '../../shared/processing'
-import type { Mount } from '../../shared/variants'
+import type { Mount, Params } from '../../shared/variants'
 
 const w = 320
 const h = 320
-const circleW = 30
-const num = 6
 
-export const mount: Mount = (stage) =>
+export const params = {
+  num: { label: '1 列の数', value: 6, min: 2, max: 10, step: 1 },
+  circleW: { label: '円の直径', value: 30, min: 10, max: 50, step: 1 },
+} satisfies Params
+
+export const mount: Mount<typeof params> = (stage, { num, circleW }) =>
   sketch(stage.querySelector('canvas')!, w, h, (ctx) => {
     // background(180, 35, 80, 20)。半透明なので、後ろのグラデーションが透ける
     ctx.fillStyle = hsb(180, 35, 80, 20)

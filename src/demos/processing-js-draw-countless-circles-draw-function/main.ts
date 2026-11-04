@@ -1,17 +1,20 @@
 import { random } from '../../shared/math'
 import { autoplayLoop } from '../../shared/motion'
 import { DEFAULT_BACKGROUND, paint, sketch } from '../../shared/processing'
-import type { Mount } from '../../shared/variants'
+import type { Mount, Params } from '../../shared/variants'
 
 const width = 500
 const height = 100
 const DIAMETER = 15
-/** draw() は 1 秒に 60 回。1 回に円を 1 つ描く */
-const PER_SECOND = 60
 /** 描き直しのために覚えておく円の数。これだけ描くと帯は何重にも埋まっていて、古い円は見えない */
 const KEEP = 4000
 /** 動きを減らす設定のときに、止まった絵として描いておく数（5 秒分） */
 const STILL = 300
+
+export const params = {
+  // draw() は 1 秒に 60 回。1 回に円を 1 つ描く
+  perSecond: { label: '1 秒に描く円', value: 60, min: 1, max: 600, step: 1 },
+} satisfies Params
 
 const circle = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
   ctx.beginPath()
@@ -19,7 +22,7 @@ const circle = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
   paint(ctx, '#fff', '#000')
 }
 
-export const mount: Mount = (stage) => {
+export const mount: Mount<typeof params> = (stage, { perSecond }) => {
   const circles: { x: number; y: number }[] = []
 
   const add = (ctx: CanvasRenderingContext2D) => {
@@ -40,7 +43,7 @@ export const mount: Mount = (stage) => {
   let due = 0
   const stop = autoplayLoop(
     (dt) => {
-      due += dt * PER_SECOND
+      due += dt * perSecond
       for (; due >= 1; due--) add(s.ctx)
     },
     () => {

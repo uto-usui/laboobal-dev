@@ -1,7 +1,7 @@
 import { clamp, pick } from '../../shared/math'
 import { autoplayLoop } from '../../shared/motion'
 import { hsb, sketch } from '../../shared/processing'
-import type { Mount } from '../../shared/variants'
+import type { Mount, Params } from '../../shared/variants'
 
 const width = 320
 const height = 320
@@ -20,6 +20,10 @@ const STEPS = [
   [0, -1],
 ] as const
 
+export const params = {
+  count: { label: '歩く点の数', value: 3, min: 1, max: 30, step: 1 },
+} satisfies Params
+
 const dot = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
   // strokeWeight(2) の point() は直径 2 の丸
   ctx.beginPath()
@@ -27,9 +31,9 @@ const dot = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
   ctx.fill()
 }
 
-export const mount: Mount = (stage) => {
-  // 真ん中から歩き出す 3 人
-  const walkers = Array.from({ length: 3 }, () => ({
+export const mount: Mount<typeof params> = (stage, { count }) => {
+  // 真ん中から歩き出す
+  const walkers = Array.from({ length: count }, () => ({
     x: width / 2,
     y: height / 2,
   }))

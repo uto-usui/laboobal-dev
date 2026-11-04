@@ -2,18 +2,21 @@ import { loop } from '../../shared/dom'
 import { random } from '../../shared/math'
 import { pointerOrWander, trackPointer } from '../../shared/pointer'
 import { hsb, paint, sketch } from '../../shared/processing'
-import type { Mount } from '../../shared/variants'
+import type { Mount, Params } from '../../shared/variants'
 
 const width = 320
 const height = 320
-const DIAMETER = 60
 // background(320) と background(200)。colorMode(HSB, 360, ...) の中では、1 つだけの数は 360 を白とする灰色になる
 const LIGHT = 'rgb(227 227 227)'
 const DARK = 'rgb(142 142 142)'
 /** 描き直しのために覚えておく円の数。10% の円がこれだけ重なれば、古い円はほとんど見えない */
 const KEEP = 3000
 
-export const mount: Mount = (stage) => {
+export const params = {
+  diameter: { label: '円の直径', value: 60, min: 4, max: 160, step: 1 },
+} satisfies Params
+
+export const mount: Mount<typeof params> = (stage, { diameter }) => {
   const canvas = stage.querySelector('canvas')!
   let background = LIGHT
   const stamps: { x: number; y: number; color: string }[] = []
@@ -25,7 +28,7 @@ export const mount: Mount = (stage) => {
     color: string,
   ) => {
     ctx.beginPath()
-    ctx.arc(x, y, DIAMETER / 2, 0, Math.PI * 2)
+    ctx.arc(x, y, diameter / 2, 0, Math.PI * 2)
     paint(ctx, color, null)
   }
 
