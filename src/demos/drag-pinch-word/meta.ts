@@ -16,4 +16,6 @@ export default defineDemo({
     '引っぱると、緑の帯に並んだ「DRAG」の文字が大きくなり、字の間が広がる。離すと元に戻る。',
   tags: ['drag', 'text'],
   tech: ['js'],
+  group: 'drag-pinch',
+  variant: '文字',
 })

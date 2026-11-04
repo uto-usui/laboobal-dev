@@ -16,4 +16,6 @@ export default defineDemo({
     '画面のどこかを押して引っぱると、真ん中の玉が遅れて追いかけ、離すと戻る。',
   tags: ['drag', 'physics'],
   tech: ['js'],
+  group: 'drag-pinch',
+  variant: '玉',
 })

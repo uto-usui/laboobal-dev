@@ -16,4 +16,6 @@ export default defineDemo({
     '引っぱると玉がのびて傾き、緑から赤へ色が変わる。離すと元の形で真ん中へ戻る。',
   tags: ['drag', 'physics'],
   tech: ['js'],
+  group: 'drag-pinch',
+  variant: '形と色',
 })
