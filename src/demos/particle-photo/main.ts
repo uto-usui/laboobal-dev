@@ -1,5 +1,12 @@
 import GUI from 'lil-gui'
-import { loop, onResize, prefersReducedMotion } from '../../shared/dom'
+import {
+  isCoarsePointer,
+  loop,
+  onResize,
+  pixelRatio,
+  prefersReducedMotion,
+} from '../../shared/dom'
+import { clamp } from '../../shared/math'
 import { washCount, type Mode } from './assign'
 import {
   createRenderer,
@@ -53,8 +60,7 @@ const P = {
   shadow: 1,
   // 指で触る端末と画面の小さい端末（スマホ）は、GPU が非力なことが多いので少ない粒から始める
   count:
-    matchMedia('(pointer: coarse)').matches ||
-    Math.min(screen.width, screen.height) < 600
+    isCoarsePointer() || Math.min(screen.width, screen.height) < 600
       ? 65536
       : 262144,
   night: false,
@@ -237,7 +243,7 @@ const addFiles = async (files: Iterable<File>) => {
 const U = new Float32Array(40)
 const cam = [0, 0]
 const smooth = (x: number) => {
-  x = Math.min(1, Math.max(0, x))
+  x = clamp(x, 0, 1)
   return x * x * (3 - 2 * x)
 }
 const frame = (rawDt: number) => {
@@ -392,7 +398,7 @@ const buildGui = () => {
 
 // ---------- 起動 ----------
 onResize(stage, ({ width, height }) => {
-  const dpr = Math.min(devicePixelRatio || 1, 2)
+  const dpr = pixelRatio()
   pixelSize = {
     w: Math.max(1, Math.floor(width * dpr)),
     h: Math.max(1, Math.floor(height * dpr)),

@@ -1,4 +1,5 @@
 import { fitCanvas, loop, onResize } from '../../shared/dom'
+import { clamp } from '../../shared/math'
 import photo from './assets/photo.jpg'
 
 const stage = document.querySelector<HTMLElement>('.draw-image')!
@@ -65,7 +66,7 @@ loop((dt) => {
     x += direction * SCAN_SPEED * dt
     if (x >= size.width) direction = -1
     if (x <= 0) direction = 1
-    x = Math.min(Math.max(x, 0), size.width)
+    x = clamp(x, 0, size.width)
     drawColumn(Math.floor(x), 0, size.width)
     return
   }

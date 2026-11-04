@@ -1,5 +1,5 @@
 import { loop, onResize, prefersReducedMotion } from '../../shared/dom'
-import { damp, map, random } from '../../shared/math'
+import { damp, map, random, toRadian } from '../../shared/math'
 
 const stage = document.querySelector<HTMLElement>('[data-stage]')!
 const dots = [...stage.querySelectorAll<HTMLElement>('[data-dot]')]
@@ -9,8 +9,6 @@ interface Point {
   y: number
   z: number
 }
-
-const toRadian = (degree: number) => (degree * Math.PI) / 180
 
 // 点の座標を原点のまわりに回す。要素そのものは回さないので、丸はいつもこちらを向いている
 const rotateX = (p: Point, angle: number) => {
