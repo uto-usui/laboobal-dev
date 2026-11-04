@@ -37,8 +37,6 @@ const BUDGET = {
     'particle-photo': 27,
     // locomotive-scroll。15.1
     scrollmanager: 17,
-    // lil-gui。12.5
-    nodeballs: 14,
   },
   // 1 ファイルの最大。jpg 36.4、webm 324.1、webp 25.8
   previews: { jpg: 45, webm: 400, webp: 40 },
