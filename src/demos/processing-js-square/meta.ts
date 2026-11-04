@@ -16,4 +16,6 @@ export default defineDemo({
     '太い線の長方形、角の丸い正方形、同じ数を rectMode の読み方を替えて描いた正方形を並べる。',
   tags: ['shape'],
   tech: ['canvas2d'],
+  group: 'processing-js',
+  variant: '四角',
 })

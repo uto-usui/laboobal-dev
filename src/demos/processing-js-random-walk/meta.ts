@@ -16,4 +16,6 @@ export default defineDemo({
     '真ん中から出た 3 つの点が、毎フレーム上下左右のどれかへ 1 歩ずつ進み、通った跡を残す。',
   tags: ['random'],
   tech: ['canvas2d'],
+  group: 'processing-js',
+  variant: 'ランダムウォーク',
 })

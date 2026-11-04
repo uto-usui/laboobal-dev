@@ -16,4 +16,6 @@ export default defineDemo({
     '正方形を描くたびに座標を進めて少し回し、20 個の正方形を輪のように並べる。',
   tags: ['shape'],
   tech: ['canvas2d'],
+  group: 'processing-js',
+  variant: '輪',
 })

@@ -16,4 +16,6 @@ export default defineDemo({
     '楕円を 1 つと、同じ数を ellipseMode の 4 つの読み方で渡した円を、灰色の画面に描く。',
   tags: ['shape'],
   tech: ['canvas2d'],
+  group: 'processing-js',
+  variant: '円',
 })

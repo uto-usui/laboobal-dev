@@ -17,4 +17,6 @@ export default defineDemo({
     'マウスの位置に青い半透明の円を描き重ねる。押すと暗くなり、離すと消えて描き直せる。',
   tags: ['cursor', 'shape'],
   tech: ['canvas2d'],
+  group: 'processing-js',
+  variant: 'マウスで描く',
 })
