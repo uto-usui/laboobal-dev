@@ -31,3 +31,7 @@ DOM の箱と WebGL の板を入れ替えて見せている。押した瞬間に
 
 - laboobal/docs/canvas/three/scale.md（`Three/Scale`）
 - [Codrops の Creating Grid-to-Fullscreen Animations with Three.js](https://tympanus.net/codrops/2019/05/22/creating-grid-to-fullscreen-animations-with-three-js/)（Daniel Velasquez）。頂点ごとに動き出す時刻をずらす考え方と、シェーダーの形はこれのもの
+
+## クレジット
+
+- Codrops: https://tympanus.net/codrops/2019/05/22/creating-grid-to-fullscreen-animations-with-three-js/ （コードは Anemolo/GridToFullscreenAnimations。LICENSE のファイルはなく、README の License の節に Codrops の利用条件がある）

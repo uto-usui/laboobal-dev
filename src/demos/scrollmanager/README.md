@@ -53,3 +53,7 @@ locomotive-scroll 5.0.1 を使っている。5 は中で Lenis 1.3 を動かし�
 
 - laboobal-dev の `pages/scrollManager/index.vue` と `pages/mixins/locomotive.ts`（タグ `nuxt2-final`）
 - タイルの並べ方は codrops の TileScroll から: https://github.com/codrops/TileScroll
+
+## クレジット
+
+- codrops TileScroll: https://github.com/codrops/TileScroll （MIT License）

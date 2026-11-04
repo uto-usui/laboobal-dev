@@ -37,3 +37,7 @@ three の `ShaderMaterial` で、画面いっぱいの板を 1 枚描く。絵�
 
 - laboobal/docs/canvas/fake3d.md（`Canvas/Fake3d`）
 - [akella/fake3d](https://github.com/akella/fake3d)。旧デモのコードとシェーダーはこれとほぼ同じ
+
+## クレジット
+
+- akella/fake3d: https://github.com/akella/fake3d （LICENSE のファイルはない。README の License の節に Codrops の利用条件がある）

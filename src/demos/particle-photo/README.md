@@ -64,3 +64,7 @@ WebGPU のパイプラインの layout を `'auto'` にすると、そのシェ�
 - `04.jpg` [Steven Spassov](https://unsplash.com/photos/tVIqMgGlAG0)
 - `05.jpg` [Alexey Topolyanskiy](https://unsplash.com/photos/-oWyJoSqBRM)
 - `06.jpg` [Samuel Scrimshaw](https://unsplash.com/photos/sseiVD2XsOk)
+
+## クレジット
+
+- 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真ごとの出どころは上の「写真」）

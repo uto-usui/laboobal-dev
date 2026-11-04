@@ -30,3 +30,7 @@ GSAP では CSS の変数 `--lift` を 0 から 1 へ動かすだけにしてい
 
 - laboobal/docs/basic/gsap.md（`basic/gsap/Stagger`）
 - 旧ページが参考に挙げていた [Advanced staggers in GSAP 3](https://codepen.io/GreenSock/pen/vYBRPbO)
+
+## クレジット
+
+- Advanced staggers in GSAP 3: https://codepen.io/GreenSock/pen/vYBRPbO （CodePen の公開 Pen なので MIT License）

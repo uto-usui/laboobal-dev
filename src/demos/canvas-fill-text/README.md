@@ -33,3 +33,7 @@ Canvas 2D。毎フレーム全部の円を描き直す。ぶつかりの判定�
 
 - laboobal/docs/canvas/fillText.md（`Canvas/FillText`）
 - 円を置いて膨らませる形は [The Coding Train の Coding Challenge #50（Animated Circle Packing）](https://thecodingtrain.com/challenges/50-animated-circle-packing) と同じ
+
+## クレジット
+
+- The Coding Train: https://thecodingtrain.com/challenges/50-animated-circle-packing （コードは MIT License。ロゴや画像は除く）
