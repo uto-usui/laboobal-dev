@@ -11,16 +11,16 @@ import { join, posix } from 'node:path'
 import { brotliCompressSync, constants, gzipSync } from 'node:zlib'
 
 // 上限。単位は KB（1000 バイト）。2026-11-04 に、そのとき測った値に 2〜3 割の余裕を足して決めた。
-// コメントの数字は、組の土台（#31）が入ったあとのビルドで測り直した値（`--report` で見られる）。
+// コメントの数字は、2026-11-04 にデモを 21 本下げたあとのビルドで測り直した値（`--report` で見られる）。
 // 上げるときは、何が増えたのかをコミットに書く
 const BUDGET = {
-  // 7.3 → 12.7（並び替え・ピックアップ・スマホの主役・板の遷移・長い slug で 3.5、一覧のデモ 35 本で 1.7）→ 12.9（組の行）
+  // 7.3 → 12.7（並び替え・ピックアップ・スマホの主役・板の遷移・長い slug で 3.5、一覧のデモ 35 本で 1.7）→ 12.9（組の行）→ 12.0（デモを 21 本下げた）
   top: 15,
   // 33.1（montserrat-ascii-400、montserrat-latin-700、molle-mark の 3 個）
   topFonts: 42,
   // デモは、読むライブラリで 3 つに分ける。gsap と three の本体は別のチャンクになるので、その名前で見分ける
   demo: {
-    // ライブラリなし。最大 7.4（processing-js-circle-at-the-mouse-position。組の切り替えで 1.3 増えた）
+    // ライブラリなし。最大 7.3（processing-js-circle-at-the-mouse-position。組の切り替えで 1.3 増え、組の一覧が 6 本減って 0.1 減った）
     plain: 8,
     // gsap を読む。最大 31.7（tweenmax-easing-of-scroll-parallax）
     gsap: 36,
