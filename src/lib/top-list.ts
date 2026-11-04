@@ -1,7 +1,8 @@
-/** トップの一覧の並べ方。ページを組み立てるときとブラウザで並べ替えるときの両方で使う */
+/** トップの一覧の並べ方。ページを組み立てるときとブラウザで並べ替えるときの両方で使う。
+ * 言葉は隣の絞り込み（hover、drag など）に合わせて英語。new は NEW の印と紛れるので latest */
 export const SORTS = [
-  { key: 'new', label: '新しい順' },
-  { key: 'name', label: '名前順' },
+  { key: 'new', label: 'latest' },
+  { key: 'name', label: 'a–z' },
 ] as const
 export type SortKey = (typeof SORTS)[number]['key']
 export const DEFAULT_SORT: SortKey = 'new'
