@@ -353,3 +353,79 @@ for (const group of groups) {
     expect(errors).toEqual([])
   })
 }
+
+/** 切り替えのしくみそのもの。follow-mouse の組で見る（DOM で描くので軽く、バリエーションが 4 本ある） */
+test.describe('切り替えのしくみ', () => {
+  const group = groups.find((g) => g.name === 'follow-mouse')!
+  const [a, b, c, d] = group.variants
+
+  /** 読み終わるのを待たずに選ぶ。読み込みの途中で選び直す流れを作るため */
+  const pick = (page: Page, slug: string) =>
+    page
+      .locator('.variant-gui select')
+      .selectOption({ label: demoOf(slug).variant! })
+  /** /<slug>/ の応答を、slug ごとに決めた長さだけ遅らせる */
+  const delayPages = async (page: Page, delays: Map<string, number>) => {
+    for (const [slug, ms] of delays)
+      await page.route(`/${slug}/`, async (route) => {
+        const response = await route.fetch()
+        await new Promise((resolve) => setTimeout(resolve, ms))
+        await route.fulfill({ response })
+      })
+  }
+  const shown = (page: Page) =>
+    page.evaluate(() => ({
+      slug: document.querySelector<HTMLElement>('main.demo')!.dataset.slug,
+      path: location.pathname,
+      select: (({ options, selectedIndex }) => options[selectedIndex].text)(
+        document.querySelector<HTMLSelectElement>('.variant-gui select')!,
+      ),
+    }))
+  const expected = (slug: string) => ({
+    slug,
+    path: `/${slug}/`,
+    select: demoOf(slug).variant,
+  })
+
+  test('B を選んで、読み込みが終わる前に A に戻すと A のまま', async ({
+    page,
+  }) => {
+    const errors = watchErrors(page)
+    await page.goto(`/${a}/`)
+    await openSwitcher(page)
+    await delayPages(page, new Map([[b, 1000]]))
+    await pick(page, b)
+    await page.waitForTimeout(100)
+    await pick(page, a)
+    await page.waitForTimeout(2000)
+    expect(await shown(page)).toEqual(expected(a))
+    expect(errors).toEqual([])
+  })
+
+  test('速く続けて選ぶと最後に選んだものになり、ループは 1 本', async ({
+    page,
+  }) => {
+    const errors = watchErrors(page)
+    await page.goto(`/${a}/`)
+    await page.waitForTimeout(2500)
+    const baseline = await loopsPerFrame(page)
+    await openSwitcher(page)
+    // どれも選び終えたあとに、選んだ順とは違う順で届く。最後は今のもの（a）を選ぶ
+    await delayPages(
+      page,
+      new Map([
+        [b, 1600],
+        [c, 1000],
+        [d, 1300],
+      ]),
+    )
+    for (const slug of [b, c, d, a, c, b, d, c, b, a]) {
+      await pick(page, slug)
+      await page.waitForTimeout(50)
+    }
+    await page.waitForTimeout(2500)
+    expect(await shown(page)).toEqual(expected(a))
+    expect(await loopsPerFrame(page)).toBeCloseTo(baseline, 0)
+    expect(errors).toEqual([])
+  })
+})

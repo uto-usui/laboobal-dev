@@ -178,8 +178,9 @@ const open = async (
   // 選んだ順に読み終えるとは限らないので、最後に選んだものだけを mount する
   let ticket = 0
   const switchTo = async (slug: string) => {
-    if (slug === page.slug) return
+    // 今のものを選び直したときも進める。進めないと、読み込み中の前の選択が最後のものとして mount される
     const mine = ++ticket
+    if (slug === page.slug) return
     let loaded: Loaded
     try {
       loaded = await loadOnce(slug)
