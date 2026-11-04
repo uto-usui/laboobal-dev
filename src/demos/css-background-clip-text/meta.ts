@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
+  created: '2017-02-01',
+  added: '2026-11-02',
+  description:
+    '「CLIP TEXT」の文字の形に、猫の写真をくり抜いて見せる。CSS だけで作っている。',
+  tags: ['text', 'image'],
+  tech: ['css'],
 })

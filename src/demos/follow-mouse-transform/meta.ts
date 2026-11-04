@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'hover',
+  created: '2018-09-03',
+  added: '2026-11-01',
+  description:
+    'マウスを追う玉が、置いていかれた分だけふくらみ、追いつくと元の大きさに戻る。',
+  tags: ['cursor', 'physics'],
+  tech: ['js'],
 })

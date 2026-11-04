@@ -12,4 +12,11 @@ export default defineDemo({
   ],
   webgl: true,
   interaction: 'hover',
+  created: '2019-10-29',
+  added: '2026-11-01',
+  description:
+    '1 枚の絵を深度の画像でずらし、マウスの位置に合わせてのぞき込むように立体に見せる。',
+  tags: ['image', '3d', 'cursor'],
+  tech: ['three', 'glsl'],
+  pick: true,
 })
