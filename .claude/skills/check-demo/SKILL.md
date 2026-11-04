@@ -12,7 +12,7 @@ description: labobal.dev のデモ 1 本が、docs/demo-guide.md の決まりど
 ## 1. コードの決まり
 
 ```sh
-rg -n "touch-action: none" src/demos/<slug>/          # 出たら直す（particle-photo のように touchGate で上書きしている理由があれば別）
+rg -n "touch-action: none" src/demos/<slug>/          # 出たら pan-y と touchGate に直す
 rg -n "from 'gsap'" src/demos/<slug>/                 # 出たら src/shared/gsap から読む形に直す
 rg -n "requestAnimationFrame|setInterval|new THREE.WebGLRenderer" src/demos/<slug>/   # loop、autoplayLoop、createGlStage に替えられないか見る
 rg -n "https?://" src/demos/<slug>/*.ts src/demos/<slug>/Demo.astro   # 実行時に外から読んでいないか
