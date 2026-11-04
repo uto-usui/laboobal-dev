@@ -1,5 +1,6 @@
 ---
 import Base from './Base.astro'
+import VariantSwitcher from './VariantSwitcher.astro'
 import { type DemoMeta, getDemos, getGroups } from '../lib/demos'
 
 interface Props {
@@ -8,41 +9,28 @@ interface Props {
 
 const { demo } = Astro.props
 // リポジトリの名前は laboobal-dev（ドメインの labobal.dev とつづりが違う）
-const codeUrlOf = (slug: string) =>
-  `https://github.com/uto-usui/laboobal-dev/tree/master/src/demos/${slug}/`
-const titleOf = (meta: DemoMeta) => `${meta.title} | labobal.dev`
-const rowsOf = (meta: DemoMeta) =>
-  [
-    { key: 'created', value: meta.created },
-    { key: 'tags', value: meta.tags?.join(' / ') },
-    { key: 'tech', value: meta.tech?.join(' / ') },
-  ].filter((row) => row.value)
-const codeUrl = codeUrlOf(demo.slug)
-const meta = rowsOf(demo)
+const codeUrl = `https://github.com/uto-usui/laboobal-dev/tree/master/src/demos/${demo.slug}/`
+const meta = [
+  { key: 'created', value: demo.created },
+  { key: 'tags', value: demo.tags?.join(' / ') },
+  { key: 'tech', value: demo.tech?.join(' / ') },
+].filter((row) => row.value)
 
-// 組のバリエーションなら、切り替えたときに URL、題、パネルを替えるための中身を埋め込む（src/shared/variants.ts が読む）
+// 組のバリエーションなら、切り替えの欄に並べる slug と呼び名を埋め込む（src/shared/variant-switcher.ts が読む）。
+// 題やパネルの中身は、切り替えたときに読むそのバリエーションのページから取る
 const group = demo.group
   ? (await getGroups()).find((g) => g.name === demo.group)
   : undefined
 const demos = group ? await getDemos() : []
 const groupData = group && {
-  name: group.name,
-  variants: group.variants
-    .map((slug) => demos.find((d) => d.slug === slug)!)
-    .map((d) => ({
-      slug: d.slug,
-      label: d.variant,
-      title: titleOf(d),
-      heading: d.title,
-      description: d.description,
-      rows: rowsOf(d),
-      article: d.article,
-      code: codeUrlOf(d.slug),
-    })),
+  variants: group.variants.map((slug) => ({
+    slug,
+    label: demos.find((d) => d.slug === slug)!.variant,
+  })),
 }
 ---
 
-<Base title={titleOf(demo)} description={demo.description}>
+<Base title={`${demo.title} | labobal.dev`} description={demo.description}>
   <main class="demo" data-slug={demo.slug} data-group={demo.group}>
     <slot />
   </main>
@@ -54,6 +42,9 @@ const groupData = group && {
         is:inline
         set:html={JSON.stringify(groupData).replaceAll('<', '\\u003c')}
       />
+      <template id="variant-switcher">
+        <VariantSwitcher />
+      </template>
       <button
         class="variant-toggle"
         type="button"
@@ -97,8 +88,8 @@ const groupData = group && {
         </dl>
       )}
       <ul class="info-links">
-        {(demo.article || groupData) && (
-          <li class="info-article" hidden={!demo.article}>
+        {demo.article && (
+          <li class="info-article">
             <a href={demo.article} target="_top">
               記事
             </a>

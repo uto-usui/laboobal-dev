@@ -2,22 +2,24 @@
  * 似たデモの組（#31）で、ページの中でバリエーションを切り替えるしくみ。見本は src/groups/random-color/。
  *
  * 置くもの
- * - src/groups/<group>/meta.ts  組の題、説明、並び順、トップから開くバリエーション（defineGroup）。ビルドだけが読む
- * - src/groups/<group>/main.ts  slug ごとの main.ts の読み込み（defineVariants）。ブラウザだけが読む
+ * - src/groups/<group>/meta.ts  組の題、説明、並び順、トップから開くバリエーション（defineGroup）
+ * - src/demos/<slug>/meta.ts    group と variant（切り替えの欄の短い呼び名）を足す
  * - src/demos/<slug>/main.ts    mount と、あれば params を export する。import しただけでは何も動かさない
- * - src/demos/<slug>/Demo.astro マークアップと、group.start(variant) を呼ぶ script。<style> は書かない
+ * - src/demos/<slug>/Demo.astro マークアップと style と、start(variant) を呼ぶ script
  *
- * 切り替えの流れ
- * 1. 次の main.ts を動的 import し、同時に /<slug>/ の HTML を読んで main.demo の中身（script を除く）をマークアップにする
- * 2. 今の dispose を呼び、main.demo の中身を入れ替えて、次の mount を呼ぶ
- * 3. URL（replaceState）、document.title、info のパネルを替える。中身は DemoLayout が埋め込んだ JSON（#demo-group）
+ * 切り替えの流れ（variant-switcher.ts。設定のボタンを押したときに読む）
+ * 1. /<slug>/ の HTML を読み、head の CSS を足し、main.demo の中の script を import する。その script の start(variant) が
+ *    mount を渡してくる。lil-gui と同じく、ほかのバリエーションのコードと CSS は切り替えたときにだけ読む
+ * 2. 今の dispose を呼び、main.demo の中身を読んだページのもの（script を除く）に入れ替えて、mount を呼ぶ
+ * 3. URL（replaceState）、document.title、info のパネルを、読んだページのものに替える
  *
  * mount の決まり
  * - stage は main.demo。要素は stage の中から探す。stage そのものの class と style は dispose のあとに戻す
  * - 始めたものは全部 dispose で止める。共有の部品（loop、autoplayLoop、onResize、trackPointer、touchGate、createGlStage など）は
  *   どれも止める関数か dispose を返す。window や document に足した listener も外す
  * - dispose のあとに、後から来る処理（写真の読み込みの完了、await の続き）で描かない
- * - バリエーションだけの CSS は main.ts から import し、[data-slug='<slug>'] の中に書く。切り替えても前の CSS は残るため
+ * - CSS は切り替えたあとも残る。バリエーションの CSS は Demo.astro の <style>（scoped）に書き、:global だけの規則や
+ *   <style is:global> を書かない（ほかのバリエーションにかかる）
  */
 
 export type Dispose = () => void
@@ -57,243 +59,128 @@ export interface Variant {
   params?: Params
 }
 
-type Loaders = Record<string, () => Promise<Variant>>
-
-/** DemoLayout が #demo-group に埋め込む、組のバリエーションの情報 */
-interface VariantInfo {
+/** 開いているページの状態。切り替えの側（variant-switcher.ts）と分け合う */
+export interface Page {
+  stage: HTMLElement
   slug: string
-  /** 切り替えの欄の名前（meta の variant） */
-  label: string
-  /** document.title */
-  title: string
-  /** info のパネルの題（meta の title） */
-  heading: string
-  description: string
-  rows: { key: string; value: string }[]
-  article?: string
-  code: string
+  variant: Variant
+  /** slug ごとのパラメーターの値。切り替えて戻っても残す */
+  valuesOf: (slug: string, variant: Variant) => Record<string, unknown>
+  /** main.demo の中身を取っておく。script はもう 1 回動かさないよう除く */
+  snapshot: (main: HTMLElement) => HTMLTemplateElement
+  /** markup を渡したときは中身を入れ替えてから、今の slug と variant で mount する */
+  run: (markup?: HTMLTemplateElement) => void
+  teardown: () => void
+  /** 切り替えの側が、ほかのページの script を import している間だけ置く */
+  receive?: (variant: Variant) => void
 }
 
-/**
- * 組の main.ts で、slug ごとの読み込みを並べる。並び順は meta.ts の variants が決める。
- * 書き方は `'<slug>': () => import('../../demos/<slug>/main')` だけにする（ビルドがこの形で数えて確かめる）
- */
-export const defineVariants = (loaders: Loaders) => ({
-  /** バリエーションの Demo.astro の script から 1 回だけ呼ぶ。variant はそのページの slug の main.ts */
-  start: (variant: Variant) => start(loaders, variant),
-})
+let page: Page | undefined
 
 const noop = () => {}
 
-/** main.demo の中身を、マークアップとして取っておく。script はもう 1 回動かさないよう除く */
-const snapshot = (main: HTMLElement) => {
-  const template = document.createElement('template')
-  template.innerHTML = main.innerHTML
-  for (const script of template.content.querySelectorAll('script'))
-    script.remove()
-  return template
-}
-
-const defaultsOf = (params: Params = {}) =>
-  Object.fromEntries(
-    Object.entries(params).map(([key, param]) => [key, param.value]),
-  )
-
-const start = (loaders: Loaders, first: Variant) => {
+/**
+ * バリエーションの Demo.astro の script から呼ぶ。そのページで最初に呼ばれたときは、そのバリエーションを mount する。
+ * 切り替えでほかのページの script を import したときは、mount を切り替えの側に渡すだけにする
+ */
+export const start = (variant: Variant) => {
+  if (page) {
+    page.receive?.(variant)
+    return
+  }
   const stage = document.querySelector<HTMLElement>('main.demo')!
-  const data: { variants: VariantInfo[] } = JSON.parse(
-    document.getElementById('demo-group')!.textContent!,
-  )
   const pristine = {
     class: stage.getAttribute('class'),
     style: stage.getAttribute('style'),
-  }
-
-  let slug = stage.dataset.slug!
-  let variant = first
-  /** 読み終えたマークアップ。今のバリエーションの分はいつも入っている */
-  const markups = new Map([[slug, snapshot(stage)]])
-  const loading = new Map<string, Promise<HTMLTemplateElement>>()
-  const values = new Map<string, Record<string, unknown>>()
-  const valuesOf = (key: string, of: Variant) => {
-    if (!values.has(key)) values.set(key, defaultsOf(of.params))
-    return values.get(key)!
-  }
-
-  const markupOf = (key: string) => {
-    const ready = markups.get(key)
-    if (ready) return Promise.resolve(ready)
-    let promise = loading.get(key)
-    if (!promise) {
-      promise = fetch(`/${key}/`)
-        .then((response) => {
-          if (!response.ok) throw new Error(`/${key}/ を読めない`)
-          return response.text()
-        })
-        .then((html) => {
-          const main = new DOMParser()
-            .parseFromString(html, 'text/html')
-            .querySelector<HTMLElement>(`main.demo[data-slug="${key}"]`)
-          if (!main) throw new Error(`/${key}/ に main.demo がない`)
-          const template = snapshot(main)
-          markups.set(key, template)
-          return template
-        })
-        .finally(() => loading.delete(key))
-      loading.set(key, promise)
-    }
-    return promise
-  }
-
-  /** markup を渡したときは中身を入れ替えてから mount する。最初の 1 回はページの HTML のまま */
-  const run = (markup?: HTMLTemplateElement): Dispose => {
-    if (markup) stage.replaceChildren(markup.content.cloneNode(true))
-    stage.dataset.slug = slug
-    try {
-      const dispose = variant.mount(stage, valuesOf(slug, variant) as never)
-      return typeof dispose === 'function' ? dispose : noop
-    } catch (error) {
-      console.error(error)
-      return noop
-    }
   }
   const restore = (name: 'class' | 'style') => {
     const value = pristine[name]
     if (value === null) stage.removeAttribute(name)
     else stage.setAttribute(name, value)
   }
-  let dispose = run()
-  const teardown = () => {
-    try {
-      dispose()
-    } catch (error) {
-      console.error(error)
-    }
-    dispose = noop
-    restore('class')
-    restore('style')
-  }
+  const values = new Map<string, Record<string, unknown>>()
+  let dispose: Dispose = noop
 
-  const panel = document.getElementById('demo-info')
-  const showInfo = (info: VariantInfo) => {
-    document.title = info.title
-    if (!panel) return
-    const text = (selector: string, value: string) => {
-      const el = panel.querySelector(selector)
-      if (el) el.textContent = value
-    }
-    text('.info-slug', info.slug)
-    text('.info-title', info.heading)
-    text('.info-description', info.description)
-    // 行（created、tags、tech）はどのデモにもあるので、並びはそのままで値だけ替える
-    for (const row of panel.querySelectorAll('.info-meta > div')) {
-      const key = row.querySelector('dt')?.textContent?.trim()
-      const dd = row.querySelector('dd')
-      if (dd) dd.textContent = info.rows.find((r) => r.key === key)?.value ?? ''
-    }
-    const article = panel.querySelector<HTMLElement>('.info-article')
-    if (article) {
-      // lab の記事に埋め込まれているときは出さない（DemoLayout と同じ）
-      article.hidden = !info.article || window.top !== window
-      article.querySelector('a')?.setAttribute('href', info.article ?? '')
-    }
-    panel.querySelector('.info-code a')?.setAttribute('href', info.code)
-  }
-
-  /** 切り替えの欄。開くまでは作らない */
-  let ui: { sync: () => void } | undefined
-
-  // 選んだ順に読み終えるとは限らないので、最後に選んだものだけを mount する
-  let ticket = 0
-  const switchTo = async (next: string) => {
-    if (next === slug || !loaders[next]) return
-    const mine = ++ticket
-    let loaded: [Variant, HTMLTemplateElement]
-    try {
-      loaded = await Promise.all([loaders[next](), markupOf(next)])
-    } catch (error) {
-      if (mine !== ticket) return
-      console.error(error)
-      ui?.sync()
-      return
-    }
-    if (mine !== ticket) return
-    teardown()
-    slug = next
-    variant = loaded[0]
-    dispose = run(loaded[1])
-    history.replaceState(
-      history.state,
-      '',
-      `/${slug}/${location.search}${location.hash}`,
-    )
-    const info = data.variants.find((v) => v.slug === slug)
-    if (info) showInfo(info)
-    ui?.sync()
-  }
-
-  /** パラメーターを替えたら、同じバリエーションを最初から作り直す */
-  const remount = () => {
-    ticket++
-    teardown()
-    dispose = run(markups.get(slug))
-  }
-
-  const toggle = document.querySelector<HTMLButtonElement>('.variant-toggle')
-  const openGui = async () => {
-    if (!toggle || ui) return
-    toggle.disabled = true
-    // lil-gui は開いたときにだけ読む（読むライブラリでページの重さを分けているため。docs/demo-guide.md の 9 章）
-    const GUI = await import('lil-gui').then(
-      (lib) => lib.default,
-      (error) => {
+  const current: Page = {
+    stage,
+    slug: stage.dataset.slug!,
+    variant,
+    valuesOf: (slug, of) => {
+      if (!values.has(slug))
+        values.set(
+          slug,
+          Object.fromEntries(
+            Object.entries(of.params ?? {}).map(([key, p]) => [key, p.value]),
+          ),
+        )
+      return values.get(slug)!
+    },
+    snapshot: (main) => {
+      const template = document.createElement('template')
+      template.innerHTML = main.innerHTML
+      for (const script of template.content.querySelectorAll('script'))
+        script.remove()
+      return template
+    },
+    run: (markup) => {
+      if (markup) stage.replaceChildren(markup.content.cloneNode(true))
+      stage.dataset.slug = current.slug
+      try {
+        const result = current.variant.mount(
+          stage,
+          current.valuesOf(current.slug, current.variant) as never,
+        )
+        dispose = typeof result === 'function' ? result : noop
+      } catch (error) {
         console.error(error)
-        toggle.disabled = false
-        return undefined
-      },
-    )
-    if (!GUI) return
-    const gui = new GUI({ title: '設定' })
-    gui.domElement.classList.add('variant-gui')
-    gui.domElement.dataset.captureHide = ''
-    const state = { slug }
-    const select = gui
-      .add(
-        state,
-        'slug',
-        Object.fromEntries(data.variants.map((v) => [v.label, v.slug])),
-      )
-      .name('バリエーション')
-      .onChange((next: string) => switchTo(next))
-    let folder: InstanceType<typeof GUI> | undefined
-    const showParams = () => {
-      folder?.destroy()
-      folder = undefined
-      const params = Object.entries(variant.params ?? {})
-      if (params.length === 0) return
-      folder = gui.addFolder('パラメーター')
-      const target = valuesOf(slug, variant)
-      for (const [key, param] of params) {
-        const controller =
-          'options' in param
-            ? folder.add(target, key, param.options)
-            : 'min' in param
-              ? folder.add(target, key, param.min, param.max, param.step)
-              : folder.add(target, key)
-        // スライダーは動かしている間ではなく、離したときに作り直す（WebGL の context を作り直すことがあるため）
-        controller.name(param.label).onFinishChange(remount)
+        dispose = noop
       }
-    }
-    ui = {
-      sync: () => {
-        state.slug = slug
-        select.updateDisplay()
-        showParams()
-      },
-    }
-    showParams()
-    toggle.remove()
-    gui.$title.focus()
+    },
+    teardown: () => {
+      try {
+        dispose()
+      } catch (error) {
+        console.error(error)
+      }
+      dispose = noop
+      restore('class')
+      restore('style')
+    },
   }
-  toggle?.addEventListener('click', openGui)
+  page = current
+  const markup = current.snapshot(stage)
+  current.run()
+
+  // 切り替えのしくみと lil-gui は、設定のボタンを押したときにだけ読む（ページを開いた直後の重さを増やさないため）。
+  // ここに import() を書くと Vite が先読みの道具（preload-helper、0.7 KB）を付けるので、DemoLayout が <template> に
+  // 入れておいた script の src を import する。その script（variant-switcher.ts）が provideSwitcher で open を渡してくる
+  const toggle = document.querySelector<HTMLButtonElement>('.variant-toggle')
+  const script = document
+    .querySelector<HTMLTemplateElement>('#variant-switcher')
+    ?.content.querySelector('script')
+  toggle?.addEventListener('click', async () => {
+    toggle.disabled = true
+    try {
+      await import(
+        /* @vite-ignore */ new URL(script!.getAttribute('src')!, location.href)
+          .href
+      )
+      await openSwitcher!(current, markup, toggle)
+    } catch (error) {
+      console.error(error)
+      toggle.disabled = false
+    }
+  })
+}
+
+type Open = (
+  page: Page,
+  markup: HTMLTemplateElement,
+  toggle: HTMLButtonElement,
+) => Promise<void>
+let openSwitcher: Open | undefined
+
+/** variant-switcher.ts が読み込まれたときに呼ぶ */
+export const provideSwitcher = (open: Open) => {
+  openSwitcher = open
 }

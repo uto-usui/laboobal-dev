@@ -5,7 +5,7 @@ import Slider from '../../groups/distortion-slider/Slider.astro'
 <Slider />
 
 <script>
-  import group from '../../groups/distortion-slider/main'
+  import { start } from '../../shared/variants'
   import * as variant from './main'
-  group.start(variant)
+  start(variant)
 </script>

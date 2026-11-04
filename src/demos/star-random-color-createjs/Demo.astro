@@ -5,7 +5,7 @@ import Fiddle from '../../groups/random-color/Fiddle.astro'
 <Fiddle title="star">星を描く<br>(ランダムな塗り)</Fiddle>
 
 <script>
-  import group from '../../groups/random-color/main'
+  import { start } from '../../shared/variants'
   import * as variant from './main'
-  group.start(variant)
+  start(variant)
 </script>

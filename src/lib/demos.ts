@@ -121,11 +121,6 @@ const metaLoaders = import.meta.glob<DemoMeta>('../demos/*/meta.ts', {
 const groupLoaders = import.meta.glob<GroupMeta>('../groups/*/meta.ts', {
   import: 'default',
 })
-// 組の main.ts（バリエーションの読み込み）は、ブラウザで動的 import をするファイル。ここからは中身を文字として読むだけにする
-const groupMains = import.meta.glob<string>('../groups/*/main.ts', {
-  query: '?raw',
-  import: 'default',
-})
 // 中身は読まない。あるかどうかだけを見る
 const notes = import.meta.glob('../demos/*/README.md', {
   query: '?raw',
@@ -156,16 +151,10 @@ import meta from '../demos/${slug}/meta'
   <Demo />
 </DemoLayout>`
 
-const variantTemplate = (group: string) => `---
-// 組の共通のマークアップ（src/groups/${group}/ の部品）を使うなら、ここで import する
----
-
-<!-- バリエーションのマークアップ。<style> は書かない。CSS は main.ts から import する -->
-
-<script>
-  import group from '../../groups/${group}/main'
+const variantScript = `<script>
+  import { start } from '../../shared/variants'
   import * as variant from './main'
-  group.start(variant)
+  start(variant)
 </script>`
 
 const folderOf = (path: string) => path.split('/').at(-2)!
@@ -290,13 +279,6 @@ const collect = async () => {
       group: await load(),
     })),
   )
-  const groupMainSources = new Map(
-    await Promise.all(
-      Object.entries(groupMains).map(
-        async ([path, load]) => [folderOf(path), await load()] as const,
-      ),
-    ),
-  )
   const bySlug = new Map(list.filter(Boolean).map((meta) => [meta.slug, meta]))
   const groups: GroupMeta[] = []
   for (const { folder, group } of groupList) {
@@ -332,26 +314,6 @@ const collect = async () => {
           `src/demos/${slug}/meta.ts: group: '${group.name}' がない（${where} の variants にある）`,
         )
     }
-    // 読み込みの一覧が variants と同じか。'<slug>': () => import('../../demos/<slug>/main') の形だけを数える
-    const main = groupMainSources.get(folder)
-    if (main === undefined) failGroup(`src/groups/${folder}/main.ts がない`)
-    else {
-      const loaders = [
-        ...main.matchAll(
-          /'([^']+)':\s*\(\)\s*=>\s*import\(\s*'\.\.\/\.\.\/demos\/([^/']+)\/main'\s*\)/g,
-        ),
-      ]
-      for (const [, key, target] of loaders)
-        if (key !== target)
-          failGroup(
-            `src/groups/${folder}/main.ts: "${key}" が別のデモ "${target}" の main を読んでいる`,
-          )
-      const keys = loaders.map((m) => m[1]).toSorted()
-      if (keys.join() !== variants.toSorted().join())
-        failGroup(
-          `src/groups/${folder}/main.ts: 読み込む slug（${keys.join(', ')}）が meta.ts の variants と違う`,
-        )
-    }
     if (errors.length === before) groups.push(group)
   }
   for (const meta of list) {
@@ -377,21 +339,28 @@ const collect = async () => {
       )
     if (typeof meta.variant !== 'string' || !meta.variant.trim())
       fail(meta.slug, `${where}: variant（切り替えの欄に出す短い呼び名）がない`)
-    // 切り替えたときは、ほかのページから Demo.astro のマークアップだけを持ってくる。<style> は付いてこない
+    // 切り替えたときは、ほかのページの main.demo の中の script を import し、そのページの CSS を足す（src/shared/variant-switcher.ts）
     const component = await components[`../demos/${meta.slug}/Demo.astro`]?.()
     if (component === undefined) continue
-    if (/<style[\s>]/.test(component))
-      fail(
-        meta.slug,
-        `src/demos/${meta.slug}/Demo.astro: 組のバリエーションに <style> を書かない（切り替えたときに付いてこない）。CSS は main.ts から import するか、組の共通の部品に置く`,
-      )
-    const boot = new RegExp(
-      `from '\\.\\./\\.\\./groups/${meta.group}/main'[\\s\\S]*\\.start\\(`,
+    if (
+      !/import \{ start \} from '\.\.\/\.\.\/shared\/variants'/.test(
+        component,
+      ) ||
+      !/import \* as variant from '\.\/main'/.test(component) ||
+      !/\bstart\(variant\)/.test(component)
     )
-    if (!boot.test(component))
       fail(
         meta.slug,
-        `src/demos/${meta.slug}/Demo.astro が組の main.ts から始めていない。次の形にする:\n${variantTemplate(meta.group)}`,
+        `src/demos/${meta.slug}/Demo.astro の script が組の決まりの形でない。次のとおりにする:\n${variantScript}`,
+      )
+    // 足した CSS は切り替えたあとも残るので、ほかのバリエーションにかかる規則を書かない
+    if (
+      /<style[^>]*\bis:global\b/.test(component) ||
+      /^\s*:global\(/m.test(component)
+    )
+      fail(
+        meta.slug,
+        `src/demos/${meta.slug}/Demo.astro: 組のバリエーションに <style is:global> や :global(...) だけの規則を書かない（切り替えたあと、ほかのバリエーションにかかる）`,
       )
   }
 

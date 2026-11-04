@@ -2,7 +2,8 @@
 // `--report` を付けると、全デモの表を出す（上限を見直すときに使う）。
 // 測るもの:
 // - トップと各デモのページで、開いた直後に読む HTML、CSS、JS の合計（brotli で圧縮した大きさ）。
-//   JS は <script src> から静的な import をたどった全部。import() で後から読むものは入れない
+//   JS は <script src> から静的な import をたどった全部。import() で後から読むものと、<template> の中の script
+//   （組の切り替えのしくみ。設定のボタンを押したときに読む）は入れない
 // - トップで読みうるフォント（woff2）の合計。unicode-range がトップの HTML の文字に当たる @font-face だけを数える
 // - public/previews の 1 ファイルあたりの大きさ（拡張子ごと）
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
@@ -87,7 +88,10 @@ const collectJs = (file, seen) => {
 
 /** ページを開いた直後に読むファイル（HTML 自身、CSS、JS） */
 const initialFiles = (html) => {
-  const source = readFileSync(html, 'utf8')
+  const source = readFileSync(html, 'utf8').replace(
+    /<template[\s\S]*?<\/template>/g,
+    '',
+  )
   const files = new Set([html])
   for (const m of source.matchAll(
     /<link[^>]+rel="(?:stylesheet|modulepreload)"[^>]*>/g,
