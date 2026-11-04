@@ -11,7 +11,7 @@ export default defineDemo({
   webgl: true,
   interaction: 'none',
   created: '2019-10-31',
-  added: '2026-11-01',
+  added: '2019-10-31',
   description:
     '黒い画面の真ん中で、縁がうねり続ける形が緑に光る。ノイズで形も光も変わり続ける。',
   tags: ['shape', 'noise'],
