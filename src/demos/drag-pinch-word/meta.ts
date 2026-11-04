@@ -13,7 +13,7 @@ export default defineDemo({
   created: '2019-01-24',
   added: '2026-11-01',
   description:
-    '引っぱると「DRAG」の文字が大きくなり、字の間と帯の太さが広がる。離すと元に戻る。',
+    '引っぱると、緑の帯に並んだ「DRAG」の文字が大きくなり、字の間が広がる。離すと元に戻る。',
   tags: ['drag', 'text'],
   tech: ['js'],
 })

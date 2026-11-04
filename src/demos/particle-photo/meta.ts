@@ -14,7 +14,7 @@ export default defineDemo({
   created: '2026-11-02',
   added: '2026-11-02',
   description:
-    '写真を数十万の粒で描き、粒が波のように飛んで次の写真へ集まる。ドラッグすると粒が吹き飛ぶ。',
+    '写真を数十万の粒で油絵のように描き、粒が波のように飛んで次の写真へ集まる。ドラッグで吹き飛ぶ。',
   tags: ['particles', 'image', 'drag'],
   tech: ['webgpu', 'wgsl'],
   pick: true,

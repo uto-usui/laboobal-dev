@@ -18,7 +18,7 @@ export default defineDemo({
   created: '2020-10-21',
   added: '2020-10-21',
   description:
-    'なめらかに減速するスクロールで、写真や文字がそれぞれ違う速さでずれ、遅れて追いつく。',
+    'なめらかに減速するスクロールで、白黒の花の写真や文字が違う速さでずれ、背景の色が移ろう。',
   tags: ['scroll', 'parallax', 'image', 'text'],
   tech: ['locomotive-scroll', 'css'],
   pick: true,

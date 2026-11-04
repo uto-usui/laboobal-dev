@@ -15,7 +15,7 @@ export default defineDemo({
   created: '2019-10-29',
   added: '2026-11-01',
   description:
-    '1 枚の絵を深度の画像でずらし、マウスの位置に合わせてのぞき込むように立体に見せる。',
+    '玉が集まった 1 枚の絵を深度の画像でずらし、マウスに合わせてのぞき込むように立体に見せる。',
   tags: ['image', '3d', 'cursor'],
   tech: ['three', 'glsl'],
   pick: true,
