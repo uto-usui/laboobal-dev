@@ -9,9 +9,30 @@ interface Loaded {
   markup: HTMLTemplateElement
   /** そのページの main.demo の中の script（バリエーションの Demo.astro の script） */
   entries: string[]
+  /** しくみ側の script が今のページと違う。開いている間に新しいデプロイが出た */
+  stale: boolean
 }
 
 const absolute = (url: string) => new URL(url, location.href).href
+
+/**
+ * main.demo の外の script（DemoLayout など）と、#variant-switcher の template の中の script の src。
+ * template の中は content にしか入らないので別に拾う。デプロイが替わってチャンクの名前が変わると、ここが変わる
+ */
+const frameOf = (doc: Document) => {
+  const main = doc.querySelector('main.demo')
+  const template = doc.querySelector<HTMLTemplateElement>('#variant-switcher')
+  return [
+    ...[...doc.querySelectorAll('script[src]')].filter(
+      (script) => !main?.contains(script),
+    ),
+    ...(template?.content.querySelectorAll('script[src]') ?? []),
+  ]
+    .map((script) => absolute(script.getAttribute('src')!))
+    .sort()
+    .join(' ')
+}
+const frame = frameOf(document)
 
 /** /<slug>/ の HTML を読む。main.demo がなければ、組のバリエーションのページではない */
 const loadPage = async (page: Page, slug: string): Promise<Loaded> => {
@@ -33,7 +54,12 @@ const loadPage = async (page: Page, slug: string): Promise<Loaded> => {
     return absolute(src)
   })
   if (entries.length === 0) throw new Error(`/${slug}/ に script がない`)
-  return { doc, markup: page.snapshot(main), entries }
+  return {
+    doc,
+    markup: page.snapshot(main),
+    entries,
+    stale: frameOf(doc) !== frame,
+  }
 }
 
 /**
@@ -184,6 +210,13 @@ const open = async (
     let loaded: Loaded
     try {
       loaded = await loadOnce(slug)
+      // 新しい版の script を import すると、別のモジュールになった variants.ts の start() が今の main.demo に
+      // もう 1 つ mount する。中で切り替えず、ページごと移る
+      if (loaded.stale) {
+        if (mine === ticket)
+          location.assign(`/${slug}/${location.search}${location.hash}`)
+        return
+      }
       await adoptStyles(loaded.doc)
       await importVariant(slug, loaded.entries)
     } catch (error) {

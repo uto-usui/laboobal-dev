@@ -428,4 +428,59 @@ test.describe('切り替えのしくみ', () => {
     expect(await loopsPerFrame(page)).toBeCloseTo(baseline, 0)
     expect(errors).toEqual([])
   })
+
+  test('開いている間に新しいデプロイが出たら、切り替えずにページごと移る', async ({
+    page,
+  }) => {
+    const errors = watchErrors(page)
+    await page.goto(`/${b}/`)
+    await page.waitForTimeout(2500)
+    const baseline = await loopsPerFrame(page)
+
+    // 新しいデプロイの /<b>/ をまねる。variants.ts が変わると、しくみ側の script（#variant-switcher の中）と、
+    // バリエーションの script が読む variants のチャンクの名前が変わる。ページごと移ったときの読み込みには本物を返す
+    const html = await (await page.request.get(`/${b}/`)).text()
+    const entry = html.match(
+      /<main[\s\S]*?<script type="module" src="([^"]+)"/,
+    )![1]
+    const js = await (await page.request.get(entry)).text()
+    const chunk = js.match(/"\.\/(variants\.[^"]+\.js)"/)![1]
+    await page.route(`/${b}/`, (route) =>
+      route.request().resourceType() === 'fetch'
+        ? route.fulfill({
+            contentType: 'text/html',
+            body: html
+              .replace(entry, '/_astro/next-deploy.js')
+              .replace(
+                /(<template id="variant-switcher"[\s\S]*?src="[^"]+)/,
+                '$1?next-deploy',
+              ),
+          })
+        : route.continue(),
+    )
+    await page.route('**/_astro/next-deploy.js', (route) =>
+      route.fulfill({
+        contentType: 'text/javascript',
+        body: js.replace(`./${chunk}`, `./${chunk}?next-deploy`),
+      }),
+    )
+
+    await page.goto(`/${a}/`)
+    await openSwitcher(page)
+    await page.evaluate(() => {
+      ;(window as unknown as { __old: boolean }).__old = true
+    })
+    await pick(page, b)
+    await page.waitForURL(`**/${b}/`, { timeout: 5000 })
+    await expect
+      .poll(() =>
+        page.evaluate(() => (window as unknown as { __old?: boolean }).__old),
+      )
+      .toBeUndefined()
+    await expect(page.locator('main.demo')).toHaveAttribute('data-slug', b)
+    await expect(page.locator('.lil-gui')).toHaveCount(0)
+    await page.waitForTimeout(1000)
+    expect(await loopsPerFrame(page)).toBeCloseTo(baseline, 0)
+    expect(errors).toEqual([])
+  })
 })
