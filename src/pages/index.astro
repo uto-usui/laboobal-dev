@@ -150,6 +150,11 @@ const countOf = (key: string) =>
             data-title={demo.title}
           >
             <span class="slug">{demo.slug}</span>
+            {demo.batch === 'new' && demo.added && (
+              <span class="new-mark" data-added={demo.added} hidden>
+                new
+              </span>
+            )}
             {demo.pick && (
               <span class="pick-mark" aria-hidden="true">
                 pick!
@@ -258,6 +263,11 @@ const countOf = (key: string) =>
     ),
   )
   render()
+
+  // ここで作ったデモ（移植でないもの）は、出してから 30 日の間 new を付ける。ビルドした日ではなく見た日で決める
+  document.querySelectorAll<HTMLElement>('.new-mark').forEach((mark) => {
+    mark.hidden = Date.now() - Date.parse(mark.dataset.added!) > 30 * 864e5
+  })
 
   // ピックアップは、マウスを重ねるとポスターの上で動画を流す。動きを減らす設定のときは流さない
   if (!isCoarsePointer() && !prefersReducedMotion())
@@ -693,6 +703,16 @@ const countOf = (key: string) =>
     color: var(--color-accent);
     pointer-events: none;
     transform: translate(70%, -10%) rotate(-14deg);
+  }
+
+  .new-mark {
+    position: absolute;
+    top: 0.6em;
+    left: 0;
+    font-size: 10px;
+    color: var(--color-accent);
+    letter-spacing: 0.3em;
+    transform: translateX(-120%);
   }
 
   .filter[data-molle] {
