@@ -1,6 +1,6 @@
 # デモの作り方
 
-labobal.dev に新しいデモを足すときの決まりです。出すまでの順番（ブランチ、PR、本番の確認）は [release.md](release.md) にあります。見本は `src/demos/marquee/`（CSS だけ）と `src/demos/drag-pinch-simple/`（script あり、指で引っぱる）です。ほかのデモとパラメーターや作りだけが違うデモは、組に入れて 1 ページで切り替えられるようにします（12 章。見本は `src/groups/random-color/`）。
+labobal.dev に新しいデモを足すときの決まりです。出すまでの順番（ブランチ、PR、本番の確認）は [release.md](release.md) にあります。見本は `src/demos/marquee/`（CSS だけ）と `src/demos/drag-pinch-simple/`（script あり、指で引っぱる）です。drag-pinch-simple は組のバリエーションなので、main.ts を `mount` の形で書いています。組でないデモは、mount の中身をそのままモジュールの top-level に書き、戻り値を受けなくてかまいません（4 章の共有の部品の節）。ほかのデモとパラメーターや作りだけが違うデモは、組に入れて 1 ページで切り替えられるようにします（12 章。見本は `src/groups/random-color/`）。
 
 ## 1. 置くファイル
 
@@ -141,7 +141,7 @@ export default defineDemo({
 | `pixelRatio()`、`fitCanvas(canvas, ctx)`（dom.ts） | canvas の解像度。devicePixelRatio は 2 で止める。2D は CSS の px の座標のまま書ける | `fitCanvas` は `{ width, height, dpr }` |
 | `onResize(el, callback)`（dom.ts） | 大きさが変わったとき。登録した時点で 1 回呼ぶ | 止める関数 |
 | `changeGate()`（dom.ts） | 追いつきかけて動きが小さくなったフレームで style を書かない | 比べる関数（止めるものはない） |
-| `trackPointer(el, options)`、`pointerOrWander()`（pointer.ts） | ポインターの位置。マウスのない端末で、マウスの代わりにゆっくり動かす | `trackPointer` は位置と `.dispose()` |
+| `trackPointer(el, options)`、`pointerOrWander()`（pointer.ts） | ポインターの位置。マウスのない端末で、マウスの代わりにゆっくり動かす。同じページで作り直したとき（組の切り替えやパラメーターの変更）は、最後のポインターの位置から始める | `trackPointer` は位置と `.dispose()` |
 | `trackPull(el)`（a/pull.ts） | 画面のどこを押しても、押した点からどれだけ引っぱったか | 量と `.dispose()` |
 | `touchGate(el)`（touch.ts） | 指で引っぱるデモ（6 章） | 止める関数（listener、timer、「tap to drag」の添え書きを外す） |
 | `hoverControl(el, over, out)`（a/hover-control.ts） | ホバーの動きを途中で止めずに最後まで動かす | 止める関数 |
@@ -214,7 +214,7 @@ lab の記事に iframe で埋め込んだとき、デモの上を指で縦に�
 
 - `e2e/demos.spec.ts`: 全デモを開き、コンソールのエラーがないこと、canvas が描ける大きさになっていること（`.demo-fallback` が出ていない）、`interaction` に合わせてマウスを動かしてもエラーが出ないこと、幅 800px と高さ 500px に縮めても横にはみ出さないこと、別のオリジンの iframe に入れても動くことを見る。canvas が 1 色のままでないかは、GPU のない CI では見ず、手元でだけ見る
 - `e2e/motion.spec.ts`: 動きを減らす設定（`AUTOPLAY`）と、指のスクロール（`DRAG`）。足すのは自分で（5 章と 6 章）
-- `e2e/groups.spec.ts`: 組ごとに、バリエーションを 3 周切り替えても前のものが残らないこと、動きを減らす設定で切り替えても止まった絵になること、iframe の中でも切り替えられて画面の外では止まること。組の定義（`src/groups/*/meta.ts`）から自動でできる。組に固有の確かめ（引っぱる組の縦なぞりなど）は `e2e/groups-<組>.spec.ts` に足す（12 章）
+- `e2e/groups.spec.ts`: 組ごとに、バリエーションを 3 周切り替えても前のもの（rAF のループ、WebGL の context、listener）が残らないこと、動きを減らす設定で切り替えても止まった絵になること、iframe の中でも切り替えられて画面の外では止まること。組の定義（`src/groups/*/meta.ts`）から自動でできる。組に固有の確かめ（引っぱる組の縦なぞりなど）は `e2e/groups-<組>.spec.ts` に足す（12 章）
 - `e2e/panel.spec.ts`、`e2e/top.spec.ts`、`e2e/seo.spec.ts`: パネル、トップの並びとピックアップ、OGP、sitemap、RSS、`/log/`
 
 テストの名前は `@<batch> <slug>` なので、1 本だけなら `pnpm test:e2e --grep <slug>` で回せます。組のテストの名前には組の名前が入るので、`pnpm test:e2e e2e/groups.spec.ts --grep <組>` で回せます。ほかの作業と同時に回すときは、`E2E_PORT` でポートを、`--output test-results/<名前>` で出力先を分けます。Playwright は始めに出力先を消すので、同じフォルダだとほかの人の結果を消します。
@@ -324,6 +324,14 @@ export const mount: Mount<typeof params> = (stage, { speed }) => {
 - 組の共通の部品（`src/groups/<組>/` の `.astro`）の `<script>`。main.demo の中に出て、切り替えたときにバリエーションの script と一緒に import される。HTML のコメントの中に書いた `<script` でも落ちる。動かす処理はバリエーションの main.ts に書き、共通のコードは `src/groups/<組>/*.ts` に置いて main.ts から import する
 
 top-level で動かすこと（上の main.ts の節）はビルドでは見ていません。E2E の 3 周で見ます。
+
+### 組で気をつけること
+
+- パラメーターの `label` は全角 7 字くらいまでにする。lil-gui の名前の欄は幅 245px のうち 4 割ほどで、それより長いとスライダーが潰れる（スマホの幅でも同じ幅で出る）。言い足りないことは main.ts のコメントか README に書く
+- CSS だけのデモを組に入れるときも、何もしない mount を置いた main.ts を作る（ビルドが Demo.astro の script の形を見るため）。例は `src/demos/hover-control-css/main.ts` の `export const mount: Mount = () => () => {}`
+- scroll-driven animations（`animation-timeline: view()` など）は、`animation` の一括指定と並べず、`animation-name`、`animation-timing-function`、`animation-fill-mode`、`animation-timeline` を 1 つずつ書く。ビルドで CSS を縮めると一括指定に `view()` がまとめられ、Chrome はその宣言ごと捨てる（`src/demos/scroll-reveal-color/Demo.astro`）。組かどうかにかかわらず同じ
+- ページ全体をスクロールさせる組は、dispose でページの先頭に戻す。切り替えのしくみはスクロールの位置に触らないので、下までスクロールしたまま切り替えると、次のバリエーションの始まりが見えない。例は `src/groups/scroll-reveal/scroll.ts` の `scrollToTop`（mount では戻さない。読み直したときにブラウザが戻す位置を消さないため）
+- 3 周のテスト（`e2e/groups.spec.ts`）はマウスもタッチもスクロールもしない。入力で始まる tween や listener（ホバーの tween、引っぱっている間の listener、スクロールの listener）の片付けは、組ごとの `e2e/groups-<組>.spec.ts` で、入力をしてから切り替えて見る。例は `groups-drag-pinch.spec.ts`、`groups-mouse-image.spec.ts`、`groups-scroll-reveal.spec.ts`
 
 ### 新しいデモを組に足す
 
