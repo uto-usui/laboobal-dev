@@ -190,6 +190,7 @@ const countOf = (key: string) =>
     yearOf,
     type SortKey,
   } from '../lib/top-list'
+  import { enterDemo, plateOf, type Plate } from '../lib/top-enter'
 
   const list = document.querySelector<HTMLElement>('.list')!
   const items = [...list.querySelectorAll<HTMLElement>('.item')]
@@ -302,6 +303,9 @@ const countOf = (key: string) =>
         link.addEventListener('pointerleave', () => clip?.pause())
       })
 
+  // 入るときに広げる板。触れたときの板が出ていれば、そこから広げる
+  let hoverPlate = (): Plate | undefined => undefined
+
   // 触れたときの動画。タッチの端末では出さない（触れた時点で開くので見る間がない）
   const preview = document.querySelector<HTMLElement>('.preview')!
   const video = preview.querySelector('video')!
@@ -314,6 +318,19 @@ const countOf = (key: string) =>
     let gl: GlPreview | null = null
     let loaded: GlPreview | null = null
     const pointer = { x: innerWidth / 2, y: innerHeight / 2 }
+    let lastFrame = { x: 0, y: 0, width: 0, tilt: 0 }
+    hoverPlate = () =>
+      !preview.classList.contains('is-active')
+        ? undefined
+        : gl
+          ? {
+              x: lastFrame.x,
+              y: lastFrame.y,
+              width: lastFrame.width,
+              height: (lastFrame.width * 10) / 16,
+              angle: lastFrame.tilt,
+            }
+          : plateOf(preview)
 
     // 項目を替えたときにすぐ出せるよう、画面に入った名前のポスターだけ読んでおく
     const prefetcher = new IntersectionObserver((entries) =>
@@ -346,6 +363,7 @@ const countOf = (key: string) =>
         document.querySelector<HTMLCanvasElement>('.preview-canvas')!,
         (f) => {
           // 名前の帯は板の左下の角に付いていく
+          lastFrame = f
           preview.style.width = `${f.width}px`
           preview.style.transform = `translate3d(${f.x}px, ${f.y}px, 0) translate(-50%, -50%) rotate(${f.tilt}rad) translate(${f.cornerX}px, ${f.cornerY}px)`
         },
@@ -405,6 +423,33 @@ const countOf = (key: string) =>
       link.addEventListener('blur', hide)
     })
   }
+
+  // 名前やポスターを押したら、板を画面いっぱいに広げながら入る（src/lib/top-enter.ts）。
+  // 新しいタブで開くときと、動きを減らす設定のときはふつうに移る
+  if (!prefersReducedMotion())
+    document.addEventListener('click', (event) => {
+      const link = (event.target as Element).closest<HTMLAnchorElement>(
+        '.list .link, .picks .pick-link',
+      )
+      if (
+        !link ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      )
+        return
+      event.preventDefault()
+      const hero = document.querySelector<HTMLElement>('.hero.is-active')
+      const from = link.classList.contains('pick-link')
+        ? plateOf(link.querySelector('img')!, link.closest('.pick')!)
+        : (hoverPlate() ??
+          (hero && link.closest('.is-hero')
+            ? plateOf(hero)
+            : plateOf(link.querySelector('.slug')!)))
+      enterDemo(link.href, `/previews/${link.dataset.slug}.webp`, from)
+    })
 </script>
 
 <style>
