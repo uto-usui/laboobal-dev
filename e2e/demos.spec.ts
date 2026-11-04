@@ -75,8 +75,8 @@ const isBlank = async (page: Page, target: Locator) => {
   const jpeg = await target.screenshot({
     type: 'jpeg',
     quality: 60,
-    // 隅のリンクが重なると 1 色にならないので、写すときだけ隠す
-    style: '.links { visibility: hidden }',
+    // 隅のリンクや組の切り替えが重なると 1 色にならないので、写すときだけ隠す
+    style: '.links, .variant-toggle, .lil-gui { visibility: hidden }',
   })
   return page.evaluate(async (base64) => {
     const blob = await (await fetch(`data:image/jpeg;base64,${base64}`)).blob()
