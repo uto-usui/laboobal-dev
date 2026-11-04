@@ -149,7 +149,9 @@ const countOf = (key: string) =>
             data-slug={demo.slug}
             data-title={demo.title}
           >
-            <span class="slug">{demo.slug}</span>
+            <span class="slug">
+              <span class="slug-text">{demo.slug}</span>
+            </span>
             {demo.batch === 'new' && demo.added && (
               <span class="new-mark" data-added={demo.added} hidden>
                 new
@@ -175,6 +177,7 @@ const countOf = (key: string) =>
 
 <script>
   import { isCoarsePointer, prefersReducedMotion } from '../shared/dom'
+  import { watchLongSlugs } from '../lib/top-slug'
   import type { createGlPreview } from '../lib/top-preview'
   import {
     compareBy,
@@ -263,6 +266,7 @@ const countOf = (key: string) =>
     ),
   )
   render()
+  if (!prefersReducedMotion()) watchLongSlugs(list)
 
   // ここで作ったデモ（移植でないもの）は、出してから 30 日の間 new を付ける。ビルドした日ではなく見た日で決める
   document.querySelectorAll<HTMLElement>('.new-mark').forEach((mark) => {
@@ -685,6 +689,46 @@ const countOf = (key: string) =>
       flex: none;
       margin: 0 -4px 0 0;
       scroll-snap-align: center;
+    }
+  }
+
+  /* 長い slug は 1 行のまま右で切り、触れたら左へ流して最後まで見せる（src/lib/top-slug.ts）。
+     動きを減らす設定のときは流さず、今までどおりハイフンで折り返す */
+  @media (prefers-reduced-motion: no-preference) {
+    .link {
+      max-width: 100%;
+    }
+
+    .slug {
+      max-width: 100%;
+      padding-block: 0.06em;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .slug-text {
+      display: inline-block;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .is-long .slug {
+      mask-image: linear-gradient(to right, #000 75%, transparent);
+    }
+
+    .is-long:hover .slug,
+    .is-long:focus-visible .slug {
+      mask-image: linear-gradient(to right, transparent, #000 25%);
+    }
+
+    .is-long:hover .slug-text,
+    .is-long:focus-visible .slug-text {
+      transform: translateX(var(--slug-over));
+      transition: transform var(--slug-time) linear 0.2s;
+    }
+
+    /* 右端まで使っているので、印は内側に置く */
+    .is-long .pick-mark {
+      transform: translate(0, -40%) rotate(-14deg);
     }
   }
 
