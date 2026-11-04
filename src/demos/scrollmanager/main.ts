@@ -1,10 +1,11 @@
 import LocomotiveScroll from 'locomotive-scroll'
 import 'locomotive-scroll/locomotive-scroll.css'
 import { loop, onResize, prefersReducedMotion } from '../../shared/dom'
+import { onReducedMotion } from '../../shared/motion'
 import { damp } from '../../shared/math'
 
 const root = document.querySelector<HTMLElement>('.sm')!
-const reduced = prefersReducedMotion()
+let reduced = prefersReducedMotion()
 
 const scroll = new LocomotiveScroll({
   lenisOptions: {
@@ -62,6 +63,12 @@ onResize(root, () => {
 })
 loop((dt) => updateLag(dt))
 
+// 動きを減らす設定の間は、ホイールの慣性と遅れて追いつく視差を外す。Lenis は wheel が来るたびに options を読む
+onReducedMotion((value) => {
+  reduced = value
+  if (scroll.lenisInstance) scroll.lenisInstance.options.smoothWheel = !value
+})
+
 root
   .querySelector('.sm-pagetop')!
-  .addEventListener('click', () => scroll.scrollTo(0))
+  .addEventListener('click', () => scroll.scrollTo(0, { immediate: reduced }))

@@ -2,10 +2,12 @@ import { changeGate, loop, onResize } from '../../shared/dom'
 import { damp, map, random } from '../../shared/math'
 import { lambdaFromEase } from '../../shared/a/ease'
 import { trackPull } from '../../shared/a/pull'
+import { touchGate } from '../../shared/touch'
 
 const stage = document.querySelector<HTMLElement>('.stage')!
 const ball = stage.querySelector<HTMLElement>('.ball')!
 const pull = trackPull(stage)
+touchGate(stage)
 
 let width = 0
 let height = 0

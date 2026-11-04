@@ -2,6 +2,8 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { loop, onResize } from '../../shared/dom'
 import { createGlStage } from '../../shared/gl'
+import { onReducedMotion } from '../../shared/motion'
+import { touchGate } from '../../shared/touch'
 
 const stage = document.querySelector<HTMLElement>('.video-demo')!
 const canvas = stage.querySelector<HTMLCanvasElement>('canvas')!
@@ -20,6 +22,8 @@ controls.enableZoom = false
 controls.enablePan = false
 // 地面の下へ回り込まない
 controls.maxPolarAngle = Math.PI * 0.56
+// OrbitControls は canvas を touch-action: none にする。記事を読む人の縦のスクロールを奪わないよう、タップするまでは pan-y にする
+touchGate(canvas)
 
 const ground = new THREE.Mesh(
   new THREE.PlaneGeometry(1000, 1000),
@@ -64,8 +68,27 @@ const renderer = createGlStage(canvas, { antialias: true })
 
 if (renderer) {
   renderer.shadowMap.enabled = true
-  // 音のない動画は自動で再生できる。止められても、形と影は描けるので握りつぶす
-  video.play().catch(() => {})
+
+  // 動きを減らす設定では、動画と多面体の回転を止める。ドラッグで見る向きを変えるのは残す
+  let reduced = false
+  onReducedMotion((value) => {
+    reduced = value
+    // 音のない動画は自動で再生できる。止められても、形と影は描けるので握りつぶす
+    if (!reduced) video.play().catch(() => {})
+    // iOS の Safari は再生しないと最初のコマを読まないので、まだ読めていなければ一度再生してすぐ止める
+    else if (video.readyState < video.HAVE_CURRENT_DATA)
+      video.play().then(
+        () => {
+          if (reduced) video.pause()
+        },
+        () => {},
+      )
+    else video.pause()
+  })
+  // 再生しないままでも最初のコマを貼る。three は新しいコマが出るのを待って貼り直すので、止まった動画では貼られない
+  const showFrame = () => (texture.needsUpdate = true)
+  if (video.readyState >= video.HAVE_CURRENT_DATA) showFrame()
+  else video.addEventListener('loadeddata', showFrame, { once: true })
 
   onResize(stage, ({ width, height }) => {
     renderer.setSize(width, height, false)
@@ -75,7 +98,7 @@ if (renderer) {
 
   loop((dt) => {
     // 旧デモは毎フレーム 0.01 rad。60fps で 1 秒に 0.6 rad
-    mesh.rotation.x += 0.6 * dt
+    if (!reduced) mesh.rotation.x += 0.6 * dt
     controls.update()
     renderer.render(scene, camera)
   })

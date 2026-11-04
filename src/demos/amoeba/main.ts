@@ -1,6 +1,7 @@
 import { ShaderMaterial } from 'three'
 import noise from '../../shared/glsl/simplex-noise.glsl?raw'
-import { loop, onResize, prefersReducedMotion } from '../../shared/dom'
+import { onResize } from '../../shared/dom'
+import { autoplayLoop } from '../../shared/motion'
 import {
   FULLSCREEN_VERTEX,
   createFullscreenScene,
@@ -32,10 +33,8 @@ if (renderer) {
     render()
   })
 
-  if (!prefersReducedMotion()) {
-    loop((_dt, elapsed) => {
-      material.uniforms.time.value = elapsed
-      render()
-    })
-  }
+  autoplayLoop((_dt, elapsed) => {
+    material.uniforms.time.value = elapsed
+    render()
+  })
 }

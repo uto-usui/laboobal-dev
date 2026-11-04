@@ -1,6 +1,7 @@
 import gsap from '../gsap'
 import * as THREE from 'three'
-import { onResize, prefersReducedMotion } from '../dom'
+import { onResize } from '../dom'
+import { onReducedMotion } from '../motion'
 import {
   FULLSCREEN_VERTEX,
   coverScale,
@@ -145,9 +146,14 @@ export const createDistortionSlider = ({
   // ホイールでは進めない。記事に埋め込むと、スクロールで通り過ぎるたびに切り替わってしまう
   root.addEventListener('click', go)
   // setInterval ではなく GSAP の時計で数える。画面の外で GSAP を止めている間（shared/gsap.ts）は進まない
+  // 動きを減らす設定の間は自動で進めない。クリックでは切り替わる
+  let timer: gsap.core.Tween | undefined
   const autoplay = () => {
-    gsap.delayedCall(interval, autoplay)
+    timer = gsap.delayedCall(interval, autoplay)
     go()
   }
-  if (!prefersReducedMotion()) gsap.delayedCall(interval, autoplay)
+  onReducedMotion((reduced) => {
+    timer?.kill()
+    timer = reduced ? undefined : gsap.delayedCall(interval, autoplay)
+  })
 }

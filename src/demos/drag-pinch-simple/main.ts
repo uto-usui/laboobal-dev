@@ -2,11 +2,13 @@ import { changeGate, loop } from '../../shared/dom'
 import { damp } from '../../shared/math'
 import { lambdaFromEase } from '../../shared/a/ease'
 import { trackPull } from '../../shared/a/pull'
+import { touchGate } from '../../shared/touch'
 
 const stage = document.querySelector<HTMLElement>('.stage')!
 const ball = stage.querySelector<HTMLElement>('.ball')!
 
 const pull = trackPull(stage)
+touchGate(stage)
 const lambda = lambdaFromEase(0.1)
 let x = 0
 let y = 0

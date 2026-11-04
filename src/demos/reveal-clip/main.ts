@@ -1,4 +1,5 @@
 import gsap from '../../shared/gsap'
+import { prefersReducedMotion } from '../../shared/dom'
 import { whenVisible } from '../../shared/visibility'
 
 const stage = document.querySelector<HTMLElement>('.stage')!
@@ -27,6 +28,11 @@ const replay = () => {
 }
 
 stage.addEventListener('click', replay)
-// 記事の中で画面に入ってから再生する。読み込んだ時点で再生すると、読む人が来る前に終わっている
-const start = () => whenVisible(() => gsap.delayedCall(0.5, show))
+// 記事の中で画面に入ってから再生する。読み込んだ時点で再生すると、読む人が来る前に終わっている。
+// 動きを減らす設定では再生せず、開いた姿を見せる。replay は読む人が押すので動かす
+const start = () =>
+  whenVisible(() => {
+    if (prefersReducedMotion()) gsap.set(photo, { clipPath: shown })
+    else gsap.delayedCall(0.5, show)
+  })
 photo.decode().then(start, start)

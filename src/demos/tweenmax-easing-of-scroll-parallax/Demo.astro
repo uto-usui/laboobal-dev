@@ -13,7 +13,7 @@ const ratios = [1.05, 0.8, 2.5, 1.1, 1.8]
   <section class="stage">
     {ratios.map((ratio, i) => (
       <div class="layer" data-parallax={ratio} style={`--i: ${i}`}>
-        <span />
+        <span data-motion="auto" />
       </div>
     ))}
   </section>

@@ -1,10 +1,18 @@
 ---
+import { Picture } from 'astro:assets'
 import photo from './assets/photo.jpg'
 ---
 
 <div class="stage">
   <div class="frame">
-    <img class="photo" src={photo.src} alt="" />
+    <Picture
+      class="photo"
+      src={photo}
+      formats={['avif']}
+      fallbackFormat="webp"
+      loading="eager"
+      alt=""
+    />
   </div>
   <button class="demo-replay" type="button">
     replay

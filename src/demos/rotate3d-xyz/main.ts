@@ -1,4 +1,5 @@
-import { loop, onResize, prefersReducedMotion } from '../../shared/dom'
+import { onResize } from '../../shared/dom'
+import { autoplayLoop } from '../../shared/motion'
 import { damp, map, random, toRadian } from '../../shared/math'
 
 const stage = document.querySelector<HTMLElement>('[data-stage]')!
@@ -45,6 +46,7 @@ onResize(stage, (size) => {
   ;({ width, height } = size)
   unit = Math.min(height, width / 1.48)
   stage.style.setProperty('--unit', `${unit}px`)
+  draw()
 })
 
 /**
@@ -68,18 +70,15 @@ const draw = () => {
   stage.dataset.ready = ''
 }
 
-if (prefersReducedMotion()) {
-  onResize(stage, draw)
-} else {
-  loop((dt) => {
-    // 1 フレームに差の 1 割ずつ近づく旧デモの追いつき方を、フレームレートによらない形にした
-    offset.x = damp(offset.x, target.x, 6, dt)
-    offset.y = damp(offset.y, target.y, 6, dt)
-    for (const p of points) {
-      rotateX(p, toRadian(p.speed.x * offset.x * dt))
-      rotateY(p, toRadian(p.speed.y * offset.y * dt))
-      rotateZ(p, toRadian(p.speed.z * dt))
-    }
-    draw()
-  })
-}
+// マウスを止めても回り続けるので、動きを減らす設定では止める
+autoplayLoop((dt) => {
+  // 1 フレームに差の 1 割ずつ近づく旧デモの追いつき方を、フレームレートによらない形にした
+  offset.x = damp(offset.x, target.x, 6, dt)
+  offset.y = damp(offset.y, target.y, 6, dt)
+  for (const p of points) {
+    rotateX(p, toRadian(p.speed.x * offset.x * dt))
+    rotateY(p, toRadian(p.speed.y * offset.y * dt))
+    rotateZ(p, toRadian(p.speed.z * dt))
+  }
+  draw()
+})

@@ -1,4 +1,5 @@
 ---
+import { Picture } from 'astro:assets'
 import photo1 from './assets/photo-1.jpg'
 import photo2 from './assets/photo-2.jpg'
 import photo3 from './assets/photo-3.jpg'
@@ -10,7 +11,14 @@ const boxes = Array.from({ length: 7 }, (_, i) => photos[i % photos.length])
 <div class="range">
   {boxes.map((photo) => (
     <div class="box">
-      <img class="inner" src={photo.src} width="400" height="400" alt="" />
+      <Picture
+        class="inner"
+        src={photo}
+        formats={['avif']}
+        fallbackFormat="webp"
+        loading="eager"
+        alt=""
+      />
     </div>
   ))}
 </div>

@@ -1,10 +1,9 @@
-import { gsap } from '../../shared/gsap'
-import { prefersReducedMotion } from '../../shared/dom'
+import { autoplay, gsap } from '../../shared/gsap'
 
 const cells = document.querySelectorAll<HTMLElement>('[data-cell]')
 
-if (!prefersReducedMotion()) {
-  // 動かすのは --lift の 0 から 1 だけ。浮き上がる高さと縮み方は CSS で入れ物の大きさから決める
+// 動かすのは --lift の 0 から 1 だけ。浮き上がる高さと縮み方は CSS で入れ物の大きさから決める。動きを減らす設定では最初の姿で止める
+autoplay(
   gsap.to(cells, {
     '--lift': 1,
     duration: 1.25,
@@ -19,5 +18,5 @@ if (!prefersReducedMotion()) {
       grid: [10, 10],
       from: 'center',
     },
-  })
-}
+  }),
+)

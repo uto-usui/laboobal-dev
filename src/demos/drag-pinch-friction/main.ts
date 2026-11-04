@@ -2,11 +2,13 @@ import { changeGate, loop } from '../../shared/dom'
 import { damp, map } from '../../shared/math'
 import { lambdaFromEase } from '../../shared/a/ease'
 import { trackPull } from '../../shared/a/pull'
+import { touchGate } from '../../shared/touch'
 
 const stage = document.querySelector<HTMLElement>('.stage')!
 const ball = stage.querySelector<HTMLElement>('.ball')!
 
 const pull = trackPull(stage)
+touchGate(stage)
 // 指の移動の半分しかついてこない。重いものを引っぱっている手ごたえになる
 const ratio = 0.5
 const lambda = lambdaFromEase(0.25)

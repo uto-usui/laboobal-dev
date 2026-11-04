@@ -18,7 +18,8 @@
     align-items: center;
     overflow: hidden;
     cursor: grab;
-    touch-action: none;
+    /* 記事を読む人の縦のスクロールを奪わない。タップすると touchGate（src/shared/touch.ts）が none にする */
+    touch-action: pan-y;
     user-select: none;
   }
 

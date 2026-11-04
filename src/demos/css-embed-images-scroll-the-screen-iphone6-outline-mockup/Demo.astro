@@ -1,12 +1,13 @@
 ---
 import '@fontsource/molle/400-italic.css'
+import { Picture } from 'astro:assets'
 import photos from './assets/photos.jpg'
 ---
 
 <div class="mockup">
   <h1>iPhone 6 Mockup</h1>
   <div class="tilt">
-    <div class="phone">
+    <div class="phone" data-motion="auto">
       <span class="key key-power"></span>
       <span class="key key-mute"></span>
       <span class="key key-up"></span>
@@ -17,10 +18,11 @@ import photos from './assets/photos.jpg'
           <span class="speaker"></span>
         </div>
         <div class="screen" tabindex="0" aria-label="画面（スクロールできる）">
-          <img
-            src={photos.src}
-            width={photos.width}
-            height={photos.height}
+          <Picture
+            src={photos}
+            formats={['avif']}
+            fallbackFormat="webp"
+            loading="eager"
             alt=""
           />
         </div>

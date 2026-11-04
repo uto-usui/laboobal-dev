@@ -5,8 +5,18 @@ import '@fontsource/molle/400-italic.css'
 <div class="wave-input">
   <h1>my input</h1>
   <form class="fields">
-    <input type="text" placeholder="name" aria-label="名前" />
-    <input type="tel" placeholder="tel" aria-label="電話番号" />
+    <input
+      type="text"
+      placeholder="name"
+      aria-label="名前"
+      data-motion="auto"
+    />
+    <input
+      type="tel"
+      placeholder="tel"
+      aria-label="電話番号"
+      data-motion="auto"
+    />
   </form>
 </div>
 
@@ -77,11 +87,5 @@ import '@fontsource/molle/400-italic.css'
     font-weight: 600;
     color: rgb(255 255 255 / 60%);
     text-transform: uppercase;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    input {
-      animation: none;
-    }
   }
 </style>

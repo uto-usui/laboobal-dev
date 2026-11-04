@@ -1,13 +1,15 @@
 ---
+import { Picture } from 'astro:assets'
 import photo from './assets/photo.jpg'
 ---
 
 <div class="stage">
-  <img
+  <Picture
     data-mouse-parallax="0.05"
-    src={photo.src}
-    width="300"
-    height="300"
+    src={photo}
+    formats={['avif']}
+    fallbackFormat="webp"
+    loading="eager"
     alt=""
   />
   <h1 data-mouse-parallax="0.1">Skew Element</h1>

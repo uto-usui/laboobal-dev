@@ -1,9 +1,17 @@
 ---
+import { Picture } from 'astro:assets'
 import photo from './assets/photo.jpg'
 ---
 
 <div class="stage">
-  <img class="photo" src={photo.src} alt="" />
+  <Picture
+    class="photo"
+    src={photo}
+    formats={['avif']}
+    fallbackFormat="webp"
+    loading="eager"
+    alt=""
+  />
 </div>
 
 <script>
@@ -25,6 +33,8 @@ import photo from './assets/photo.jpg'
   /* 入れ物の幅の 80% と高さの 80% の、どちらにも収まる 16:9 */
   .photo {
     width: min(80cqw, 80cqh * 16 / 9);
+    /* Picture が付ける height の属性より、縦横比を優先する */
+    height: auto;
     aspect-ratio: 16 / 9;
     object-fit: cover;
     pointer-events: none;

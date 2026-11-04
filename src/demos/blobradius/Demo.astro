@@ -1,6 +1,6 @@
 <div class="blobradius">
-  <div class="blob blob--left"></div>
-  <div class="blob blob--right"></div>
+  <div class="blob blob--left" data-motion="auto"></div>
+  <div class="blob blob--right" data-motion="auto"></div>
 </div>
 
 <style>
@@ -36,12 +36,6 @@
     animation:
       radius 30s ease-in-out infinite both alternate-reverse,
       drift 20s ease-in-out infinite both;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .blob {
-      animation-play-state: paused;
-    }
   }
 
   /* 8 つの値で四隅の楕円を別々に決める。前半 4 つが横の半径、/ の後ろが縦の半径 */
