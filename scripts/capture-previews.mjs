@@ -34,7 +34,6 @@ const TUNE = {
   'particle-photo': { warmup: 2400 },
   'processing-js-circle-at-the-mouse-position': { poster: 'late' },
   'processing-js-random-walk': { poster: 'late' },
-  'news-ticker-infinite-loop': { poster: 'late' },
   // スクロールで箱の色が緑から青へ変わる。始めのコマは緑のままなので、少し進んで色が変わりかけたところにする
   'scroll-reveal-color': { poster: 0.8 },
 }
