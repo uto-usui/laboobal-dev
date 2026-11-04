@@ -47,8 +47,17 @@ pnpm install
 pnpm dev          # localhost:4321
 pnpm build        # dist/ に静的な HTML を出す
 pnpm test:e2e     # dist/ を開いて全デモを確かめる。先に pnpm build が要る
-pnpm verify       # lint、整形、型、ビルド、E2E をまとめて
+pnpm check:budget # ビルドの結果の大きさが上限に収まっているか。先に pnpm build が要る
+pnpm verify       # lint、整形、型、ビルド、大きさ、E2E をまとめて
 ```
+
+## 文書
+
+- [docs/release.md](docs/release.md): デモを出す流れ（ブランチ、確かめ方、プレビュー、PR、本番の確認、lab の記事とのつなぎ、SNS 用の動画）
+- [docs/context.md](docs/context.md): まわりのリポジトリとの関係、決まっていること、今の状態
+- [docs/ideas.md](docs/ideas.md): デモをまたいだ考え方
+- [docs/history/](docs/history/): 作り直しのときの計画と、下げたデモの記録
+- [.claude/skills/](.claude/skills/): コーディングエージェント向けの手順（プレビューの撮り直し、lab の記事とのつなぎ、依存の更新）
 
 ## デモを足す
 
