@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'scroll',
+  created: '2017-12-08',
+  added: '2026-11-01',
+  description:
+    '縦に並んだ箱が画面に入るとふわっと出て、見えている間は中の写真がスクロールに合わせてずれる。',
+  tags: ['scroll', 'parallax', 'image'],
+  tech: ['gsap'],
 })

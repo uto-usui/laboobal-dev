@@ -10,4 +10,9 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
+  created: '2016-10-17',
+  added: '2026-11-02',
+  description: '入力欄に書いた文字の数を、書くたび消すたびに欄の右下へ出す。',
+  tags: ['form', 'text'],
+  tech: ['js'],
 })
