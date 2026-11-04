@@ -10,36 +10,37 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix } from 'node:path'
 import { brotliCompressSync, constants, gzipSync } from 'node:zlib'
 
-// 上限。単位は KB（1000 バイト）。2026-11-04 に測った値（コメントの数字）に、2〜3 割の余裕を足した。
+// 上限。単位は KB（1000 バイト）。2026-11-04 に、そのとき測った値に 2〜3 割の余裕を足して決めた。
+// コメントの数字は、組の土台（#31）が入ったあとのビルドで測り直した値（`--report` で見られる）。
 // 上げるときは、何が増えたのかをコミットに書く
 const BUDGET = {
-  // 7.3 → 12.7（並び替え・ピックアップ・スマホの主役・板の遷移・長い slug で 3.5、一覧のデモ 35 本で 1.7）
+  // 7.3 → 12.7（並び替え・ピックアップ・スマホの主役・板の遷移・長い slug で 3.5、一覧のデモ 35 本で 1.7）→ 12.9（組の行）
   top: 15,
-  // 32.5（montserrat-ascii-400、montserrat-latin-700、molle-mark の 3 個）
+  // 33.1（montserrat-ascii-400、montserrat-latin-700、molle-mark の 3 個）
   topFonts: 42,
   // デモは、読むライブラリで 3 つに分ける。gsap と three の本体は別のチャンクになるので、その名前で見分ける
   demo: {
-    // ライブラリなし。最大 4.2（toc）
+    // ライブラリなし。最大 6.4（star-rotate-animation-createjs）
     plain: 8,
-    // gsap を読む。最大 29.9（tweenmax-easing-of-scroll-parallax）
+    // gsap を読む。最大 31.7（tweenmax-easing-of-scroll-parallax）
     gsap: 36,
-    // three を読む。最大 140.6（distortion-slider-b）
+    // three を読む。最大 144.1（distortion-slider-b）
     three: 170,
   },
   // 上の分け方に収まらないデモ。ライブラリがデモのチャンクに入っているもの
   demoOverride: {
-    // ScrollTrigger。42.8
+    // ScrollTrigger。45.3
     'tweenmax-visual-range-animation-class': 52,
-    // MotionPathPlugin。36.1
+    // MotionPathPlugin。37.8
     'gsap-motion-path': 44,
-    // lil-gui と WebGPU のシェーダー。21.5
+    // lil-gui と WebGPU のシェーダー。24.4
     'particle-photo': 27,
-    // locomotive-scroll。13.3
+    // locomotive-scroll。15.1
     scrollmanager: 17,
-    // lil-gui。10.8
+    // lil-gui。12.5
     nodeballs: 14,
   },
-  // 1 ファイルの最大。jpg 36.4、webm 324.1、webp 32.1
+  // 1 ファイルの最大。jpg 36.4、webm 324.1、webp 25.8
   previews: { jpg: 45, webm: 400, webp: 40 },
 }
 
