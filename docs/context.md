@@ -64,6 +64,7 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 - 作り直す前の Nuxt 2 のコードは、タグ `nuxt2-final` に残しています
 - デモは 55 本です。`src/demos/<slug>/` に 1 本ずつあり、`/<slug>/` のページとトップの一覧に出ます。laboobal から移す候補のうち 19 本は下げました。理由は [`docs/history/dropped/`](history/dropped/) にあります
 - 移すのではなく、ここで新しく作ったデモは `batch: 'new'` にします。今は particle-photo（WebGPU）の 1 本です。WebGPU のデモは meta に `webgpu: true` を付けます。今はどこからも読んでいない目印で、使えないブラウザで一行の案内を出すのはデモの側の処理です
+- 似たデモは組にまとめています（[#31](https://github.com/uto-usui/laboobal-dev/issues/31)、2026-11 の第 4 波）。URL は今までどおりバリエーションごとで、ページの右上の「設定」から組のほかのバリエーションへ切り替えられます。トップでは組を 1 行にまとめます。組の定義は `src/groups/<組>/meta.ts`、作り方は [demo-guide.md](demo-guide.md) の 12 章にあります
 - `public/previews/<slug>.webm` と `.jpg`（480×300）は、トップの一覧と webmanab の記事のページの両方が使います。webmanab は URL で直接読むので、名前と大きさを変えません
 - 前からある 7 本は、パスを変えずに作り直しました
 
