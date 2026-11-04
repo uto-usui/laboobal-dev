@@ -1,6 +1,8 @@
+import GUI from 'lil-gui'
 import { type Page, provideSwitcher, type Variant } from './variants'
 
-// 設定のボタンを押したときに読む（src/layouts/VariantSwitcher.astro の script。variants.ts の start を見る）
+// 設定のボタンを押したときに読む（src/layouts/VariantSwitcher.astro の script。variants.ts の start を見る）。
+// lil-gui もここで静的に読む。import() にすると Vite の先読みの道具が共有のチャンクに分かれ、トップが 1 ファイル増える
 
 interface Loaded {
   doc: Document
@@ -75,7 +77,6 @@ const open = async (
   ownMarkup: HTMLTemplateElement,
   toggle: HTMLButtonElement,
 ) => {
-  const { default: GUI } = await import('lil-gui')
   const data: { variants: { slug: string; label: string }[] } = JSON.parse(
     document.getElementById('demo-group')!.textContent!,
   )
