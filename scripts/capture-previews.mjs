@@ -22,7 +22,8 @@ const VIEW = { width: 800, height: 500 }
 const WARMUP = 1200
 const LENGTH = 3600
 // デモごとに撮り方を変えるもの。poster: 'brightest' は、切り出した中でいちばん明るいコマをポスターにする。
-// 暗い背景に字や写真が出たり消えたりするデモで、出そろったところを選ぶため
+// 暗い背景に字や写真が出たり消えたりするデモで、出そろったところを選ぶため。
+// poster: 'late' は、切り出しの終わりの 0.4 秒前のコマにする。描き足していくデモで、始めのコマではほとんど何も映らないため
 const TUNE = {
   // 写真を読み終えてから開く。開ききったところから撮り始める
   'reveal-clip': { warmup: 2600, poster: 'brightest' },
@@ -30,6 +31,9 @@ const TUNE = {
   splitting: { poster: 'brightest' },
   // 粒が集まって写真になるまで 1 秒ほどかかる。ぼやけたままのポスターにならないよう待つ
   'particle-photo': { warmup: 2400 },
+  'processing-js-circle-at-the-mouse-position': { poster: 'late' },
+  'processing-js-random-walk': { poster: 'late' },
+  'news-ticker-infinite-loop': { poster: 'late' },
 }
 
 const demos = readdirSync('src/demos')
@@ -182,6 +186,7 @@ for (const demo of targets) {
   // ポスターは劣化のない png に 1 コマ抜いてから、jpg と webp にする
   const frame = join(dir, 'poster.png')
   let at = offset + 0.2
+  if (tune.poster === 'late') at = offset + LENGTH / 1000 - 0.4
   if (tune.poster === 'brightest') {
     // 0.1 秒ごとに明るさの平均（YAVG）を出し、いちばん明るいコマの時刻を取る
     const stats = join(dir, 'stats.txt')
