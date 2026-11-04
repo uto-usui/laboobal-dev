@@ -3,7 +3,8 @@ import { loadDemos, loadGroups } from './meta'
 
 /**
  * 組の中の切り替え（src/shared/variants.ts）。組ごとに、バリエーションを a→b→…→a と 3 周切り替えて、
- * 前のバリエーションが何も残していないこと（rAF のループ、WebGL の context、エラー）と、URL・題・パネルが替わることを見る
+ * 前のバリエーションが何も残していないこと（rAF のループ、WebGL の context、listener、エラー）と、URL・題・パネルが替わることを見る
+ * 入力（マウス、タッチ、スクロール）はしないので、入力で始まる tween や listener の片付けは組ごとの spec（groups-<組>.spec.ts）で見る
  */
 
 const demos = loadDemos()
@@ -14,10 +15,72 @@ interface Counters {
   __raf: number
   __rawRaf: (callback: FrameRequestCallback) => number
   __liveGl: () => number
+  __globalListeners: () => number
+  __markStage: () => void
+  __detachedListeners: () => string[]
 }
-/** rAF の呼び出しと、生きている WebGL の context を数える。iframe の中にも入る */
+/**
+ * rAF の呼び出し、生きている WebGL の context、付いている listener を数える。iframe の中にも入る。
+ * listener は addEventListener と removeEventListener を (target, type, listener, capture) で突き合わせる。once は数えない
+ */
 const instrument = () => {
   const w = window as unknown as Counters
+  const live: {
+    target: EventTarget
+    type: string
+    listener: unknown
+    capture: boolean
+  }[] = []
+  const captureOf = (options?: boolean | EventListenerOptions) =>
+    typeof options === 'boolean' ? options : !!options?.capture
+  const events = EventTarget.prototype
+  const add = events.addEventListener
+  const remove = events.removeEventListener
+  const indexOf = (
+    target: EventTarget,
+    type: string,
+    listener: unknown,
+    capture: boolean,
+  ) =>
+    live.findIndex(
+      (l) =>
+        l.target === target &&
+        l.type === type &&
+        l.listener === listener &&
+        l.capture === capture,
+    )
+  events.addEventListener = function (type, listener, options) {
+    const capture = captureOf(options)
+    if (
+      listener &&
+      // Playwright も window に listener を足す（クリックの当たり判定やスクショ）。サイトの script が足したものだけ数える
+      (!(this === window || this === document) ||
+        new Error().stack?.includes(location.origin)) &&
+      !(typeof options === 'object' && options.once) &&
+      indexOf(this, type, listener, capture) < 0
+    )
+      live.push({ target: this, type, listener, capture })
+    return add.call(this, type, listener, options)
+  }
+  events.removeEventListener = function (type, listener, options) {
+    const i = indexOf(this, type, listener, captureOf(options))
+    if (i >= 0) live.splice(i, 1)
+    return remove.call(this, type, listener, options)
+  }
+  w.__globalListeners = () =>
+    live.filter((l) => l.target === window || l.target === document).length
+  // 切り替える前の main.demo の中の要素。切り替えると main.demo から外れる
+  let previous = new WeakSet<EventTarget>()
+  w.__markStage = () => {
+    previous = new WeakSet(document.querySelectorAll('main.demo *'))
+  }
+  w.__detachedListeners = () =>
+    live
+      .filter((l) => previous.has(l.target) && !(l.target as Node).isConnected)
+      .map(
+        (l) =>
+          `${(l.target as Element).getAttribute('class') || (l.target as Element).tagName} の ${l.type}`,
+      )
   const raf = window.requestAnimationFrame.bind(window)
   w.__rawRaf = raf
   w.__raf = 0
@@ -101,6 +164,7 @@ const openSwitcher = async (target: Page | Frame) => {
 }
 
 const switchTo = async (target: Page | Frame, slug: string) => {
+  await target.evaluate(() => (window as unknown as Counters).__markStage())
   await target
     .locator('.variant-gui select')
     .selectOption({ label: demoOf(slug).variant! })
@@ -126,12 +190,18 @@ for (const group of groups) {
     test.setTimeout(60_000 + group.variants.length * 15_000)
     const errors = watchErrors(page)
 
-    // それぞれのページを直に開いたときのループの数。GSAP の ticker は動きがなくなって 2 秒たつと眠るので、それより待つ
+    // それぞれのページを直に開いたときのループの数。GSAP の ticker は動きがなくなって 2 秒たつと眠るので、それより待つ。
+    // window と document の listener の数は、切り替えの欄を開いたあとに数える（欄も document に listener を足す）
     const baseline = new Map<string, number>()
+    const listenerBaseline = new Map<string, number>()
+    const globalListeners = () =>
+      page.evaluate(() => (window as unknown as Counters).__globalListeners())
     for (const slug of group.variants) {
       await page.goto(`/${slug}/`)
       await page.waitForTimeout(2500)
       baseline.set(slug, await loopsPerFrame(page))
+      await openSwitcher(page)
+      listenerBaseline.set(slug, await globalListeners())
     }
 
     const [first] = group.variants
@@ -193,6 +263,19 @@ for (const group of groups) {
               },
             )
             .toBe(demo.webgl ? 1 : 0)
+
+        // 前のバリエーションの要素にも、window と document にも、listener が残っていない
+        expect(
+          await page.evaluate(() =>
+            (window as unknown as Counters).__detachedListeners(),
+          ),
+          `${where} で、外れた要素に残った listener`,
+        ).toEqual([])
+        if (round === 2)
+          expect(
+            await globalListeners(),
+            `${where} の window と document の listener の数`,
+          ).toBe(listenerBaseline.get(slug))
       }
     }
     expect(errors).toEqual([])
