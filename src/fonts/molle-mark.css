@@ -1,4 +1,4 @@
-/* トップの背景の「labobal.dev」専用。字を絞ってあるので、ほかの文字には使えない（scripts/subset-fonts.sh） */
+/* トップの背景の「labobal.dev」とピックアップの「pick!」専用。字を絞ってあるので、ほかの文字には使えない（scripts/subset-fonts.sh） */
 @font-face {
   font-family: 'Molle Mark';
   font-style: italic;
