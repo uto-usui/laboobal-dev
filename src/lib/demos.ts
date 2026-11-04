@@ -76,7 +76,7 @@ const folderOf = (path: string) => path.split('/').at(-2)!
 const pageSlugOf = (path: string) => path.match(/([^/]+)\.astro$/)![1]
 
 /**
- * meta.ts を集めて確かめる。決まりに合わないものがあればビルドを落とす（docs/plan.md の 5 章）。
+ * meta.ts を集めて確かめる。決まりに合わないものがあればビルドを落とす（docs/history/rebuild-plan.md の 5 章）。
  * 開発サーバーでは、作りかけのデモがあっても全ページが 500 にならないよう、そのデモだけ外して警告にする
  */
 const collect = async () => {

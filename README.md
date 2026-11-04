@@ -8,7 +8,7 @@
 
 コードは [MIT License](LICENSE) です。ほかの人のコードや写真、フォントを使っているところは、下の「ライセンス」にまとめています。
 
-2026-11-02 に Astro で作り直し、[laboobal](https://github.com/uto-usui/laboobal) のデモもここに移しました（[webmanab#53](https://github.com/uto-usui/webmanab/issues/53)）。まわりのリポジトリとの関係は [docs/context.md](docs/context.md)、作り直しの進め方は [docs/plan.md](docs/plan.md) にあります。作り直す前の Nuxt 2 のコードはタグ `nuxt2-final` にあります。
+2026-11-02 に Astro で作り直し、[laboobal](https://github.com/uto-usui/laboobal) のデモもここに移しました（[webmanab#53](https://github.com/uto-usui/webmanab/issues/53)）。まわりのリポジトリとの関係は [docs/context.md](docs/context.md)、作り直しの記録は [docs/history/](docs/history/) にあります。作り直す前の Nuxt 2 のコードはタグ `nuxt2-final` にあります。
 
 ## ライセンス
 
@@ -66,4 +66,4 @@ import meta from '../demos/<slug>/meta'
 </DemoLayout>
 ```
 
-ページを 1 つの動的ルート（`[slug].astro`）にまとめないのは、まとめると全デモの CSS がどのページにも付くためです。ページがない、別のデモを読んでいる、デモのないページがある、のどれかがあるとビルドが落ち、置くべき中身がエラーに出ます。そのほかの共有のファイルは書き換えません。決まりは [docs/plan.md](docs/plan.md) の 5 章、見本は `src/demos/marquee/` と `src/pages/marquee.astro` です。
+ページを 1 つの動的ルート（`[slug].astro`）にまとめないのは、まとめると全デモの CSS がどのページにも付くためです。ページがない、別のデモを読んでいる、デモのないページがある、のどれかがあるとビルドが落ち、置くべき中身がエラーに出ます。そのほかの共有のファイルは書き換えません。決まりは [作り直しの計画](docs/history/rebuild-plan.md) の 5 章、見本は `src/demos/marquee/` と `src/pages/marquee.astro` です。
