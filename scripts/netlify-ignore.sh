@@ -18,8 +18,6 @@ git diff --quiet "$CACHED_COMMIT_REF" "$COMMIT_REF" -- . \
   ':(exclude)e2e' \
   ':(exclude)scripts' \
   ':(exclude)playwright.config.ts' \
-  ':(exclude)eslint.config.js' \
-  ':(exclude).prettierrc' \
-  ':(exclude).prettierignore' \
+  ':(exclude)biome.json' \
   ':(exclude).editorconfig' \
   ':(exclude).gitignore'

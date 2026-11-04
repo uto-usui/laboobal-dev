@@ -185,7 +185,7 @@ webmanab の lab の記事 47 本が jsfiddle を埋め込んでいます。2026
 
 ほかに知っておくこと:
 
-- webmanab とそろえるもの: Node 26（`.nvmrc`）、pnpm 10（`packageManager`）、Playwright 1.64.1、ESLint と Prettier の設定、依存の更新のやり方（webmanab の `.claude/skills/deps-update/SKILL.md`）
+- webmanab とそろえるもの: Node 26（`.nvmrc`）、pnpm 10（`packageManager`）、Playwright 1.64.1、依存の更新のやり方（webmanab の `.claude/skills/deps-update/SKILL.md`）。lint と整形は、2026-11-04 からこのリポジトリだけ Biome（`biome.json`）にしている
 - ビルドの設定は `netlify.toml` に書きます。管理画面の設定より優先されます
 - webmanab の `Permissions-Policy` は camera、microphone、geolocation、payment、usb を止めています。埋め込んだ iframe の中でもこれらは使えません。使うデモを作るときは webmanab 側のヘッダーを変える必要があります
 
@@ -200,7 +200,7 @@ webmanab の lab の記事 47 本が jsfiddle を埋め込んでいます。2026
 | webmanab の `src/lib/schema.ts` | 記事の frontmatter の形（`demoUrl` など） |
 | webmanab の `src/pages/lab/[slug].astro`、`src/components/EntryDemo.astro` | lab のページと、tip のページで `demoUrl` を出している部品 |
 | webmanab の `netlify.toml` | CSP、`Permissions-Policy` |
-| webmanab の `scripts/netlify-ignore.sh`、`playwright.config.ts`、`eslint.config.js` | ビルドの止め方、テストと lint の設定 |
+| webmanab の `scripts/netlify-ignore.sh`、`playwright.config.ts` | ビルドの止め方、テストの設定 |
 | `uto-usui/laboobal` の `docs/` | 移すデモのもと（`.vue` と `*Script.js`） |
 | このリポジトリの 9e996ba のコミット本文 | Nuxt 2 のまま本番を直したやり方 |
 
