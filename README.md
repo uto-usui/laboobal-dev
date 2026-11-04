@@ -1,6 +1,6 @@
 # laboobal-dev
 
-[labobal.dev](https://labobal.dev) のコードです。uto-usui の動きの実験のデモを 55 本置いています。
+[labobal.dev](https://labobal.dev) のコードです。uto-usui の動きの実験のデモを 69 本置いています。
 
 - 触る: [labobal.dev](https://labobal.dev)
 - なぜそう動くか: [webmanab の lab](https://webmanab.com/lab/) の記事。記事からデモを埋め込んでいます

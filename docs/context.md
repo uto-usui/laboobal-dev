@@ -1,6 +1,6 @@
 # 作業の前提
 
-このリポジトリで作業する人（エージェントを含む）向けに、まわりのリポジトリとの関係、決まっていること、今の状態、作業の流れ、参考にするものをまとめます。2026-11-01 時点の内容で、本数などは 2026-11-03 に直しました。
+このリポジトリで作業する人（エージェントを含む）向けに、まわりのリポジトリとの関係、決まっていること、今の状態、作業の流れ、参考にするものをまとめます。2026-11-01 時点の内容で、本数などは 2026-11-04 に直しました。
 
 ## 1. 場所と役割
 
@@ -8,7 +8,7 @@
 
 | 場所 | 役割 | 公開先 | 今の状態 |
 | --- | --- | --- | --- |
-| `uto-usui/laboobal-dev`（ここ） | 動くデモ。1 デモ 1 ページ。説明は書かず、lab の記事へのリンクだけ置く | [labobal.dev](https://labobal.dev) | Astro の 55 デモ（2026-11-02 に作り直した） |
+| `uto-usui/laboobal-dev`（ここ） | 動くデモ。1 デモ 1 ページ。説明は書かず、lab の記事へのリンクだけ置く | [labobal.dev](https://labobal.dev) | Astro の 69 デモ（2026-11-02 に作り直した） |
 | [`uto-usui/webmanab`](https://github.com/uto-usui/webmanab) | ブログ webmanab.com のサイトのコード。lab の記事がデモを `<iframe>` で埋め込む | [webmanab.com](https://webmanab.com) | Astro 7。動いている |
 | 作者の Obsidian の vault（非公開） | webmanab の記事の原稿。lab の記事もここで書く | なし。push すると webmanab に写る | 動いている |
 | [`uto-usui/laboobal`](https://github.com/uto-usui/laboobal) | なくす。デモを移し終えたら、リポジトリをアーカイブする | laboobal.netlify.app | 2021-05 から止まっている |
@@ -62,7 +62,8 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 
 - Astro 7.4（静的出力）、TypeScript、GLSL、pnpm 10。Node は 26（`.nvmrc`）
 - 作り直す前の Nuxt 2 のコードは、タグ `nuxt2-final` に残しています
-- デモは 90 本です。`src/demos/<slug>/` に 1 本ずつあり、`/<slug>/` のページとトップの一覧に出ます。laboobal から移す候補のうち 19 本は下げました。理由は [`docs/history/dropped/`](history/dropped/) にあります
+- デモは 69 本です。`src/demos/<slug>/` に 1 本ずつあり、`/<slug>/` のページとトップの一覧に出ます。laboobal から移す候補のうち 19 本は下げました。理由は [`docs/history/dropped/`](history/dropped/) にあります
+- 2026-11-04 に、jsfiddle から移して出していたデモ 21 本を、作者が「古くて、触れず、学びのない」見本として下げました。URL はトップへ 301 します（`netlify.toml`）。何だったかと残しておきたい考え方は [B3](history/dropped/B3.md) にあります
 - 移すのではなく、ここで新しく作ったデモは `batch: 'new'` にします。今は particle-photo（WebGPU）の 1 本です。WebGPU のデモは meta に `webgpu: true` を付けます。今はどこからも読んでいない目印で、使えないブラウザで一行の案内を出すのはデモの側の処理です
 - 似たデモは組にまとめています（[#31](https://github.com/uto-usui/laboobal-dev/issues/31)、2026-11 の第 4 波）。URL は今までどおりバリエーションごとで、ページの右上の「設定」から組のほかのバリエーションへ切り替えられます。トップでは組を 1 行にまとめます。組の定義は `src/groups/<組>/meta.ts`、作り方は [demo-guide.md](demo-guide.md) の 12 章にあります
 - `public/previews/<slug>.webm` と `.jpg`（480×300）は、トップの一覧と webmanab の記事のページの両方が使います。webmanab は URL で直接読むので、名前と大きさを変えません
