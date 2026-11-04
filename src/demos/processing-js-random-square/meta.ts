@@ -16,4 +16,6 @@ export default defineDemo({
     '大きさも色も位置もでたらめな半透明の正方形 300 個を、ループで散らす。開くたびに変わる。',
   tags: ['shape', 'random'],
   tech: ['canvas2d'],
+  group: 'processing-js',
+  variant: 'でたらめな四角',
 })

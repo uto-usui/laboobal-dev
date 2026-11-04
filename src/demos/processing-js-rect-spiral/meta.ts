@@ -16,4 +16,6 @@ export default defineDemo({
     '真ん中から測る角度と距離を少しずつ増やし、20 個の正方形を渦巻きに並べる。',
   tags: ['shape'],
   tech: ['canvas2d'],
+  group: 'processing-js',
+  variant: '渦巻き',
 })

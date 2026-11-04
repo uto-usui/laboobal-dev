@@ -17,4 +17,6 @@ export default defineDemo({
     '横長の画面のでたらめな位置に、白い小さな円を毎フレーム 1 つずつ描き足していく。',
   tags: ['shape', 'random'],
   tech: ['canvas2d'],
+  group: 'processing-js',
+  variant: '描き足す円',
 })

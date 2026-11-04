@@ -16,4 +16,6 @@ export default defineDemo({
     '点と直線を描き、太い線では端の形を丸・切りっぱなし・伸ばすの 3 通りで見せる。',
   tags: ['shape'],
   tech: ['canvas2d'],
+  group: 'processing-js',
+  variant: '点と線',
 })

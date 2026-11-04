@@ -16,4 +16,6 @@ export default defineDemo({
     '頂点を決めて描く三角形と、円を 3 等分する点を結んで描く三角形を重ねる。',
   tags: ['shape'],
   tech: ['canvas2d'],
+  group: 'processing-js',
+  variant: '三角',
 })

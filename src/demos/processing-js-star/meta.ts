@@ -16,4 +16,6 @@ export default defineDemo({
     '山と谷の頂点を交互に結んで、同じ色の星を 2 つ描く。色は開くたびに変わる。',
   tags: ['shape', 'random'],
   tech: ['canvas2d'],
+  group: 'processing-js',
+  variant: '星',
 })

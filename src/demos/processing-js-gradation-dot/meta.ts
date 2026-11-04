@@ -16,4 +16,6 @@ export default defineDemo({
     '二重のループで 6×6 の水玉を並べ、列ごとに色相をずらして青緑から赤紫へ移す。',
   tags: ['shape'],
   tech: ['canvas2d'],
+  group: 'processing-js',
+  variant: '水玉',
 })
