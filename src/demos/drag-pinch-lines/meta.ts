@@ -16,4 +16,6 @@ export default defineDemo({
     '引っぱると、散らばった 80 個の点が引っぱる向きの赤い線にのびる。離すと元に戻る。',
   tags: ['drag', 'particles'],
   tech: ['js'],
+  group: 'drag-pinch',
+  variant: '線',
 })
