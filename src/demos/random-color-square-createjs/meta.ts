@@ -16,4 +16,6 @@ export default defineDemo({
     '塗りの四角と線の角丸四角を描き、どちらも開くたびに変わるでたらめな色で塗る。',
   tags: ['shape', 'random'],
   tech: ['canvas2d'],
+  group: 'random-color',
+  variant: '四角',
 })

@@ -16,4 +16,6 @@ export default defineDemo({
     '塗りの円と線の円を 1 つずつ描き、どちらも開くたびに変わるでたらめな色で塗る。',
   tags: ['shape', 'random'],
   tech: ['canvas2d'],
+  group: 'random-color',
+  variant: '円',
 })

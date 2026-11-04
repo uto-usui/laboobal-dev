@@ -15,4 +15,6 @@ export default defineDemo({
   description: 'でたらめな色で塗った星が、1 秒に 30 度ずつゆっくり回り続ける。',
   tags: ['shape', 'random'],
   tech: ['canvas2d'],
+  group: 'random-color',
+  variant: '回る星',
 })

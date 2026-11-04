@@ -15,4 +15,6 @@ export default defineDemo({
   description: '頂点が 5 つの星を描き、開くたびに変わるでたらめな色で塗る。',
   tags: ['shape', 'random'],
   tech: ['canvas2d'],
+  group: 'random-color',
+  variant: '星',
 })
