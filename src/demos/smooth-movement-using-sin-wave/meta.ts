@@ -16,4 +16,6 @@ export default defineDemo({
     '箱が sin 波で左右になめらかに行き来し、端で速さを落としながら、位置に合わせて色を変える。',
   tags: ['shape', 'trigonometry'],
   tech: ['gsap'],
+  group: 'trigonometry',
+  variant: '左右に往復',
 })
