@@ -9,6 +9,116 @@
 # 開かれると小文字のパスへ 301 する（2026-11-01 に本番で /NodeBalls/ も 301 になるのを確かめた）。
 # ルールを書くと、ルールの照合が大文字小文字を区別しない場合に /nodeballs/ 自身にも当たって回り続けるおそれがある
 
+# 2026-11-04 に下げたデモ 21 本（docs/history/dropped/B3.md）。ページはもうないので、開かれたらトップへ 301 する。
+# 上の大文字のパスの心配は当たらない。どの from にもファイルは残っておらず、行き先の / はどの from にも当たらない。
+# from は 1 本ずつ書き、* は使わない（processing-js-* には残っているデモがある）。末尾の / の有無は Netlify が同じに扱う。
+# プレビュー（/previews/<slug>.*）は飛ばさない
+
+[[redirects]]
+  from = "/vue-todo/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/jqueryui-simple-calender/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/count-textarea/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/flex-responsive-table/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/toc/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/news-ticker-infinite-loop/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/styling-input/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/css-background-clip-text/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/hover-text-effect/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/hover-effect-to-change-the-background-colo/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/noise-glitch/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/random-color-circle-createjs/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/random-color-square-createjs/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/star-random-color-createjs/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/star-rotate-animation-createjs/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/processing-js-line-and-point/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/processing-js-circle/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/processing-js-square/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/processing-js-triangle/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/processing-js-star/"
+  to = "/"
+  status = 301
+
+[[redirects]]
+  from = "/processing-js-gradation-dot/"
+  to = "/"
+  status = 301
+
 [[headers]]
   for = "/*"
   [headers.values]
