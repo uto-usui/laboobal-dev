@@ -1,6 +1,6 @@
 # デモの作り方
 
-labobal.dev に新しいデモを足すときの決まりです。出すまでの順番（ブランチ、PR、本番の確認）は [release.md](release.md) にあります。見本は `src/demos/marquee/`（CSS だけ）と `src/demos/drag-pinch-simple/`（script あり、指で引っぱる）です。drag-pinch-simple は組のバリエーションなので、main.ts を `mount` の形で書いています。組でないデモは、mount の中身をそのままモジュールの top-level に書き、戻り値を受けなくてかまいません（4 章の共有の部品の節）。ほかのデモとパラメーターや作りだけが違うデモは、組に入れて 1 ページで切り替えられるようにします（12 章。見本は `src/groups/random-color/`）。
+labobal.dev に新しいデモを足すときの決まりです。出すまでの順番（ブランチ、PR、本番の確認）は [release.md](release.md) にあります。見本は `src/demos/marquee/`（CSS だけ）と `src/demos/drag-pinch-simple/`（script あり、指で引っぱる）です。drag-pinch-simple は組のバリエーションなので、main.ts を `mount` の形で書いています。組でないデモは、mount の中身をそのままモジュールの top-level に書き、戻り値を受けなくてかまいません（4 章の共有の部品の節）。ほかのデモとパラメーターや作りだけが違うデモは、組に入れて 1 ページで切り替えられるようにします（12 章。見本は `src/groups/nodes/`）。
 
 ## 1. 置くファイル
 
@@ -240,16 +240,17 @@ lab の記事に iframe で埋め込んだとき、デモの上を指で縦に�
 import { defineGroup } from '../../lib/demos'
 
 export default defineGroup({
-  name: 'random-color', // フォルダ名と同じ
-  title: 'でたらめな色の図形', // トップの組の行に出る
-  description: '円、四角、星を、開くたびに変わるでたらめな色で塗る。星は回すこともできる。',
+  name: 'nodes', // フォルダ名と同じ
+  title: '力で動く点', // トップの組の行に出る
+  description:
+    '玉や点を、ぶつかって弾く力、ばねのように引き合う力、重力と摩擦で動かす。近い点どうしは線で結ぶ。',
   variants: [
-    'random-color-circle-createjs',
-    'random-color-square-createjs',
-    'star-random-color-createjs',
-    'star-rotate-animation-createjs',
+    'nodeballs',
+    'move-a-node-with-springiness',
+    'createjs-node-motion',
+    'createjs-gravity-and-friction',
   ], // 切り替えの欄とトップの行はこの順
-  default: 'random-color-circle-createjs', // トップの組の名前から開くバリエーション
+  default: 'nodeballs', // トップの組の名前から開くバリエーション
 })
 ```
 
@@ -257,37 +258,53 @@ variants は 2 本以上で、同じ slug を 2 回書かない。default は va
 
 ### バリエーションの meta.ts
 
-2 章の項目に、`group: '<組>'` と `variant: '<短い呼び名>'` を足します。呼び名は切り替えの欄とトップのリンクの字になるので、日本語の短い言葉にします（random-color なら「円」「四角」）。`/demos.json` にはこの 2 つが増えるだけで、ほかの項目は変わりません。
+2 章の項目に、`group: '<組>'` と `variant: '<短い呼び名>'` を足します。呼び名は切り替えの欄とトップのリンクの字になるので、日本語の短い言葉にします（nodes なら「弾く玉」「ばね」）。`/demos.json` にはこの 2 つが増えるだけで、ほかの項目は変わりません。
 
 ### バリエーションの main.ts
 
-`mount(stage, params)` を export し、始めたものを全部止める関数（dispose）を返します。型は `src/shared/variants.ts` の `Mount` と `Params` です。下は短くした例で、実物は `src/demos/star-rotate-animation-createjs/main.ts` です。
+`mount(stage, params)` を export し、始めたものを全部止める関数（dispose）を返します。型は `src/shared/variants.ts` の `Mount` と `Params` です。下は短くした例で、実物は `src/demos/createjs-beat-motion-trigonometric/main.ts`（trigonometry の組）です。
 
 ```ts
+import { fiddleCanvas } from '../../shared/fiddle-canvas'
 import { autoplayLoop } from '../../shared/motion'
 import type { Mount, Params } from '../../shared/variants'
 
+const SIZE = 250
+
 // あれば。lil-gui の欄になる。数（min、max、step）、真偽、選択（options）が使える
 export const params = {
-  speed: { label: '1 秒に回る角度', value: 30, min: 0, max: 360, step: 1 },
+  speed: { label: '進む角度', value: 0.1, min: 0, max: 0.5, step: 0.01 },
 } satisfies Params
 
 export const mount: Mount<typeof params> = (stage, { speed }) => {
+  let angle = 0
+  const draw = (ctx: CanvasRenderingContext2D) => {
+    ctx.clearRect(0, 0, SIZE, SIZE)
+    ctx.beginPath()
+    ctx.arc(SIZE / 2, SIZE / 2, 30 * (1 + Math.sin(angle) * 0.5), 0, Math.PI * 2)
+    ctx.fill()
+  }
   // 要素は stage（main.demo）の中から探す
-  const el = stage.querySelector<HTMLElement>('.star')!
-  let rotation = 0
+  const canvas = fiddleCanvas(
+    stage.querySelector<HTMLCanvasElement>('[data-fiddle-canvas]')!,
+    SIZE,
+    SIZE,
+    draw,
+  )
   const stop = autoplayLoop(
     (dt) => {
-      rotation += speed * dt
-      el.style.rotate = `${rotation}deg`
+      angle += speed * 60 * dt
+      draw(canvas.ctx)
     },
-    // 動きを減らす設定では、回る前の向きで止める
+    // 動きを減らす設定では、もとの大きさで止める
     () => {
-      el.style.rotate = '0deg'
+      angle = 0
+      draw(canvas.ctx)
     },
   )
   return () => {
     stop()
+    canvas.dispose()
   }
 }
 ```
