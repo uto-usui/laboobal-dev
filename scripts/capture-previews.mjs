@@ -117,12 +117,13 @@ const act = async (page, interaction) => {
 
 const ffmpeg = (...args) =>
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', ...args])
-// トップ用。ffmpeg の webp は入っていないことが多いので cwebp で作る
+// トップ用。ffmpeg の webp は入っていないことが多いので cwebp で作る。
+// 画質 70 は 80 と見比べて差が分からず、ピックアップの帯の 8 枚で 2 割ほど軽くなった値
 const webp = (input, slug) =>
   execFileSync('cwebp', [
     '-quiet',
     '-q',
-    '80',
+    '70',
     input,
     '-o',
     join(OUT, `${slug}.webp`),
