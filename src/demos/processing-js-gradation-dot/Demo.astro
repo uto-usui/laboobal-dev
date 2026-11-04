@@ -5,10 +5,13 @@ import '@fontsource/molle/400-italic.css'
 <div class="sketch">
   <h1>processing.js</h1>
   <p class="lead">
-    variable / for <br /> gradation dot
+    variable / for <br>
+    gradation dot
   </p>
   <div class="frame" style="--w: 320; --h: 320">
-    <canvas aria-label="6 列 6 行の水玉。左の列の青緑から右の列の赤紫へ、列ごとに色が移る。真ん中に細い線の正方形"></canvas>
+    <canvas
+      aria-label="6 列 6 行の水玉。左の列の青緑から右の列の赤紫へ、列ごとに色が移る。真ん中に細い線の正方形"
+    ></canvas>
   </div>
 </div>
 
@@ -57,7 +60,8 @@ import '@fontsource/molle/400-italic.css'
     width: min(
       100%,
       max(80px, (100cqh - 150px) * var(--w) / var(--h)),
-      var(--w) * 2px
+      var(--w) *
+      2px
     );
     margin-top: 12px;
     background-color: rgb(255 255 255 / 15%);

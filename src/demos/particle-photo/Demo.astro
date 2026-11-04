@@ -4,7 +4,7 @@
 import firstPhoto from './assets/01.jpg?url'
 ---
 
-<link rel="preload" href={firstPhoto} as="fetch" crossorigin="anonymous" />
+<link rel="preload" href={firstPhoto} as="fetch" crossorigin="anonymous">
 
 <div class="particle-photo">
   <canvas
@@ -21,10 +21,8 @@ import firstPhoto from './assets/01.jpg?url'
       ＋
     </button>
   </div>
-  <input type="file" accept="image/*" multiple hidden />
-  <div class="drop" aria-hidden="true">
-    ここに写真をドロップ
-  </div>
+  <input type="file" accept="image/*" multiple hidden>
+  <div class="drop" aria-hidden="true">ここに写真をドロップ</div>
   <p class="unsupported">このブラウザは WebGPU に対応していません</p>
   <pre class="error" hidden></pre>
 </div>
@@ -110,7 +108,7 @@ import firstPhoto from './assets/01.jpg?url'
   .strip :global(.is-busy)::after {
     position: absolute;
     inset: 0;
-    content: '';
+    content: "";
     background: color-mix(in srgb, var(--paper) 55%, transparent);
   }
 

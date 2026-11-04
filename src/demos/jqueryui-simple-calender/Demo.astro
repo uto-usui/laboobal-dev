@@ -8,16 +8,16 @@ import '@fontsource/molle/400-italic.css'
     <section class="frame range">
       <label>
         FROM:
-        <input type="date" class="from" />
+        <input type="date" class="from">
       </label>
       <label>
         TO:
-        <input type="date" class="to" />
+        <input type="date" class="to">
       </label>
     </section>
     <section class="frame">
       <div class="calendar"></div>
-      <input type="text" class="output" readonly aria-label="選んだ日" />
+      <input type="text" class="output" readonly aria-label="選んだ日">
     </section>
   </div>
 </div>
@@ -154,7 +154,7 @@ import '@fontsource/molle/400-italic.css'
   }
 
   .calendar-demo :global(.calendar td button:is(:hover, :focus-visible)),
-  .calendar-demo :global(.calendar td button[aria-pressed='true']) {
+  .calendar-demo :global(.calendar td button[aria-pressed="true"]) {
     color: var(--paper);
     background-color: var(--line);
     outline: 0;

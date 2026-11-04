@@ -1,4 +1,5 @@
 ---
+
 name: link-lab-article
 description: labobal.dev のデモと、それを説明する webmanab の lab の記事をつなぐ。デモの meta.article に記事の URL を入れ、記事の側に要る demoUrl と iframe を作者に渡し、webmanab の pnpm check:demos で食い違いがないかを見る。「記事とつないで」「記事のリンクを入れて」「lab の記事に埋め込みたい」「jsfiddle から labobal.dev に差し替えて」と言われたときに使う。
 ---
@@ -69,7 +70,6 @@ description: labobal.dev のデモと、それを説明する webmanab の lab �
    ```
 
    本番の `https://labobal.dev/demos.json` と記事を突き合わせます。まだ本番に出していないときは、このリポジトリで `pnpm build && pnpm preview --port 4322` を立てて `pnpm check:demos --demos http://localhost:4322/demos.json` にします。出てくるのは次のものです。
-
    - meta の `article` が指す記事が、まだ jsfiddle を埋め込んでいる → 作者に記事の差し替えを頼む
    - meta の `article` が指す記事が見つからない → URL の打ち間違いか、記事がまだ写されていない
    - `demoUrl` と本文の iframe が別のデモを指している → 作者に知らせる

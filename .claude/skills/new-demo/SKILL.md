@@ -1,4 +1,5 @@
 ---
+
 name: new-demo
 description: labobal.dev に新しいデモを 1 本足す。slug を決め、src/demos/<slug>/ の meta.ts、Demo.astro、main.ts、README.md と src/pages/<slug>.astro を docs/demo-guide.md の決まりで置き、動きを減らす設定とタッチに対応させ、check-demo で確かめ、プレビューを撮るところまでやる。「デモを足して」「新しいデモを作って」「この動きをデモにして」「jsfiddle のデモを移して」と言われたときに使う。
 ---

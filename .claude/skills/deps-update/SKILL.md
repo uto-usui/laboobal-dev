@@ -1,4 +1,5 @@
 ---
+
 name: deps-update
 description: labobal.dev（このリポジトリ）の依存を pnpm で更新する。上げる版を決め、変更履歴を読み、pnpm verify を通し、いくつかのデモをブラウザで開いて描かれていることを見てから 1 本の PR にする。three、gsap、locomotive-scroll（中は Lenis）、lil-gui、Astro を上げるときの注意もここにある。「依存を更新して」「パッケージを上げて」「脆弱性を直して」と言われたとき、pnpm audit が落ちたときに使う。
 ---

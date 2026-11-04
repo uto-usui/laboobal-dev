@@ -70,7 +70,7 @@ const wait = (page, ms) => page.waitForTimeout(ms)
  */
 const glide = async (page, size, points, duration) => {
   const start = Date.now()
-  for (let done = false; !done;) {
+  for (let done = false; !done; ) {
     const progress = Math.min((Date.now() - start) / duration, 1)
     done = progress === 1
     const t = progress * (points.length - 1)

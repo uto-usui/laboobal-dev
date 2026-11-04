@@ -6,8 +6,8 @@ import mp4 from './assets/clip.mp4'
 <div class="stage">
   <div class="wrap" data-wrap>
     <video muted loop playsinline preload="auto" data-video>
-      <source src={webm} type="video/webm" />
-      <source src={mp4} type="video/mp4" />
+      <source src={webm} type="video/webm">
+      <source src={mp4} type="video/mp4">
     </video>
     <button class="btn" type="button" aria-pressed="false" data-sound>
       sound
@@ -45,7 +45,7 @@ import mp4 from './assets/clip.mp4'
     inset: 0;
     z-index: 1;
     pointer-events: none;
-    content: '';
+    content: "";
     background-color: #000;
     mix-blend-mode: color-burn;
     transition: opacity 0.5s;

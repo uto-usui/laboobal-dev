@@ -36,9 +36,7 @@ const meta = [
       aria-label="このデモについて"
       hidden
     >
-      <button class="info-close" type="button">
-        close
-      </button>
+      <button class="info-close" type="button">close</button>
       <p class="info-slug" aria-hidden="true">
         {demo.slug}
       </p>
@@ -63,14 +61,10 @@ const meta = [
           </li>
         )}
         <li>
-          <a href={codeUrl} target="_top">
-            コード
-          </a>
+          <a href={codeUrl} target="_top"> コード </a>
         </li>
         <li>
-          <a href="/" target="_top">
-            labobal.dev
-          </a>
+          <a href="/" target="_top"> labobal.dev </a>
         </li>
       </ul>
     </aside>
@@ -139,7 +133,7 @@ const meta = [
 
   .info-toggle:hover,
   .info-toggle:focus-visible,
-  .info-toggle[aria-expanded='true'] {
+  .info-toggle[aria-expanded="true"] {
     opacity: 1;
   }
 
@@ -213,7 +207,7 @@ const meta = [
   /* トップの一覧と同じ、線だけの名前。長い slug は端で折る */
   .info-slug {
     margin: 8px 0 0;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 44px;
     line-height: 0.95;
     color: transparent;
@@ -273,7 +267,7 @@ const meta = [
   }
 
   .info-links a::after {
-    content: ' ↗';
+    content: " ↗";
     color: var(--color-accent);
   }
 

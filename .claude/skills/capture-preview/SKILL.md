@@ -1,4 +1,5 @@
 ---
+
 name: capture-preview
 description: labobal.dev のデモ 1 本の、トップの一覧と webmanab の記事ページで使う短い動画とポスター（public/previews/<slug>.jpg、.webm、.webp）を撮り直す。新しいデモを足したとき、デモの見た目が大きく変わってプレビューと合わなくなったとき、「プレビューを撮って」「サムネを撮り直して」と言われたときに使う。全デモをまとめて撮り直すことはしない。
 ---

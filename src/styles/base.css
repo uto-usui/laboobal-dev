@@ -12,7 +12,7 @@ html {
 body {
   margin: 0;
   font-family:
-    Montserrat, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic',
+    Montserrat, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic",
     sans-serif;
   color: var(--color-fg);
   background: var(--color-bg);
@@ -52,7 +52,7 @@ html[data-offscreen] * {
 /* 動きを減らす設定のとき、ひとりでに動き続ける CSS の animation を止める（決まりは docs/demo-guide.md の 5 章）。
    読み込んだときから止めると最初のコマで止まる。スクロールに合わせて動く animation は止めないので、印を付けた要素だけにする */
 @media (prefers-reduced-motion: reduce) {
-  [data-motion='auto'] {
+  [data-motion="auto"] {
     animation-play-state: paused !important;
   }
 }

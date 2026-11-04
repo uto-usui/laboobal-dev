@@ -60,17 +60,16 @@ const countOf = (key: string) =>
     is:inline
     set:html={JSON.stringify(SPECULATION)}
   />
-  <p class="mark" aria-hidden="true">
-    labobal.dev
-  </p>
+  <p class="mark" aria-hidden="true">labobal.dev</p>
   <figure class="hero" aria-hidden="true">
-    <img alt="" />
+    <img alt="">
   </figure>
   <main class="wrap">
     <h1 class="visually-hidden">labobal.dev</h1>
     <p class="lead">
       動きの実験のデモ。説明は{' '}
-      <a href="https://webmanab.com/lab/">webmanab の lab</a> に。
+      <a href="https://webmanab.com/lab/">webmanab の lab</a>
+      に。
     </p>
     {picks.length > 0 && (
       <section class="picks" aria-labelledby="picks-title">
@@ -458,7 +457,7 @@ const countOf = (key: string) =>
     top: 50%;
     left: 50%;
     margin: 0;
-    font-family: 'Molle Mark', cursive;
+    font-family: "Molle Mark", cursive;
     font-size: 18vw;
     font-style: italic;
     white-space: nowrap;
@@ -514,7 +513,7 @@ const countOf = (key: string) =>
   /* 線だけで描き、触れたときだけ塗る。Montserrat は字形の中で輪郭が重なっていて、線だけにすると重なりが透けるので、
      旧トップと同じく手元の Helvetica 系にする。長い slug はハイフンのところで折り返す */
   .slug {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: clamp(32px, 8vw, 120px);
     font-weight: 400;
     line-height: 1.05;
@@ -566,7 +565,7 @@ const countOf = (key: string) =>
     left: max(0px, 50% - 560px);
     z-index: 3;
     margin: 0;
-    font-family: 'Molle Mark', cursive;
+    font-family: "Molle Mark", cursive;
     font-size: clamp(44px, 7vw, 96px);
     font-style: italic;
     font-weight: 400;
@@ -686,7 +685,7 @@ const countOf = (key: string) =>
     position: absolute;
     bottom: 0;
     left: -6px;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: clamp(20px, 2.4vw, 34px);
     line-height: 1;
     color: transparent;
@@ -794,7 +793,7 @@ const countOf = (key: string) =>
     position: absolute;
     top: 0;
     right: 0;
-    font-family: 'Molle Mark', cursive;
+    font-family: "Molle Mark", cursive;
     font-size: clamp(14px, 2vw, 24px);
     font-style: italic;
     color: var(--color-accent);
@@ -813,7 +812,7 @@ const countOf = (key: string) =>
   }
 
   .filter[data-molle] {
-    font-family: 'Molle Mark', cursive;
+    font-family: "Molle Mark", cursive;
     font-size: 15px;
     font-style: italic;
   }
@@ -839,7 +838,7 @@ const countOf = (key: string) =>
   .sorts::before {
     font-size: 12px;
     color: var(--color-muted);
-    content: '/';
+    content: "/";
   }
 
   /* 狭い画面では並べ方が次の行に回るので、線は要らない */
@@ -861,7 +860,7 @@ const countOf = (key: string) =>
     border-bottom: 1px solid transparent;
   }
 
-  .filter[aria-pressed='true'] {
+  .filter[aria-pressed="true"] {
     color: var(--color-accent);
     border-bottom-color: currentcolor;
   }
@@ -884,11 +883,11 @@ const countOf = (key: string) =>
     letter-spacing: 0.4em;
   }
 
-  .list[data-sort='new'] .item[data-year-first] .year {
+  .list[data-sort="new"] .item[data-year-first] .year {
     display: block;
   }
 
-  .list[data-sort='new'] .item[data-year-first]:first-child .year {
+  .list[data-sort="new"] .item[data-year-first]:first-child .year {
     margin-top: 0;
   }
 
