@@ -20,7 +20,7 @@ const BUDGET = {
   topFonts: 42,
   // デモは、読むライブラリで 3 つに分ける。gsap と three の本体は別のチャンクになるので、その名前で見分ける
   demo: {
-    // ライブラリなし。最大 6.4（star-rotate-animation-createjs）
+    // ライブラリなし。最大 7.4（processing-js-circle-at-the-mouse-position。組の切り替えで 1.3 増えた）
     plain: 8,
     // gsap を読む。最大 31.7（tweenmax-easing-of-scroll-parallax）
     gsap: 36,
