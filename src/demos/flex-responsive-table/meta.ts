@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
+  created: '2016-08-29',
+  added: '2026-11-02',
+  description:
+    '4 行 4 列の表を、画面の幅に合わせて行と列を入れ替えて組み直す。',
+  tags: ['layout'],
+  tech: ['css'],
 })

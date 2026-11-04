@@ -15,4 +15,10 @@ export default defineDemo({
   ],
   webgl: false,
   interaction: 'click',
+  created: '2019-08-24',
+  added: '2026-11-01',
+  description:
+    '大きな 1 文字の形の中に円を置いて膨らませ、大小の円で埋めていく。クリックで別の文字になる。',
+  tags: ['text', 'shape'],
+  tech: ['canvas2d'],
 })

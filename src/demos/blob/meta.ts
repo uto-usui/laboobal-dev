@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: true,
   interaction: 'hover',
+  created: '2019-07-16',
+  added: '2019-07-16',
+  description:
+    '表面が波打ち続ける薄紫の球。マウスに遅れてついてきて、カメラが球のまわりへ回り込む。',
+  tags: ['3d', 'shape', 'noise', 'cursor'],
+  tech: ['three'],
 })

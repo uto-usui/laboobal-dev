@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'click',
+  created: '2018-08-28',
+  added: '2026-11-01',
+  description:
+    '写真が左から右へ、切り抜きが広がるように現れる。クリックするともう一度見られる。',
+  tags: ['reveal', 'image'],
+  tech: ['gsap', 'css'],
 })

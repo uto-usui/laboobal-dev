@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'drag',
+  created: '2019-01-23',
+  added: '2026-11-01',
+  description:
+    '画面のどこかを押して引っぱると、真ん中の玉が遅れて追いかけ、離すと戻る。',
+  tags: ['drag', 'physics'],
+  tech: ['js'],
 })
