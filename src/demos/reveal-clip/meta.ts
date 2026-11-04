@@ -16,4 +16,6 @@ export default defineDemo({
     '写真が左から右へ、切り抜きが広がるように現れる。クリックするともう一度見られる。',
   tags: ['reveal', 'image'],
   tech: ['gsap', 'css'],
+  group: 'reveal',
+  variant: '切り抜き',
 })

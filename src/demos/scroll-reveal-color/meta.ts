@@ -16,4 +16,6 @@ export default defineDemo({
     'スクロールで下から上へ通り過ぎる箱が、緑から水色、青へと色を変える。',
   tags: ['scroll'],
   tech: ['js'],
+  group: 'scroll-reveal',
+  variant: '色',
 })

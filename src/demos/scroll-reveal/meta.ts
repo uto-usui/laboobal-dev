@@ -16,4 +16,6 @@ export default defineDemo({
     'スクロールで通り過ぎる緑の箱が、画面のどこまで来たかを 0〜1 の数で出す。',
   tags: ['scroll'],
   tech: ['js'],
+  group: 'scroll-reveal',
+  variant: '数える',
 })
