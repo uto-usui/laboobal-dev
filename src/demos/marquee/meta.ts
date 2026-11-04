@@ -11,7 +11,7 @@ export default defineDemo({
   webgl: false,
   interaction: 'none',
   created: '2019-08-23',
-  added: '2026-11-01',
+  added: '2019-08-23',
   description:
     '大きな文字の帯 4 本が、横・縦・斜めに向きを変えて重なり、流れ続ける。',
   tags: ['text'],
