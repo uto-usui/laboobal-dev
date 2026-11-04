@@ -3,7 +3,7 @@
 // https://github.com/stegu/webgl-noise
 // 使い方: `import noise from '../../shared/glsl/simplex-noise.glsl?raw'` で読み、シェーダーの文字列の先頭に足す
 //
-// 以下は上流の src/noise2D.glsl、src/noise3D.glsl の見出しと LICENSE をそのまま写したもの。
+// 以下は上流の src/noise2D.glsl、src/noise3D.glsl の見出しのうち作者と License の行と、LICENSE をそのまま写したもの。
 //
 //      Author : Ian McEwan, Ashima Arts.
 //  Maintainer : stegu
