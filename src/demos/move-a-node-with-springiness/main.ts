@@ -42,9 +42,9 @@ const step = () => {
     p.y += p.vy
   }
   // 近い 2 点を、距離に比例した強さで引き寄せ合う。引き合うたびに速さが増していく
-  for (let i = 0; i < count - 1; i++) {
+  for (let i = 0; i < particles.length - 1; i++) {
     const a = particles[i]
-    for (let j = i + 1; j < count; j++) {
+    for (let j = i + 1; j < particles.length; j++) {
       const b = particles[j]
       const dx = b.x - a.x
       const dy = b.y - a.y
@@ -64,9 +64,9 @@ const draw = () => {
   ctx.clearRect(0, 0, width, height)
   // 近いほど濃い線で結ぶ
   ctx.lineWidth = weight
-  for (let i = 0; i < count - 1; i++) {
+  for (let i = 0; i < particles.length - 1; i++) {
     const a = particles[i]
-    for (let j = i + 1; j < count; j++) {
+    for (let j = i + 1; j < particles.length; j++) {
       const b = particles[j]
       const d2 = (b.x - a.x) ** 2 + (b.y - a.y) ** 2
       if (d2 < limit) {
