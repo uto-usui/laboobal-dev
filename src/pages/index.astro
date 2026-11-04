@@ -136,9 +136,11 @@ const countOf = (key: string) =>
   const list = document.querySelector<HTMLElement>('.list')!
   const items = [...list.querySelectorAll<HTMLElement>('.item')]
   const filters = [
-    ...document.querySelectorAll<HTMLButtonElement>('[data-filter]'),
+    ...document.querySelectorAll<HTMLButtonElement>('.filters button'),
   ]
-  const sorts = [...document.querySelectorAll<HTMLButtonElement>('[data-sort]')]
+  const sorts = [
+    ...document.querySelectorAll<HTMLButtonElement>('.sorts button'),
+  ]
 
   // 絞り込みと並べ方は URL の ?filter=&sort= に残す。初期の値のときは付けない
   const params = new URLSearchParams(location.search)
@@ -420,7 +422,7 @@ const countOf = (key: string) =>
     display: flex;
     flex-wrap: wrap;
     gap: 4px 20px;
-    align-items: baseline;
+    align-items: center;
     justify-content: center;
     margin: 0 0 6vh;
   }
