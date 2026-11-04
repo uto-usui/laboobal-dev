@@ -2,8 +2,19 @@
 import '../fonts/molle-mark.css'
 import Base from '../layouts/Base.astro'
 import { getDemos } from '../lib/demos'
+import { compareBy, DEFAULT_SORT, SORTS, yearOf } from '../lib/top-list'
 
-const demos = await getDemos()
+// JS がなくても初期の並び（新しい順）で出るよう、ここで並べておく
+const demos = (await getDemos()).toSorted(compareBy(DEFAULT_SORT))
+// 新しい順のときは、年が替わる最初の項目に年を出す
+const yearFirst = new Set(
+  demos
+    .filter(
+      (demo, i) =>
+        demo.created && yearOf(demo.created) !== yearOf(demos[i - 1]?.created),
+    )
+    .map((demo) => demo.slug),
+)
 
 // 何をすると動くかで絞る。meta.ts の interaction はテストでも使っていて、どのデモにも確かに入っている
 const FILTERS = [
@@ -50,22 +61,47 @@ const countOf = (key: string) =>
       動きの実験のデモ。説明は{' '}
       <a href="https://webmanab.com/lab/">webmanab の lab</a> に。
     </p>
-    <nav class="filters" aria-label="何をすると動くかで絞る">
-      {FILTERS.map((filter) => (
-        <button
-          class="filter"
-          type="button"
-          data-filter={filter.key}
-          aria-pressed={filter.key === 'all' ? 'true' : 'false'}
-        >
-          {filter.label}
-          <sup>{countOf(filter.key)}</sup>
-        </button>
-      ))}
-    </nav>
-    <ul class="list">
+    <div class="controls">
+      <nav class="filters" aria-label="何をすると動くかで絞る">
+        {FILTERS.map((filter) => (
+          <button
+            class="filter"
+            type="button"
+            data-filter={filter.key}
+            aria-pressed={filter.key === 'all' ? 'true' : 'false'}
+          >
+            {filter.label}
+            <sup>{countOf(filter.key)}</sup>
+          </button>
+        ))}
+      </nav>
+      <nav class="sorts" aria-label="並べ方">
+        {SORTS.map((sort) => (
+          <button
+            class="filter"
+            type="button"
+            data-sort={sort.key}
+            aria-pressed={sort.key === DEFAULT_SORT ? 'true' : 'false'}
+          >
+            {sort.label}
+          </button>
+        ))}
+      </nav>
+    </div>
+    <ul class="list" data-sort={DEFAULT_SORT}>
       {demos.map((demo) => (
-        <li class="item" data-interaction={demo.interaction}>
+        <li
+          class="item"
+          data-interaction={demo.interaction}
+          data-slug={demo.slug}
+          data-created={demo.created}
+          data-year-first={yearFirst.has(demo.slug) ? '' : undefined}
+        >
+          {demo.created && (
+            <span class="year" aria-hidden="true">
+              {yearOf(demo.created)}
+            </span>
+          )}
           <a
             class="link"
             href={`/${demo.slug}/`}
@@ -89,27 +125,89 @@ const countOf = (key: string) =>
 <script>
   import { isCoarsePointer, prefersReducedMotion } from '../shared/dom'
   import type { createGlPreview } from '../lib/top-preview'
+  import {
+    compareBy,
+    DEFAULT_SORT,
+    isSortKey,
+    yearOf,
+    type SortKey,
+  } from '../lib/top-list'
 
   const list = document.querySelector<HTMLElement>('.list')!
   const items = [...list.querySelectorAll<HTMLElement>('.item')]
-  const filters = [...document.querySelectorAll<HTMLButtonElement>('.filter')]
+  const filters = [
+    ...document.querySelectorAll<HTMLButtonElement>('[data-filter]'),
+  ]
+  const sorts = [...document.querySelectorAll<HTMLButtonElement>('[data-sort]')]
+
+  // 絞り込みと並べ方は URL の ?filter=&sort= に残す。初期の値のときは付けない
+  const params = new URLSearchParams(location.search)
+  const filterParam = params.get('filter')
+  const state = {
+    filter: filters.some((b) => b.dataset.filter === filterParam)
+      ? filterParam!
+      : 'all',
+    sort: isSortKey(params.get('sort')) ? params.get('sort')! : DEFAULT_SORT,
+  } as { filter: string; sort: SortKey }
+
+  const render = () => {
+    items.forEach((item) => {
+      item.hidden =
+        state.filter !== 'all' && item.dataset.interaction !== state.filter
+    })
+    // CSS の order ではなく DOM の順を替える。読み上げと Tab の順も並びに合わせるため
+    const sorted = items.toSorted((a, b) =>
+      compareBy(state.sort)(
+        { slug: a.dataset.slug!, created: a.dataset.created },
+        { slug: b.dataset.slug!, created: b.dataset.created },
+      ),
+    )
+    if (sorted.some((item, i) => list.children[i] !== item))
+      list.append(...sorted)
+    list.dataset.sort = state.sort
+    let year = ''
+    sorted
+      .filter((item) => !item.hidden)
+      .forEach((item) => {
+        const y = yearOf(item.dataset.created)
+        item.toggleAttribute('data-year-first', y !== '' && y !== year)
+        year = y
+      })
+    filters.forEach((b) =>
+      b.setAttribute('aria-pressed', String(b.dataset.filter === state.filter)),
+    )
+    sorts.forEach((b) =>
+      b.setAttribute('aria-pressed', String(b.dataset.sort === state.sort)),
+    )
+  }
+
+  const update = (change: Partial<typeof state>) => {
+    Object.assign(state, change)
+    const url = new URL(location.href)
+    const set = (key: string, value: string, initial: string) =>
+      value === initial
+        ? url.searchParams.delete(key)
+        : url.searchParams.set(key, value)
+    set('filter', state.filter, 'all')
+    set('sort', state.sort, DEFAULT_SORT)
+    history.replaceState(history.state, '', url)
+    // 並びが詰まる動きは、対応するブラウザでだけ付ける
+    if (document.startViewTransition && !prefersReducedMotion())
+      document.startViewTransition(render)
+    else render()
+  }
 
   filters.forEach((button) =>
-    button.addEventListener('click', () => {
-      const key = button.dataset.filter
-      filters.forEach((b) =>
-        b.setAttribute('aria-pressed', String(b === button)),
-      )
-      const apply = () =>
-        items.forEach((item) => {
-          item.hidden = key !== 'all' && item.dataset.interaction !== key
-        })
-      // 並びが詰まる動きは、対応するブラウザでだけ付ける
-      if (document.startViewTransition && !prefersReducedMotion())
-        document.startViewTransition(apply)
-      else apply()
-    }),
+    button.addEventListener('click', () =>
+      update({ filter: button.dataset.filter }),
+    ),
   )
+  sorts.forEach((button) =>
+    button.addEventListener('click', () =>
+      update({ sort: button.dataset.sort as SortKey }),
+    ),
+  )
+  render()
 
   // 触れたときの動画。タッチの端末では出さない（触れた時点で開くので見る間がない）
   const preview = document.querySelector<HTMLElement>('.preview')!
@@ -318,12 +416,28 @@ const countOf = (key: string) =>
     }
   }
 
-  .filters {
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    align-items: baseline;
+    justify-content: center;
+    margin: 0 0 6vh;
+  }
+
+  .filters,
+  .sorts {
     display: flex;
     flex-wrap: wrap;
     gap: 4px 20px;
     justify-content: center;
-    margin: 0 0 6vh;
+  }
+
+  /* 絞り込みと並べ方の間に斜めの線を 1 本 */
+  .sorts::before {
+    font-size: 12px;
+    color: var(--color-muted);
+    content: '/';
   }
 
   .filter {
@@ -350,6 +464,23 @@ const countOf = (key: string) =>
 
   .item {
     view-transition-name: match-element;
+  }
+
+  /* 新しい順のときだけ、年が替わるところに小さく年を出す */
+  .year {
+    display: none;
+    margin: 6vh 0 1vh;
+    font-size: 11px;
+    color: var(--color-accent);
+    letter-spacing: 0.4em;
+  }
+
+  .list[data-sort='new'] .item[data-year-first] .year {
+    display: block;
+  }
+
+  .list[data-sort='new'] .item[data-year-first]:first-child .year {
+    margin-top: 0;
   }
 
   /* 一覧の上に浮かせる。名前の上に乗っても触れたままでいられるよう、ポインタを通す */
