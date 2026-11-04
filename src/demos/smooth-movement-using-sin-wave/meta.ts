@@ -14,6 +14,6 @@ export default defineDemo({
   added: '2026-11-04',
   description:
     '箱が sin 波で左右になめらかに行き来し、端で速さを落としながら、位置に合わせて色を変える。',
-  tags: ['shape'],
+  tags: ['shape', 'trigonometry'],
   tech: ['gsap'],
 })

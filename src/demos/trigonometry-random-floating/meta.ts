@@ -15,6 +15,6 @@ export default defineDemo({
   added: '2026-11-01',
   description:
     '丸が 1 つ、位置・奥行き・色をそれぞれ別の sin で揺らされて、画面の中を漂う。',
-  tags: ['3d', 'random'],
+  tags: ['3d', 'random', 'trigonometry'],
   tech: ['js'],
 })

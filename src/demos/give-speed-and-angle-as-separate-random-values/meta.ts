@@ -15,6 +15,6 @@ export default defineDemo({
   added: '2026-11-04',
   description:
     '灰色の箱が、縦・横・奥行きごとに違う速さの sin 波で、決まった道をなぞらずに漂う。',
-  tags: ['3d', 'random'],
+  tags: ['3d', 'random', 'trigonometry'],
   tech: ['gsap'],
 })

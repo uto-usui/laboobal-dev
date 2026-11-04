@@ -10,7 +10,7 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'hover',
-  created: '2018-02-02',
+  created: '2018-02-03',
   added: '2026-11-04',
   description:
     '光の玉が流れる動画を、フィルターと color-burn で黒く焼き込む。マウスを乗せると焼き込みが消えて浮き上がる。',

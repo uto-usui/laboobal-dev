@@ -15,6 +15,6 @@ export default defineDemo({
   added: '2026-11-04',
   description:
     '円周に並んだ 12 枚の色の板が輪ごと回り、奥と手前を行き来しながら、それぞれ回転して大きさを変える。',
-  tags: ['3d'],
+  tags: ['3d', 'trigonometry'],
   tech: ['gsap'],
 })
