@@ -16,7 +16,7 @@ export default defineDemo({
   webgl: false,
   interaction: 'scroll',
   created: '2020-10-21',
-  added: '2026-11-01',
+  added: '2020-10-21',
   description:
     'なめらかに減速するスクロールで、写真や文字がそれぞれ違う速さでずれ、遅れて追いつく。',
   tags: ['scroll', 'parallax', 'image', 'text'],
