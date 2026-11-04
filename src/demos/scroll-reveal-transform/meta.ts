@@ -16,4 +16,6 @@ export default defineDemo({
     'スクロールで通り過ぎる横長の箱が、奥へ倒れた形から起き上がり、上で手前へ倒れる。',
   tags: ['scroll', '3d'],
   tech: ['js'],
+  group: 'scroll-reveal',
+  variant: '起き上がる',
 })
