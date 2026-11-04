@@ -25,6 +25,16 @@ body {
   --color-muted: #808080;
 }
 
+/* Picture（AVIF と WebP を出し分ける）の包み。中の img がそのまま親の grid や flex に並ぶよう、箱を作らない。
+   source は UA の CSS で隠れていないので、grid の中で空の行を作らないよう隠す */
+main.demo picture {
+  display: contents;
+}
+
+main.demo picture > source {
+  display: none;
+}
+
 img,
 video,
 canvas,

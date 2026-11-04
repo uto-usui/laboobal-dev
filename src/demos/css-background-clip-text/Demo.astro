@@ -1,9 +1,13 @@
 ---
 import '@fontsource/molle/400-italic.css'
 import photo from './assets/photo.jpg'
+import { getImage } from 'astro:assets'
+
+// CSS の background に敷くので、Picture の代わりに WebP だけを作る
+const background = await getImage({ src: photo, format: 'webp' })
 ---
 
-<div class="clip-text" style={`--photo: url(${photo.src})`}>
+<div class="clip-text" style={`--photo: url(${background.src})`}>
   <h1>clip text</h1>
   <section class="frame">
     <p class="clip">CLIP TEXT</p>

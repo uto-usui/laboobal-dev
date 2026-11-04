@@ -1,6 +1,6 @@
 import { fitCanvas, loop, onResize } from '../../shared/dom'
 import { onReducedMotion } from '../../shared/motion'
-import photo from './assets/photo.jpg'
+import photo from './assets/photo.webp'
 
 const stage = document.querySelector<HTMLElement>('.draw-image')!
 const canvas = stage.querySelector<HTMLCanvasElement>('canvas')!

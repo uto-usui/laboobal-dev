@@ -9,7 +9,7 @@ import {
 } from '../../shared/gl'
 import noise from '../../shared/glsl/simplex-noise.glsl?raw'
 import { autoplayLoop } from '../../shared/motion'
-import photo from './assets/photo.jpg'
+import photo from './assets/photo.webp'
 import glitch from './assets/glitch.frag?raw'
 
 const stage = document.querySelector<HTMLElement>('.glitch-image')!

@@ -3,6 +3,13 @@ import '@fontsource/molle/400-italic.css'
 import flowersWide from './assets/flowers-wide.jpg'
 import flowers from './assets/flowers.jpg'
 import foliage from './assets/foliage.jpg'
+import { Picture, getImage } from 'astro:assets'
+
+// 帯と背景に敷く写真は CSS の background なので、Picture の代わりに WebP だけを作る
+const background = async (src: typeof flowers) =>
+  `url(${(await getImage({ src, format: 'webp' })).src})`
+const flowersWideBackground = await background(flowersWide)
+const flowersBackground = await background(flowers)
 
 const pageTop = 'Back To Page Top'
 ---
@@ -26,7 +33,13 @@ const pageTop = 'Back To Page Top'
     <div class="sm-lag" data-lag="0.05" data-lag-speed="2">
       <figure class="sm-figure" style="--w: 50vw; --h: 100vh">
         <div class="sm-figure-inner" data-scroll data-scroll-speed="-0.15">
-          <img src={foliage.src} alt="" />
+          <Picture
+            src={foliage}
+            formats={['avif']}
+            fallbackFormat="webp"
+            loading="eager"
+            alt=""
+          />
         </div>
       </figure>
     </div>
@@ -45,21 +58,39 @@ const pageTop = 'Back To Page Top'
     <div class="sm-lag" data-lag="0.05" data-lag-speed="1">
       <figure class="sm-figure" style="--w: 90vw; --h: 25vh">
         <div class="sm-figure-inner" data-scroll data-scroll-speed="-0.06">
-          <img src={flowersWide.src} alt="" />
+          <Picture
+            src={flowersWide}
+            formats={['avif']}
+            fallbackFormat="webp"
+            loading="eager"
+            alt=""
+          />
         </div>
       </figure>
     </div>
     <div class="sm-lag spacer-b" data-lag="0.05" data-lag-speed="4">
       <figure class="sm-figure" style="--w: 50vw; --h: 50vw">
         <div class="sm-figure-inner" data-scroll data-scroll-speed="-0.13">
-          <img src={flowers.src} alt="" />
+          <Picture
+            src={flowers}
+            formats={['avif']}
+            fallbackFormat="webp"
+            loading="eager"
+            alt=""
+          />
         </div>
       </figure>
     </div>
     <div class="sm-lag spacer-a" data-lag="0.05" data-lag-speed="6">
       <figure class="sm-figure" style="--w: 15vw; --h: 30vw">
         <div class="sm-figure-inner" data-scroll data-scroll-speed="-0.15">
-          <img src={flowers.src} alt="" />
+          <Picture
+            src={flowers}
+            formats={['avif']}
+            fallbackFormat="webp"
+            loading="eager"
+            alt=""
+          />
         </div>
       </figure>
     </div>
@@ -87,7 +118,7 @@ const pageTop = 'Back To Page Top'
             {Array.from({ length: 6 }, () => (
               <div
                 class="sm-tile"
-                style={`background-image: url(${flowersWide.src})`}
+                style={`background-image: ${flowersWideBackground}`}
               />
             ))}
           </div>
@@ -113,7 +144,7 @@ const pageTop = 'Back To Page Top'
             {Array.from({ length: 6 }, () => (
               <div
                 class="sm-tile"
-                style={`background-image: url(${flowersWide.src})`}
+                style={`background-image: ${flowersWideBackground}`}
               />
             ))}
           </div>
@@ -134,7 +165,7 @@ const pageTop = 'Back To Page Top'
             {Array.from({ length: 3 }, () => (
               <div
                 class="sm-tile"
-                style={`background-image: url(${flowers.src})`}
+                style={`background-image: ${flowersBackground}`}
               />
             ))}
           </div>
@@ -149,7 +180,7 @@ const pageTop = 'Back To Page Top'
         <div class="sm-fixed-track">
           <div
             class="sm-fixed-bg"
-            style={`background-image: url(${flowers.src})`}
+            style={`background-image: ${flowersBackground}`}
           ></div>
         </div>
       </figure>

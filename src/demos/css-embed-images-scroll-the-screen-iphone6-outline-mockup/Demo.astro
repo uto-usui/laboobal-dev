@@ -1,5 +1,6 @@
 ---
 import '@fontsource/molle/400-italic.css'
+import { Picture } from 'astro:assets'
 import photos from './assets/photos.jpg'
 ---
 
@@ -17,10 +18,11 @@ import photos from './assets/photos.jpg'
           <span class="speaker"></span>
         </div>
         <div class="screen" tabindex="0" aria-label="画面（スクロールできる）">
-          <img
-            src={photos.src}
-            width={photos.width}
-            height={photos.height}
+          <Picture
+            src={photos}
+            formats={['avif']}
+            fallbackFormat="webp"
+            loading="eager"
             alt=""
           />
         </div>

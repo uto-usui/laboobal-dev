@@ -1,9 +1,17 @@
 ---
+import { Picture } from 'astro:assets'
 import photo from './assets/photo.jpg'
 ---
 
 <div class="stage">
-  <img class="photo" src={photo.src} alt="" />
+  <Picture
+    class="photo"
+    src={photo}
+    formats={['avif']}
+    fallbackFormat="webp"
+    loading="eager"
+    alt=""
+  />
   <div class="light"></div>
   <div class="light light--sm"></div>
 </div>

@@ -9,7 +9,7 @@ import {
   createGlStage,
 } from '../../shared/gl'
 import { pointerOrWander, trackPointer } from '../../shared/pointer'
-import photo from './assets/photo.jpg'
+import photo from './assets/photo.webp'
 import fragmentShader from './assets/shift.frag?raw'
 
 const stage = document.querySelector<HTMLElement>('.shift-image')!
