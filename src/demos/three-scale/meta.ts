@@ -18,7 +18,7 @@ export default defineDemo({
   created: '2019-10-07',
   added: '2026-11-01',
   description:
-    '色の箱を押すと、板が曲がりながら画面いっぱいまで広がり、少し止まって箱に戻る。',
+    '赤・緑・黄の箱を押すと、板が曲がりながら画面いっぱいまで広がり、少し止まって箱に戻る。',
   tags: ['distortion', 'layout'],
   tech: ['three', 'glsl', 'gsap'],
 })

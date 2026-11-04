@@ -13,7 +13,7 @@ export default defineDemo({
   created: '2019-11-19',
   added: '2026-11-01',
   description:
-    'S 字の道に沿って小さな粒が進んでは引き返し、通った所を色で塗っていく。',
+    '灰色の S 字の線の上を緑の粒が進んでは引き返し、通った所を緑に塗っていく。',
   tags: ['shape'],
   tech: ['gsap', 'svg'],
 })

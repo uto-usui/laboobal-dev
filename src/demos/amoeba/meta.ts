@@ -13,7 +13,7 @@ export default defineDemo({
   created: '2019-10-31',
   added: '2019-10-31',
   description:
-    '黒い画面の真ん中で、縁がうねり続ける形が緑に光る。ノイズで形も光も変わり続ける。',
+    'ざらついた青い光の中で、縁の赤い暗い形がうねり続け、内側がときどき緑に光る。',
   tags: ['shape', 'noise'],
   tech: ['three', 'glsl'],
   pick: true,
