@@ -12,8 +12,8 @@ import { brotliCompressSync, constants, gzipSync } from 'node:zlib'
 // 上限。単位は KB（1000 バイト）。2026-11-04 に測った値（コメントの数字）に、2〜3 割の余裕を足した。
 // 上げるときは、何が増えたのかをコミットに書く
 const BUDGET = {
-  // 7.3
-  top: 10,
+  // 7.3 → 12.7（並び替え・ピックアップ・スマホの主役・板の遷移・長い slug で 3.5、一覧のデモ 35 本で 1.7）
+  top: 15,
   // 32.5（montserrat-ascii-400、montserrat-latin-700、molle-mark の 3 個）
   topFonts: 42,
   // デモは、読むライブラリで 3 つに分ける。gsap と three の本体は別のチャンクになるので、その名前で見分ける

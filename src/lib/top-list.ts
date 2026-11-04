@@ -1,8 +1,9 @@
 /** トップの一覧の並べ方。ページを組み立てるときとブラウザで並べ替えるときの両方で使う。
- * 言葉は隣の絞り込み（hover、drag など）に合わせて英語。new は NEW の印と紛れるので latest */
+ * 言葉は隣の絞り込み（hover、drag など）に合わせて英語。new は NEW の印と紛れるので latest。
+ * a-z はふつうのハイフン（ダッシュにすると、その 1 字のために Montserrat の latin の版を読む） */
 export const SORTS = [
   { key: 'new', label: 'latest' },
-  { key: 'name', label: 'a–z' },
+  { key: 'name', label: 'a-z' },
 ] as const
 export type SortKey = (typeof SORTS)[number]['key']
 export const DEFAULT_SORT: SortKey = 'new'
