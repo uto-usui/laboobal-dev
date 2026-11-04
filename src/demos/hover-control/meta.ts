@@ -16,4 +16,6 @@ export default defineDemo({
     'マウスを乗せると帯が左から赤く塗られ、すぐ外しても最後まで伸びきってから戻る。',
   tags: ['hover'],
   tech: ['gsap'],
+  group: 'hover-control',
+  variant: '帯（最後まで）',
 })
