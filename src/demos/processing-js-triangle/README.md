@@ -15,7 +15,7 @@
 
 ## 作り方
 
-canvas 2D のパスで頂点を結んでいる。回すのは `ctx.translate` で中心へ移してから `ctx.rotate`。座標は記事と同じ 320×320 のまま書き、表示の大きさに合わせて拡大している（`sketch.ts`）。
+canvas 2D のパスで頂点を結んでいる。回すのは `ctx.translate` で中心へ移してから `ctx.rotate`。座標は記事と同じ 320×320 のまま書き、表示の大きさに合わせて拡大している（`src/shared/processing.ts`）。
 
 ## もとのデモから変えたこと
 

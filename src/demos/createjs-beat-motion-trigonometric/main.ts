@@ -1,5 +1,5 @@
 import { autoplayLoop } from '../../shared/motion'
-import { fiddleCanvas } from './fiddle-canvas'
+import { fiddleCanvas } from '../../shared/fiddle-canvas'
 
 // もとの fiddle の canvas は 250×250。数字は記事のコードのままで、速さは 60fps のときの 1 フレームあたり
 const SIZE = 250

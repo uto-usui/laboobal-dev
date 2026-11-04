@@ -1,6 +1,6 @@
 import { autoplayLoop } from '../../shared/motion'
 import { random } from '../../shared/math'
-import { fiddleCanvas } from './fiddle-canvas'
+import { fiddleCanvas } from '../../shared/fiddle-canvas'
 
 /*
  * もとの fiddle は 600×600 の canvas を 300×300 に縮めて見せていた。ここでは見えていた 300×300 を座標にし、

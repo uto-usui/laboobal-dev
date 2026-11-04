@@ -1,7 +1,7 @@
 import { loop } from '../../shared/dom'
 import { random } from '../../shared/math'
 import { pointerOrWander, trackPointer } from '../../shared/pointer'
-import { hsb, paint, sketch } from './sketch'
+import { hsb, paint, sketch } from '../../shared/processing'
 
 const canvas = document.querySelector<HTMLCanvasElement>('.sketch canvas')!
 const width = 320

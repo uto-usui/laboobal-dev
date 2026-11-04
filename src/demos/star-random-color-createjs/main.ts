@@ -1,5 +1,5 @@
 import { toRadian } from '../../shared/math'
-import { fiddleCanvas } from './fiddle-canvas'
+import { fiddleCanvas } from '../../shared/fiddle-canvas'
 
 // もとの fiddle の canvas は 300×260。座標は記事のコードのまま（図形を (50, 50) に置き、その中の (50, 50) を中心に描く）
 const WIDTH = 300

@@ -16,7 +16,7 @@
 
 ## 作り方
 
-canvas 2D の `lineCap` が `strokeCap` にあたる。名前が違うので注意する。`ROUND` は `round`、`SQUARE` は `butt`、`PROJECT` は `square`。点は 1×1 の `fillRect` で描いている。座標は記事と同じ 480×320 のまま書き、表示の大きさに合わせて拡大している（`sketch.ts`）。
+canvas 2D の `lineCap` が `strokeCap` にあたる。名前が違うので注意する。`ROUND` は `round`、`SQUARE` は `butt`、`PROJECT` は `square`。点は 1×1 の `fillRect` で描いている。座標は記事と同じ 480×320 のまま書き、表示の大きさに合わせて拡大している（`src/shared/processing.ts`）。
 
 ## もとのデモから変えたこと
 

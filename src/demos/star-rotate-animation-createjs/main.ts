@@ -1,6 +1,6 @@
 import { autoplayLoop } from '../../shared/motion'
 import { toRadian } from '../../shared/math'
-import { fiddleCanvas } from './fiddle-canvas'
+import { fiddleCanvas } from '../../shared/fiddle-canvas'
 
 // もとの fiddle の canvas は 300×260。星は (100, 100) を中心に置き、1 フレームに 0.5 度ずつ回す
 const WIDTH = 300

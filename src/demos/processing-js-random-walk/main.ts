@@ -1,6 +1,6 @@
 import { clamp, pick } from '../../shared/math'
 import { autoplayLoop } from '../../shared/motion'
-import { hsb, sketch } from './sketch'
+import { hsb, sketch } from '../../shared/processing'
 
 const canvas = document.querySelector<HTMLCanvasElement>('.sketch canvas')!
 const width = 320

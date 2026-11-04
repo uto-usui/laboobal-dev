@@ -1,6 +1,6 @@
 import { random } from '../../shared/math'
 import { autoplayLoop } from '../../shared/motion'
-import { DEFAULT_BACKGROUND, paint, sketch } from './sketch'
+import { DEFAULT_BACKGROUND, paint, sketch } from '../../shared/processing'
 
 const canvas = document.querySelector<HTMLCanvasElement>('.sketch canvas')!
 const width = 500

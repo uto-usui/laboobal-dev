@@ -1,4 +1,4 @@
-import { DEFAULT_BACKGROUND, paint, sketch } from './sketch'
+import { DEFAULT_BACKGROUND, paint, sketch } from '../../shared/processing'
 
 const canvas = document.querySelector<HTMLCanvasElement>('.sketch canvas')!
 

@@ -1,5 +1,5 @@
 import { random, toRadian } from '../../shared/math'
-import { hsb, paint, sketch } from './sketch'
+import { hsb, paint, sketch } from '../../shared/processing'
 
 const canvas = document.querySelector<HTMLCanvasElement>('.sketch canvas')!
 const width = 320

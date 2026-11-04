@@ -1,4 +1,4 @@
-import { hsb, paint, sketch } from './sketch'
+import { hsb, paint, sketch } from '../../shared/processing'
 
 const canvas = document.querySelector<HTMLCanvasElement>('.sketch canvas')!
 const w = 320

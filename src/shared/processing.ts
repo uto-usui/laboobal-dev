@@ -1,6 +1,6 @@
-import { fitCanvas, onResize } from '../../shared/dom'
+import { fitCanvas, onResize } from './dom'
 
-// Processing.js で書いていたスケッチを canvas 2D で描くための小さな道具。processing-js-* のデモに同じものを置いている
+// Processing.js で書いていたスケッチ（processing-js-* のデモ）を canvas 2D で描くための小さな道具
 
 /** Processing の size() を呼んだだけのときの背景（グレー 204） */
 export const DEFAULT_BACKGROUND = 'rgb(204 204 204)'

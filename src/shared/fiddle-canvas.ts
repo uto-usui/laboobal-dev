@@ -1,7 +1,7 @@
-import { fitCanvas, onResize } from '../../shared/dom'
+import { fitCanvas, onResize } from './dom'
 
 /**
- * もとの fiddle の canvas（width × height の固定の大きさ）の座標のまま描けるようにする。
+ * CreateJS で書いていた fiddle のデモで使う。もとの fiddle の canvas（width × height の固定の大きさ）の座標のまま描けるようにする。
  * 入れ物に収まる大きさまで canvas を広げ（もとの 2 倍まで）、2D の文脈をその倍率で拡大しておく。
  * 大きさが変わるたびに draw を呼ぶので、止まっている間も絵が消えない
  */
