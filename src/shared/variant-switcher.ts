@@ -214,6 +214,38 @@ const open = async (
 
   select.onChange((slug: string) => switchTo(slug))
   showParams()
+
+  // 欄の外を押したら閉じる（スマホの幅では開いた欄が右上を覆うため）。押した操作はそのままデモに届ける。
+  // デモが伝わりを止めても閉じるよう capture で聞く。欄の中で押している指（スライダーを動かしている指）があれば、
+  // 別の指で外に触れても閉じない。isPrimary の押し始めはほかに押している指がないので、離したのを取りこぼした分を捨てる
+  const pressing = new Set<number>()
+  // select の一覧を開いている間は、外を押しても一覧が閉じるだけにする（外を押した操作がページに届く端末があるため）。
+  // 選ぶか、select から外れたら終わり
+  const list = select.domElement.querySelector('select')!
+  let listing = false
+  list.addEventListener('pointerdown', () => {
+    listing = true
+  })
+  for (const type of ['change', 'blur'])
+    list.addEventListener(type, () => {
+      listing = false
+    })
+  document.addEventListener(
+    'pointerdown',
+    (event) => {
+      if (event.isPrimary) pressing.clear()
+      if (gui.domElement.contains(event.target as Node)) {
+        pressing.add(event.pointerId)
+        return
+      }
+      if (listing) listing = false
+      else if (pressing.size === 0) gui.close()
+    },
+    true,
+  )
+  const release = (event: PointerEvent) => pressing.delete(event.pointerId)
+  document.addEventListener('pointerup', release, true)
+  document.addEventListener('pointercancel', release, true)
   toggle.remove()
   gui.$title.focus()
 }
