@@ -27,7 +27,7 @@ E2E_PORT=4399 pnpm verify
 ```
 
 - ビルドが meta やページの決まりで落ちたら、エラーに出た中身のとおりに直す
-- `pnpm check:budget` の行で、このデモの数字と上限を見る。超えたら、出てきた一覧で大きいファイルを見る
+- このデモの大きさは `node scripts/check-budget.mjs --report | grep "^<slug>,"` で見る（ふつうの出力は分け方ごとの最大だけ）。上限は demo-guide.md の 9 章の表か、`scripts/check-budget.mjs` の `demoOverride`。超えたときは、そのページで読むファイルが大きい順に出る
 - E2E のうち、このデモの分だけを見直すなら `E2E_PORT=4399 pnpm test:e2e --grep <slug>`。ほかの作業と同時なら `--output test-results/<名前>` を付ける
 - ひとりでに動き続けるデモが `e2e/motion.spec.ts` の `AUTOPLAY` に、指で引っぱるデモが `DRAG` に入っているか
 
@@ -43,7 +43,7 @@ agent-browser を使うときは、zsh では関数にする: `ab(){ agent-brows
 2. `interaction` に合わせて、マウスを動かす、引っぱる、スクロールする、クリックする。動きが出て、コンソールにエラーや警告がないか
 3. 大きさを変える（`ab set viewport 800 500`、`ab set viewport 390 844`）。幅 800px と高さ 500px は lab の記事の iframe の大きさ。はみ出し、切れ、描き直しの漏れがないか
 4. 右の端の「info」を押してパネルを開く。デモのボタンや文字と重なっていないか、パネルに description、tags、tech が出ているか。Esc で閉じるか
-5. 動きを減らす設定を入れて開き直す（`ab set media dark reduced-motion`。Playwright なら `reducedMotion: 'reduce'`）。demo-guide.md の 5 章のとおり、ひとりでに動くものは止まった絵に、1 回きりの再生は終わりの姿に、操作についてくる動きは残っているか
+5. 動きを減らす設定を入れて開き直す（`ab set media reduced-motion`。Playwright なら `reducedMotion: 'reduce'`）。demo-guide.md の 5 章のとおり、ひとりでに動くものは止まった絵に、1 回きりの再生は終わりの姿に、操作についてくる動きは残っているか
 6. 指で引っぱるデモは、`e2e/motion.spec.ts` の `DRAG` のテスト（iPhone の大きさとタッチで、本物のタッチを CDP で送る）が通っていることで見る。目で見るなら Playwright の `devices['iPhone 13']` で開き、左上に「tap to drag」が出ることを見る。agent-browser の `set device` は画面の大きさが変わるだけで、タッチの端末（`pointer: coarse`）にはならない
 
 見終わったらプレビューを止めます（`pnpm exec astro preview stop`、または立てたプロセスを止める）。
