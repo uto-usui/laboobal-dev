@@ -1,24 +1,72 @@
 ---
 import '../fonts/molle-mark.css'
 import Base from '../layouts/Base.astro'
-import { getDemos } from '../lib/demos'
+import { getDemos, getGroups } from '../lib/demos'
 import { compareBy, DEFAULT_SORT, SORTS, yearOf } from '../lib/top-list'
 
-// JS がなくても初期の並び（新しい順）で出るよう、ここで並べておく
 const demos = (await getDemos()).toSorted(compareBy(DEFAULT_SORT))
+const groups = await getGroups()
+
+// 一覧の 1 行。組（#31）は 1 行にまとめ、名前の下に各バリエーションへのリンクを並べる。
+// key は並べ替えに使う名前（組の名前か slug）。slug は名前を押したときに開くデモで、ポスターもこれを使う
+const grouped = new Set(groups.flatMap((group) => group.variants))
+const rows = [
+  ...demos
+    .filter((demo) => !grouped.has(demo.slug))
+    .map((demo) => ({
+      key: demo.slug,
+      slug: demo.slug,
+      title: demo.title,
+      created: demo.created,
+      members: [demo],
+      group: undefined,
+    })),
+  ...groups.map((group) => {
+    const members = group.variants.map(
+      (slug) => demos.find((demo) => demo.slug === slug)!,
+    )
+    return {
+      key: group.name,
+      slug: group.default,
+      title: group.title,
+      // 新しい順は、組の中でいちばん新しいもので並べる
+      created: members
+        .map((demo) => demo.created)
+        .toSorted()
+        .at(-1)!,
+      members,
+      group,
+    }
+  }),
+]
+  // JS がなくても初期の並び（新しい順）で出るよう、ここで並べておく
+  .toSorted((a, b) =>
+    compareBy(DEFAULT_SORT)(
+      { slug: a.key, created: a.created },
+      { slug: b.key, created: b.created },
+    ),
+  )
+  .map((row) => ({
+    ...row,
+    pick: row.members.some((demo) => demo.pick),
+    // ここで作ったデモ（移植でないもの）を出した日。組なら、いちばん新しいもの
+    added: row.members
+      .filter((demo) => demo.batch === 'new' && demo.added)
+      .map((demo) => demo.added)
+      .toSorted()
+      .at(-1),
+  }))
 // 新しい順のときは、年が替わる最初の項目に年を出す
 const yearFirst = new Set(
-  demos
-    .filter(
-      (demo, i) =>
-        demo.created && yearOf(demo.created) !== yearOf(demos[i - 1]?.created),
-    )
-    .map((demo) => demo.slug),
+  rows
+    .filter((row, i) => yearOf(row.created) !== yearOf(rows[i - 1]?.created))
+    .map((row) => row.key),
 )
 
 const picks = demos.filter((demo) => demo.pick)
 
-// 何をすると動くかで絞る。meta.ts の interaction はテストでも使っていて、どのデモにも確かに入っている。pick は meta の pick
+// 何をすると動くかで絞る。meta.ts の interaction はテストでも使っていて、どのデモにも確かに入っている。pick は meta の pick。
+// 数は行ではなくデモの本数で数える（組の行は、合うバリエーションのリンクだけを出す）
 const FILTERS = [
   { key: 'all', label: 'all' },
   { key: 'pick', label: 'pick!' },
@@ -131,41 +179,66 @@ const countOf = (key: string) =>
       </nav>
     </div>
     <ul class="list" data-sort={DEFAULT_SORT}>
-      {demos.map((demo) => (
+      {rows.map((row) => (
         <li
           class="item"
-          data-interaction={demo.interaction}
-          data-slug={demo.slug}
-          data-created={demo.created}
-          data-pick={demo.pick ? '' : undefined}
-          data-year-first={yearFirst.has(demo.slug) ? '' : undefined}
+          data-key={row.group ? row.key : undefined}
+          data-interaction={row.group ? undefined : row.members[0].interaction}
+          data-slug={row.slug}
+          data-created={row.created}
+          data-pick={row.pick ? '' : undefined}
+          data-group={row.group ? '' : undefined}
+          data-year-first={yearFirst.has(row.key) ? '' : undefined}
         >
-          {demo.created && (
+          {row.created && (
             <span class="year" aria-hidden="true">
-              {yearOf(demo.created)}
+              {yearOf(row.created)}
             </span>
           )}
           <a
             class="link"
-            href={`/${demo.slug}/`}
-            data-slug={demo.slug}
-            data-title={demo.title}
+            href={`/${row.slug}/`}
+            data-slug={row.slug}
+            data-title={row.title}
           >
             <span class="slug">
-              <span class="slug-text">{demo.slug}</span>
+              <span class="slug-text">{row.key}</span>
             </span>
-            {demo.batch === 'new' && demo.added && (
-              <span class="new-mark" data-added={demo.added} hidden>
+            {row.added && (
+              <span class="new-mark" data-added={row.added} hidden>
                 new
               </span>
             )}
-            {demo.pick && (
+            {row.pick && (
               <span class="pick-mark" aria-hidden="true">
                 pick!
               </span>
             )}
-            <span class="title">{demo.title}</span>
+            <span class="title">{row.title}</span>
           </a>
+          {row.group && (
+            <ul
+              class="variants"
+              aria-label={`${row.group.title}のバリエーション`}
+            >
+              {row.members.map((demo) => (
+                <li
+                  class="variant"
+                  data-interaction={demo.interaction}
+                  data-pick={demo.pick ? '' : undefined}
+                >
+                  <a
+                    class="variant-link"
+                    href={`/${demo.slug}/`}
+                    data-slug={demo.slug}
+                    data-title={demo.title}
+                  >
+                    {demo.variant}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </li>
       ))}
     </ul>
@@ -193,6 +266,10 @@ const countOf = (key: string) =>
 
   const list = document.querySelector<HTMLElement>('.list')!
   const items = [...list.querySelectorAll<HTMLElement>('.item')]
+  // 名前と、組の行のバリエーションのリンク。どちらも触れると動画を出し、押すと板を広げて入る
+  const links = [
+    ...list.querySelectorAll<HTMLAnchorElement>('.link, .variant-link'),
+  ]
   const filters = [
     ...document.querySelectorAll<HTMLButtonElement>('.filters button'),
   ]
@@ -210,18 +287,28 @@ const countOf = (key: string) =>
     sort: isSortKey(params.get('sort')) ? params.get('sort')! : DEFAULT_SORT,
   } as { filter: string; sort: SortKey }
 
+  // 並べ替えの名前。組の行は組の名前（data-key）、ほかは slug
+  const keyOf = (item: HTMLElement) => item.dataset.key ?? item.dataset.slug!
+  const matches = (el: HTMLElement) =>
+    state.filter === 'pick'
+      ? el.dataset.pick !== undefined
+      : state.filter === 'all' || el.dataset.interaction === state.filter
   const render = () => {
     items.forEach((item) => {
-      item.hidden =
-        state.filter === 'pick'
-          ? item.dataset.pick === undefined
-          : state.filter !== 'all' && item.dataset.interaction !== state.filter
+      const variants = [...item.querySelectorAll<HTMLElement>('.variant')]
+      if (variants.length === 0) {
+        item.hidden = !matches(item)
+        return
+      }
+      // 組の行は、合うバリエーションのリンクだけを出し、1 つもなければ行ごと隠す
+      for (const variant of variants) variant.hidden = !matches(variant)
+      item.hidden = variants.every((variant) => variant.hidden)
     })
     // CSS の order ではなく DOM の順を替える。読み上げと Tab の順も並びに合わせるため
     const sorted = items.toSorted((a, b) =>
       compareBy(state.sort)(
-        { slug: a.dataset.slug!, created: a.dataset.created },
-        { slug: b.dataset.slug!, created: b.dataset.created },
+        { slug: keyOf(a), created: a.dataset.created },
+        { slug: keyOf(b), created: b.dataset.created },
       ),
     )
     if (sorted.some((item, i) => list.children[i] !== item))
@@ -346,9 +433,7 @@ const countOf = (key: string) =>
       gl = loaded
       preview.classList.add('is-gl')
       gl.setTarget(pointer.x, pointer.y)
-      list
-        .querySelectorAll<HTMLAnchorElement>('.link')
-        .forEach((link) => prefetcher.observe(link))
+      links.forEach((link) => prefetcher.observe(link))
     }
 
     // three は大きいので、ページを開いただけでは読まない。マウスを動かすかキーボードで移ったら読み始める
@@ -367,9 +452,12 @@ const countOf = (key: string) =>
           preview.style.transform = `translate3d(${f.x}px, ${f.y}px, 0) translate(-50%, -50%) rotate(${f.tilt}rad) translate(${f.cornerX}px, ${f.cornerY}px)`
         },
         (slug) => {
-          caption.textContent =
-            list.querySelector<HTMLAnchorElement>(`[data-slug="${slug}"]`)
-              ?.dataset.title ?? ''
+          // 組の行では同じ slug のリンクが 2 つある（名前と、バリエーションのリンク）。触れているほうの題を出す
+          const link =
+            hovered?.dataset.slug === slug
+              ? hovered
+              : list.querySelector<HTMLAnchorElement>(`a[data-slug="${slug}"]`)
+          caption.textContent = link?.dataset.title ?? ''
         },
       )
       // DOM の画像を出している最中なら、次に項目が替わったときに板へ移る
@@ -380,6 +468,7 @@ const countOf = (key: string) =>
       addEventListener('focusin', loadGl)
     }
     let hideTimer = 0
+    let hovered: HTMLAnchorElement | undefined
 
     const place = (x: number, y: number) => {
       pointer.x = x
@@ -392,8 +481,9 @@ const countOf = (key: string) =>
       place(event.clientX, event.clientY),
     )
 
-    list.querySelectorAll<HTMLAnchorElement>('.link').forEach((link) => {
+    links.forEach((link) => {
       const show = () => {
+        hovered = link
         clearTimeout(hideTimer)
         useGl()
         const slug = link.dataset.slug!
@@ -428,7 +518,7 @@ const countOf = (key: string) =>
   if (!prefersReducedMotion())
     document.addEventListener('click', (event) => {
       const link = (event.target as Element).closest<HTMLAnchorElement>(
-        '.list .link, .picks .pick-link',
+        '.list .link, .list .variant-link, .picks .pick-link',
       )
       if (
         !link ||
@@ -446,7 +536,7 @@ const countOf = (key: string) =>
         : (hoverPlate() ??
           (hero && link.closest('.is-hero')
             ? plateOf(hero)
-            : plateOf(link.querySelector('.slug')!)))
+            : plateOf(link.querySelector('.slug') ?? link)))
       enterDemo(link.href, `/previews/${link.dataset.slug}.webp`, from)
     })
 </script>
@@ -545,6 +635,37 @@ const countOf = (key: string) =>
   .link:focus-visible {
     outline: 1px solid var(--color-accent);
     outline-offset: 8px;
+  }
+
+  /* 組の行のバリエーション。名前の下に、短い呼び名を小さく並べる */
+  .variants {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 16px;
+    justify-content: center;
+    padding: 0;
+    margin: 0 0 1vh;
+    list-style: none;
+  }
+
+  .variant-link {
+    display: inline-block;
+    padding: 2px 0;
+    font-size: 12px;
+    color: var(--color-muted);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid transparent;
+  }
+
+  .variant-link:hover,
+  .variant-link:focus-visible {
+    color: var(--color-accent);
+    border-bottom-color: currentcolor;
+  }
+
+  .variant-link:focus-visible {
+    outline: none;
   }
 
   @media (pointer: coarse) {
@@ -961,7 +1082,7 @@ const countOf = (key: string) =>
 
   /* 動画が名前の線と重なると読めないので、触れている名前は動画より手前に出す。
      .item は view-transition-name で重なりの範囲を作るので、.link ではなく .item に付ける */
-  .item:has(.link:hover) {
+  .item:has(.link:hover, .variant-link:hover) {
     position: relative;
     z-index: 2;
   }
