@@ -5,7 +5,7 @@ description: labobal.dev（このリポジトリ）の依存を pnpm で更新�
 
 # deps-update
 
-Dependabot の PR は作らせていません。依存はこのスキルで、手元で上げて確かめてから 1 本の PR にします。やり方は webmanab の `.claude/skills/deps-update/SKILL.md` とそろえています。
+Dependabot の version updates（`dependabot.yml`）は置いていません。ふだんの版上げはこのスキルで、手元で上げて確かめてから 1 本の PR にします。Dependabot の security updates はリポジトリの設定で有効なので、脆弱性を直す PR が届くことがあります。届いた PR を使うときも、このスキルの手順 4 と 5 の確かめを通してからマージします。やり方は webmanab の `.claude/skills/deps-update/SKILL.md` とそろえています。
 
 ## 手順
 

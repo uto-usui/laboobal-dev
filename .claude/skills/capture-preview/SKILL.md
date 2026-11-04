@@ -43,7 +43,7 @@ description: labobal.dev のデモ 1 本の、トップの一覧と webmanab の
    - jpg と webm が 480×300、webm が vp9 でおよそ 3.6 秒なら合っている
    - jpg を開いて目で見る。真っ黒、真っ白、ぼやけたまま、字が消えたところになっていないか
    - webm も開いて、動きが映っているかを見る
-   - `pnpm check:budget` を通す（previews の 1 ファイルの上限を見ている）
+   - `pnpm build && pnpm check:budget` を通す（previews の 1 ファイルの上限を見ている）。検査は dist/ を読むので、撮ったあとにビルドし直さないと前のファイルを測ってしまう
 
 4. 止めて、コミットする
 

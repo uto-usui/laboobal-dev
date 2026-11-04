@@ -62,7 +62,7 @@ description: labobal.dev のデモと、それを説明する webmanab の lab �
 
    `pnpm build` を通し、`dist/<slug>/index.html` に記事へのリンクが出ていること、`/demos.json` の `article` に入っていることを見る。
 
-4. webmanab で食い違いを見る。webmanab の手元のリポジトリで
+4. webmanab で食い違いを見る。webmanab の手元のリポジトリを最新の master にしてから（`check:demos` は新しいスクリプトなので、古いままだと無い）
 
    ```sh
    pnpm check:demos
