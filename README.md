@@ -4,7 +4,7 @@
 
 - 触る: [labobal.dev](https://labobal.dev)
 - なぜそう動くか: [webmanab の lab](https://webmanab.com/lab/) の記事。記事からデモを埋め込んでいます
-- コードと考え方のメモ: [`src/demos/<slug>/`](src/demos/)。メモは各フォルダの `notes.md` です
+- コードと考え方のメモ: [`src/demos/<slug>/`](src/demos/)。メモは各フォルダの `README.md` です
 
 コードは [MIT License](LICENSE) です。ほかの人のコードや写真、フォントを使っているところは、下の「ライセンス」にまとめています。
 
@@ -33,7 +33,7 @@
 
 写真とフォント:
 
-- Unsplash の写真: [Unsplash License](https://unsplash.com/license)。canvas-draw-image、canvas-glitch-image、canvas-shift-image、css-background-clip-text、css-embed-images-scroll-the-screen-iphone6-outline-mockup、distortion-slider-a〜d、follow-mouse-spotlight、mouse-skew、mouse-tilt、parallax-distorts-by-following-mouse、parallax-shifting-divided-background-by-mouse、particle-photo、reveal-clip、reveal-curtain、tweenmax-visual-range-animation-class で使う。写真ごとの出どころは各デモの `notes.md` にある
+- Unsplash の写真: [Unsplash License](https://unsplash.com/license)。canvas-draw-image、canvas-glitch-image、canvas-shift-image、css-background-clip-text、css-embed-images-scroll-the-screen-iphone6-outline-mockup、distortion-slider-a〜d、follow-mouse-spotlight、mouse-skew、mouse-tilt、parallax-distorts-by-following-mouse、parallax-shifting-divided-background-by-mouse、particle-photo、reveal-clip、reveal-curtain、tweenmax-visual-range-animation-class で使う。写真ごとの出どころは各デモの `README.md` にある
 - Montserrat（The Montserrat Project Authors）と Molle（Sorkin Type Co）: SIL Open Font License 1.1。[Fontsource](https://fontsource.org/) のパッケージから入れている。Montserrat は全ページ、Molle は jsfiddle から移したデモの一部と scrollmanager で使う
 
 scrollmanager の写真、three-video の動画、canvas-fake3d の絵は、このリポジトリで作ったものです。npm の依存（three、gsap など）は、それぞれのパッケージのライセンスに従います。
@@ -52,7 +52,7 @@ pnpm verify       # lint、整形、型、ビルド、E2E をまとめて
 
 ## デモを足す
 
-`src/demos/<slug>/` に `meta.ts`、`Demo.astro`、`notes.md` を置き、`src/pages/<slug>.astro` にページを置くと、`/<slug>/` のページとトップの一覧に出ます。ページの中身は次の形で、`<slug>` のところだけを替えます。
+`src/demos/<slug>/` に `meta.ts`、`Demo.astro`、`README.md` を置き、`src/pages/<slug>.astro` にページを置くと、`/<slug>/` のページとトップの一覧に出ます。ページの中身は次の形で、`<slug>` のところだけを替えます。
 
 ```astro
 ---

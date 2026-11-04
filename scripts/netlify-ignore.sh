@@ -12,7 +12,7 @@ git diff --quiet "$CACHED_COMMIT_REF" "$COMMIT_REF" -- . \
   ':(exclude)README.md' \
   ':(exclude)CLAUDE.md' \
   ':(exclude)AGENTS.md' \
-  ':(exclude)src/demos/*/notes.md' \
+  ':(exclude)src/demos/*/README.md' \
   ':(exclude).claude' \
   ':(exclude).github' \
   ':(exclude)e2e' \

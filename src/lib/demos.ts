@@ -20,6 +20,18 @@ export interface DemoMeta {
   webgpu?: boolean
   /** テストでマウスをどう動かすか */
   interaction: Interaction
+  /** もとのデモを作った日（YYYY-MM-DD、日が分からなければ YYYY-MM）。トップの「新しい順」はこれで並べる */
+  created?: string
+  /** labobal.dev に出した日（YYYY-MM-DD）。RSS と新着はこれで決める */
+  added?: string
+  /** 一文の説明。ページの description と OGP、詳細のパネルに出す */
+  description?: string
+  /** トップのピックアップに出す */
+  pick?: boolean
+  /** 何を見せるデモか（例: text、image、scroll、noise）。小文字のケバブケース */
+  tags?: string[]
+  /** 使っている技術（例: three、gsap、glsl、wgsl、canvas2d、css）。小文字のケバブケース */
+  tech?: string[]
 }
 
 export const defineDemo = (meta: DemoMeta) => meta
@@ -32,7 +44,7 @@ const metaLoaders = import.meta.glob<DemoMeta>('../demos/*/meta.ts', {
   import: 'default',
 })
 // 中身は読まない。あるかどうかだけを見る
-const notes = import.meta.glob('../demos/*/notes.md', {
+const notes = import.meta.glob('../demos/*/README.md', {
   query: '?raw',
   import: 'default',
 })
@@ -48,7 +60,7 @@ const pages = import.meta.glob<string>('../pages/*.astro', {
   import: 'default',
 })
 /** src/pages の .astro のうち、デモのページでないもの */
-const NON_DEMO_PAGES = ['index']
+const NON_DEMO_PAGES = ['index', '404']
 
 const pageTemplate = (slug: string) => `---
 import DemoLayout from '../layouts/DemoLayout.astro'
@@ -111,6 +123,24 @@ const collect = async () => {
         folder,
         `${where}: interaction が ${INTERACTIONS.join(' | ')} のどれでもない`,
       )
+    for (const key of ['created', 'added'] as const) {
+      const value = meta[key]
+      if (value !== undefined && !/^\d{4}-\d{2}(-\d{2})?$/.test(value))
+        fail(folder, `${where}: ${key} が YYYY-MM-DD か YYYY-MM でない`)
+    }
+    for (const key of ['tags', 'tech'] as const) {
+      const value = meta[key]
+      if (
+        value !== undefined &&
+        !(
+          Array.isArray(value) &&
+          value.every((v) => /^[a-z0-9]+(-[a-z0-9]+)*$/.test(v))
+        )
+      )
+        fail(folder, `${where}: ${key} が小文字のケバブケースの配列でない`)
+    }
+    if (meta.pick !== undefined && typeof meta.pick !== 'boolean')
+      fail(folder, `${where}: pick が true / false でない`)
     if (meta.slug !== folder)
       fail(folder, `${where}: slug "${meta.slug}" がフォルダ名と違う`)
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(folder))
@@ -118,7 +148,7 @@ const collect = async () => {
     if (seen.has(meta.slug)) fail(folder, `${where}: slug が重なっている`)
     seen.add(meta.slug)
     if (!noteFolders.has(folder))
-      fail(folder, `src/demos/${folder}/notes.md がない`)
+      fail(folder, `src/demos/${folder}/README.md がない`)
     if (!componentFolders.has(folder))
       fail(folder, `src/demos/${folder}/Demo.astro がない`)
     const page = pageSources.get(folder)
