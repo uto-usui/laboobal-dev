@@ -19,7 +19,7 @@
  *   どれも止める関数か dispose を返す。window や document に足した listener も外す
  * - dispose のあとに、後から来る処理（写真の読み込みの完了、await の続き）で描かない
  * - CSS は切り替えたあとも残る。バリエーションの CSS は Demo.astro の <style>（scoped）に書き、:global だけの規則や
- *   <style is:global> を書かない（ほかのバリエーションにかかる）
+ *   <style is:global> を書かない（ほかのバリエーションにかかる）。@keyframes と @property は scoped にならないので、名前に slug を付ける
  */
 
 export type Dispose = () => void
@@ -78,6 +78,9 @@ export interface Page {
 let page: Page | undefined
 
 const noop = () => {}
+
+/** 切り替えのしくみのチャンクを読めずに読み直したときの印（sessionStorage）。値はそのチャンクの URL */
+const RELOADED = 'labobal:variant-reload'
 
 /**
  * バリエーションの Demo.astro の script から呼ぶ。そのページで最初に呼ばれたときは、そのバリエーションを mount する。
@@ -158,18 +161,34 @@ export const start = (variant: Variant) => {
   const script = document
     .querySelector<HTMLTemplateElement>('#variant-switcher')
     ?.content.querySelector('script')
+  // 読んでいる間の二度押しは印で止める。disabled にすると、キーボードで押したときにフォーカスが body に落ちる
+  let busy = false
   toggle?.addEventListener('click', async () => {
-    toggle.disabled = true
+    if (busy) return
+    busy = true
+    const src = new URL(script!.getAttribute('src')!, location.href).href
     try {
-      await import(
-        /* @vite-ignore */ new URL(script!.getAttribute('src')!, location.href)
-          .href
-      )
-      await openSwitcher!(current, markup, toggle)
+      await import(/* @vite-ignore */ src)
     } catch (error) {
       console.error(error)
-      toggle.disabled = false
+      busy = false
+      // 新しいデプロイが出ると、このページが指すチャンクは消えている。読み直して新しいページにする。
+      // 同じチャンクでは 1 回だけ。印を残せない（storage が使えない）ときは読み直さない
+      try {
+        if (sessionStorage.getItem(RELOADED) !== src) {
+          sessionStorage.setItem(RELOADED, src)
+          location.reload()
+        }
+      } catch {}
+      return
     }
+    try {
+      sessionStorage.removeItem(RELOADED)
+    } catch {}
+    openSwitcher!(current, markup, toggle).catch((error) => {
+      console.error(error)
+      busy = false
+    })
   })
 }
 

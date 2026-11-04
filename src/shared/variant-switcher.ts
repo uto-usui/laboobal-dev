@@ -9,9 +9,30 @@ interface Loaded {
   markup: HTMLTemplateElement
   /** そのページの main.demo の中の script（バリエーションの Demo.astro の script） */
   entries: string[]
+  /** しくみ側の script が今のページと違う。開いている間に新しいデプロイが出た */
+  stale: boolean
 }
 
 const absolute = (url: string) => new URL(url, location.href).href
+
+/**
+ * main.demo の外の script（DemoLayout など）と、#variant-switcher の template の中の script の src。
+ * template の中は content にしか入らないので別に拾う。デプロイが替わってチャンクの名前が変わると、ここが変わる
+ */
+const frameOf = (doc: Document) => {
+  const main = doc.querySelector('main.demo')
+  const template = doc.querySelector<HTMLTemplateElement>('#variant-switcher')
+  return [
+    ...[...doc.querySelectorAll('script[src]')].filter(
+      (script) => !main?.contains(script),
+    ),
+    ...(template?.content.querySelectorAll('script[src]') ?? []),
+  ]
+    .map((script) => absolute(script.getAttribute('src')!))
+    .sort()
+    .join(' ')
+}
+const frame = frameOf(document)
 
 /** /<slug>/ の HTML を読む。main.demo がなければ、組のバリエーションのページではない */
 const loadPage = async (page: Page, slug: string): Promise<Loaded> => {
@@ -33,12 +54,18 @@ const loadPage = async (page: Page, slug: string): Promise<Loaded> => {
     return absolute(src)
   })
   if (entries.length === 0) throw new Error(`/${slug}/ に script がない`)
-  return { doc, markup: page.snapshot(main), entries }
+  return {
+    doc,
+    markup: page.snapshot(main),
+    entries,
+    stale: frameOf(doc) !== frame,
+  }
 }
 
 /**
- * 読んだページの head の CSS のうち、まだないものを足す。同じ部品の CSS は同じ中身なので、重なっても見た目は変わらない。
- * link は読み終えるまで待つ（読む前に mount すると、大きさを測り違える）
+ * 読んだページの head の CSS を足す。link はまだないものだけ足し、読み終えるまで待つ（読む前に mount すると、大きさを測り違える）。
+ * ページの <style> は DemoLayout の CSS とバリエーションの CSS がひとつになっているので、そのまま足すと切り替えるたびに
+ * DemoLayout の分が重なる。足したあと、同じ規則が前の <style> にあれば前のほうを外す。後ろの写しが効くので見え方は変わらない
  */
 const adoptStyles = async (doc: Document) => {
   const hrefs = new Set(
@@ -46,14 +73,21 @@ const adoptStyles = async (doc: Document) => {
       ...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'),
     ].map((link) => link.href),
   )
-  const texts = new Set(
-    [...document.querySelectorAll('style')].map((style) => style.textContent),
-  )
   const waits: Promise<unknown>[] = []
   for (const el of doc.head.querySelectorAll('link[rel="stylesheet"], style')) {
     if (el.tagName === 'STYLE') {
-      if (texts.has(el.textContent)) continue
-      document.head.append(document.importNode(el, true))
+      const style = document.importNode(el, true) as HTMLStyleElement
+      document.head.append(style)
+      const fresh = new Set(
+        [...style.sheet!.cssRules].map((rule) => rule.cssText),
+      )
+      for (const old of document.querySelectorAll('style')) {
+        const sheet = old.sheet
+        if (old === style || !sheet) continue
+        for (let i = sheet.cssRules.length - 1; i >= 0; i--)
+          if (fresh.has(sheet.cssRules[i].cssText)) sheet.deleteRule(i)
+        if (sheet.cssRules.length === 0) old.remove()
+      }
       continue
     }
     const href = absolute(el.getAttribute('href')!)
@@ -150,6 +184,13 @@ const open = async (
       Object.fromEntries(data.variants.map((v) => [v.label, v.slug])),
     )
     .name('バリエーション')
+  const list = select.domElement.querySelector('select')!
+  // 切り替えたこと、読み込めなかったことを読み上げで伝える。見た目には出さない
+  const status = document.createElement('p')
+  status.setAttribute('role', 'status')
+  status.style.cssText =
+    'position:fixed;width:1px;height:1px;margin:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap'
+  document.body.append(status)
   let folder: InstanceType<typeof GUI> | undefined
   const showParams = () => {
     folder?.destroy()
@@ -178,17 +219,27 @@ const open = async (
   // 選んだ順に読み終えるとは限らないので、最後に選んだものだけを mount する
   let ticket = 0
   const switchTo = async (slug: string) => {
-    if (slug === page.slug) return
+    // 今のものを選び直したときも進める。進めないと、読み込み中の前の選択が最後のものとして mount される
     const mine = ++ticket
+    if (slug === page.slug) return
     let loaded: Loaded
     try {
       loaded = await loadOnce(slug)
+      // 新しい版の script を import すると、別のモジュールになった variants.ts の start() が今の main.demo に
+      // もう 1 つ mount する。中で切り替えず、ページごと移る
+      if (loaded.stale) {
+        if (mine === ticket)
+          location.assign(`/${slug}/${location.search}${location.hash}`)
+        return
+      }
       await adoptStyles(loaded.doc)
       await importVariant(slug, loaded.entries)
     } catch (error) {
       if (mine === ticket) {
         console.error(error)
         sync()
+        status.textContent = '読み込めませんでした'
+        list.focus()
       }
       return
     }
@@ -205,6 +256,9 @@ const open = async (
     )
     showInfo(loaded.doc)
     sync()
+    status.textContent =
+      loaded.doc.querySelector('#demo-info .info-title')?.textContent?.trim() ??
+      document.title
   }
   /** パラメーターを替えたら、同じバリエーションを最初から作り直す */
   function remount() {
@@ -221,7 +275,6 @@ const open = async (
   const pressing = new Set<number>()
   // select の一覧を開いている間は、外を押しても一覧が閉じるだけにする（外を押した操作がページに届く端末があるため）。
   // 選ぶか、select から外れたら終わり
-  const list = select.domElement.querySelector('select')!
   let listing = false
   list.addEventListener('pointerdown', () => {
     listing = true
@@ -246,6 +299,18 @@ const open = async (
   const release = (event: PointerEvent) => pressing.delete(event.pointerId)
   document.addEventListener('pointerup', release, true)
   document.addEventListener('pointercancel', release, true)
+  // info のパネルと同じく Escape で閉じる。欄の中にフォーカスがあれば題に戻す（閉じた欄の中に残すと body に落ちる）。
+  // lil-gui は欄の中のキーの伝わりを止めるので capture で聞く
+  document.addEventListener(
+    'keydown',
+    (event) => {
+      if (event.key !== 'Escape' || gui._closed) return
+      const inside = gui.domElement.contains(document.activeElement)
+      gui.close()
+      if (inside) gui.$title.focus()
+    },
+    true,
+  )
   toggle.remove()
   gui.$title.focus()
 }

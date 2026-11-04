@@ -287,6 +287,8 @@ const countOf = (key: string) =>
     sort: isSortKey(params.get('sort')) ? params.get('sort')! : DEFAULT_SORT,
   } as { filter: string; sort: SortKey }
 
+  // 組の行の data-slug は絞り込みで替えるので、初めの値（default）を取っておく
+  const defaults = new Map(items.map((item) => [item, item.dataset.slug]))
   // 並べ替えの名前。組の行は組の名前（data-key）、ほかは slug
   const keyOf = (item: HTMLElement) => item.dataset.key ?? item.dataset.slug!
   const matches = (el: HTMLElement) =>
@@ -303,6 +305,17 @@ const countOf = (key: string) =>
       // 組の行は、合うバリエーションのリンクだけを出し、1 つもなければ行ごと隠す
       for (const variant of variants) variant.hidden = !matches(variant)
       item.hidden = variants.every((variant) => variant.hidden)
+      // 名前から開くのは default。絞り込みに合わなければ、合う最初のもの（動画とスマホの主役もそれに合わせる）
+      const shown = variants
+        .filter((variant) => !variant.hidden)
+        .map((variant) => variant.querySelector('a')!.dataset.slug!)
+      const slug = shown.includes(defaults.get(item)!)
+        ? defaults.get(item)!
+        : shown[0]
+      if (!slug) return
+      const link = item.querySelector<HTMLAnchorElement>('.link')!
+      item.dataset.slug = link.dataset.slug = slug
+      link.href = `/${slug}/`
     })
     // CSS の order ではなく DOM の順を替える。読み上げと Tab の順も並びに合わせるため
     const sorted = items.toSorted((a, b) =>

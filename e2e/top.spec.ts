@@ -182,6 +182,42 @@ test('組は 1 行にまとまり、名前の下に各バリエーションへ�
   }
 })
 
+test('絞り込んだときは、組の名前から絞り込みに合うバリエーションが開く', async ({
+  page,
+}) => {
+  test.skip(groups.length === 0, '組がまだない')
+  await page.goto('/')
+  const filters = await page
+    .locator('.filters [data-filter]')
+    .evaluateAll((buttons) =>
+      buttons.map((button) => (button as HTMLElement).dataset.filter!),
+    )
+  for (const filter of [...filters.filter((f) => f !== 'all'), 'all']) {
+    await page.locator(`.filters [data-filter="${filter}"]`).click()
+    for (const group of groups) {
+      const matching = group.variants.filter((slug) => {
+        const demo = demos.find((d) => d.slug === slug)!
+        return filter === 'all'
+          ? true
+          : filter === 'pick'
+            ? demo.pick
+            : demo.interaction === filter
+      })
+      if (matching.length === 0) continue
+      // 初めに開くもの（default）が合えばそのまま。合わなければ、合う最初のもの
+      const slug = matching.includes(group.default)
+        ? group.default
+        : matching[0]
+      const link = page.locator(`.list .item[data-key="${group.name}"] .link`)
+      await expect(link, `${filter} の ${group.name}`).toHaveAttribute(
+        'href',
+        `/${slug}/`,
+      )
+      await expect(link).toHaveAttribute('data-slug', slug)
+    }
+  }
+})
+
 test('一覧とピックアップのリンクは /<slug>/ へ行く', async ({ page }) => {
   await page.goto('/')
   const hrefs = await page

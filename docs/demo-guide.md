@@ -336,9 +336,10 @@ export const mount: Mount<typeof params> = (stage, { speed }) => {
 
 切り替えて足した CSS はページに残り、切り替えのたびに script を import します。そのため、次のものはビルドで落ちます。
 
-- バリエーションの Demo.astro の `<style is:global>`
-- バリエーションの Demo.astro で、行の頭が `:global(` で始まる規則。ほかのバリエーションにもかかる。`.stage :global(canvas)` のように、自分の要素の下に絞ったものはよい
+- バリエーションの Demo.astro と、組の共通の部品の `<style is:global>`
+- バリエーションの Demo.astro と組の共通の部品で、行の頭が `:global(` で始まる規則。ほかのバリエーションにもかかる。`.stage :global(canvas)` のように、自分の要素の下に絞ったものはよい
 - 組の共通の部品（`src/groups/<組>/` の `.astro`）の `<script>`。main.demo の中に出て、切り替えたときにバリエーションの script と一緒に import される。HTML のコメントの中に書いた `<script` でも落ちる。動かす処理はバリエーションの main.ts に書き、共通のコードは `src/groups/<組>/*.ts` に置いて main.ts から import する
+- 同じ組の中で、別のファイルに同じ名前の `@keyframes` や `@property` を書く。Astro はこの 2 つの名前を scoped にしないので、切り替えたあとは後から足したほうが効く。名前に slug を付ける。バリエーションの Demo.astro の `<style>`、組の共通の部品、相対パスで読む `.css` を見る。パッケージの CSS は中を見られないので、バリエーションでは読まず、組の共通の部品で読む
 
 top-level で動かすこと（上の main.ts の節）はビルドでは見ていません。E2E の 3 周で見ます。
 
