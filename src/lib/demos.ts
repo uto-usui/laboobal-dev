@@ -85,9 +85,31 @@ export interface DemoMeta {
   tags: Tag[]
   /** 使っている技術。TECH の中から選ぶ */
   tech: Tech[]
+  /** 入っている組の名前（src/groups/<group>/）。組に入れるときは variant も書く */
+  group?: string
+  /** 組の中での短い呼び名。切り替えの欄とトップの行に出る */
+  variant?: string
 }
 
 export const defineDemo = (meta: DemoMeta) => meta
+
+/**
+ * 似たデモの組（#31）。ページは今までどおりバリエーションの slug ごとにあり、その中で組のほかのバリエーションへ切り替えられる。
+ * 置き方と切り替えのしくみは src/shared/variants.ts
+ */
+export interface GroupMeta {
+  /** フォルダ名と同じ。各バリエーションの meta.ts の group に書く */
+  name: string
+  title: string
+  /** 一文の説明。トップの組の行に出る */
+  description: string
+  /** バリエーションの slug。切り替えの欄とトップの行はこの順に並ぶ */
+  variants: string[]
+  /** トップの組の名前から開くバリエーション */
+  default: string
+}
+
+export const defineGroup = (meta: GroupMeta) => meta
 
 const BATCHES: Batch[] = ['current', 'A', 'B1', 'B2', 'F6', 'new']
 const INTERACTIONS: Interaction[] = ['drag', 'hover', 'scroll', 'click', 'none']
@@ -96,13 +118,22 @@ const INTERACTIONS: Interaction[] = ['drag', 'hover', 'scroll', 'click', 'none']
 const metaLoaders = import.meta.glob<DemoMeta>('../demos/*/meta.ts', {
   import: 'default',
 })
+const groupLoaders = import.meta.glob<GroupMeta>('../groups/*/meta.ts', {
+  import: 'default',
+})
+// 組の main.ts（バリエーションの読み込み）は、ブラウザで動的 import をするファイル。ここからは中身を文字として読むだけにする
+const groupMains = import.meta.glob<string>('../groups/*/main.ts', {
+  query: '?raw',
+  import: 'default',
+})
 // 中身は読まない。あるかどうかだけを見る
 const notes = import.meta.glob('../demos/*/README.md', {
   query: '?raw',
   import: 'default',
 })
-// Demo.astro も中身は読まない。部品として glob すると、読み込まなくても全デモの CSS がこのファイルを使うページ（トップも）に付く
-const components = import.meta.glob('../demos/*/Demo.astro', {
+// Demo.astro は部品としては読まない。部品として glob すると、読み込まなくても全デモの CSS がこのファイルを使うページ（トップも）に付く。
+// 中身は組のバリエーションの決まりを見るためにだけ文字として読む
+const components = import.meta.glob<string>('../demos/*/Demo.astro', {
   query: '?raw',
   import: 'default',
 })
@@ -125,12 +156,25 @@ import meta from '../demos/${slug}/meta'
   <Demo />
 </DemoLayout>`
 
+const variantTemplate = (group: string) => `---
+// 組の共通のマークアップ（src/groups/${group}/ の部品）を使うなら、ここで import する
+---
+
+<!-- バリエーションのマークアップ。<style> は書かない。CSS は main.ts から import する -->
+
+<script>
+  import group from '../../groups/${group}/main'
+  import * as variant from './main'
+  group.start(variant)
+</script>`
+
 const folderOf = (path: string) => path.split('/').at(-2)!
 const pageSlugOf = (path: string) => path.match(/([^/]+)\.astro$/)![1]
 
 /**
  * meta.ts を集めて確かめる。決まりに合わないものがあればビルドを落とす（docs/demo-guide.md の 1 章と 2 章）。
- * 開発サーバーでは、作りかけのデモがあっても全ページが 500 にならないよう、そのデモだけ外して警告にする
+ * 組（src/groups/）も確かめる。開発サーバーでは、作りかけのデモがあっても全ページが 500 にならないよう、
+ * そのデモだけ外して警告にする
  */
 const collect = async () => {
   const metas = Object.fromEntries(
@@ -239,23 +283,145 @@ const collect = async () => {
       )
   }
 
+  // 組。切り替えのしくみが前提にしていること（src/shared/variants.ts）を、ここで確かめる
+  const groupList = await Promise.all(
+    Object.entries(groupLoaders).map(async ([path, load]) => ({
+      folder: folderOf(path),
+      group: await load(),
+    })),
+  )
+  const groupMainSources = new Map(
+    await Promise.all(
+      Object.entries(groupMains).map(
+        async ([path, load]) => [folderOf(path), await load()] as const,
+      ),
+    ),
+  )
+  const bySlug = new Map(list.filter(Boolean).map((meta) => [meta.slug, meta]))
+  const groups: GroupMeta[] = []
+  for (const { folder, group } of groupList) {
+    const where = `src/groups/${folder}/meta.ts`
+    if (!group) {
+      errors.push(`${where}: defineGroup(...) を default export していない`)
+      continue
+    }
+    const before = errors.length
+    // 組が決まりに合わなければ、その組のバリエーションをまとめて外す
+    const failGroup = (message: string) => {
+      errors.push(message)
+      for (const slug of group.variants ?? []) broken.add(slug)
+    }
+    if (group.name !== folder)
+      failGroup(`${where}: name "${group.name}" がフォルダ名と違う`)
+    for (const key of ['title', 'description'] as const)
+      if (typeof group[key] !== 'string' || !group[key].trim())
+        failGroup(`${where}: ${key} がない`)
+    const variants = Array.isArray(group.variants) ? group.variants : []
+    if (variants.length < 2)
+      failGroup(`${where}: variants に slug が 2 つ以上ない`)
+    if (new Set(variants).size !== variants.length)
+      failGroup(`${where}: variants に同じ slug が 2 回ある`)
+    if (!variants.includes(group.default))
+      failGroup(`${where}: default "${group.default}" が variants にない`)
+    for (const slug of variants) {
+      const demo = bySlug.get(slug)
+      if (!demo) failGroup(`${where}: variants の "${slug}" というデモがない`)
+      else if (demo.group !== group.name)
+        fail(
+          slug,
+          `src/demos/${slug}/meta.ts: group: '${group.name}' がない（${where} の variants にある）`,
+        )
+    }
+    // 読み込みの一覧が variants と同じか。'<slug>': () => import('../../demos/<slug>/main') の形だけを数える
+    const main = groupMainSources.get(folder)
+    if (main === undefined) failGroup(`src/groups/${folder}/main.ts がない`)
+    else {
+      const loaders = [
+        ...main.matchAll(
+          /'([^']+)':\s*\(\)\s*=>\s*import\(\s*'\.\.\/\.\.\/demos\/([^/']+)\/main'\s*\)/g,
+        ),
+      ]
+      for (const [, key, target] of loaders)
+        if (key !== target)
+          failGroup(
+            `src/groups/${folder}/main.ts: "${key}" が別のデモ "${target}" の main を読んでいる`,
+          )
+      const keys = loaders.map((m) => m[1]).toSorted()
+      if (keys.join() !== variants.toSorted().join())
+        failGroup(
+          `src/groups/${folder}/main.ts: 読み込む slug（${keys.join(', ')}）が meta.ts の variants と違う`,
+        )
+    }
+    if (errors.length === before) groups.push(group)
+  }
+  for (const meta of list) {
+    if (!meta) continue
+    const where = `src/demos/${meta.slug}/meta.ts`
+    if (meta.group === undefined) {
+      if (meta.variant !== undefined)
+        fail(meta.slug, `${where}: variant があるのに group がない`)
+      continue
+    }
+    const group = groupList.find((g) => g.group?.name === meta.group)?.group
+    if (!group) {
+      fail(
+        meta.slug,
+        `${where}: group の "${meta.group}" という組がない（src/groups/${meta.group}/meta.ts）`,
+      )
+      continue
+    }
+    if (!group.variants?.includes(meta.slug))
+      fail(
+        meta.slug,
+        `${where}: src/groups/${meta.group}/meta.ts の variants に "${meta.slug}" がない`,
+      )
+    if (typeof meta.variant !== 'string' || !meta.variant.trim())
+      fail(meta.slug, `${where}: variant（切り替えの欄に出す短い呼び名）がない`)
+    // 切り替えたときは、ほかのページから Demo.astro のマークアップだけを持ってくる。<style> は付いてこない
+    const component = await components[`../demos/${meta.slug}/Demo.astro`]?.()
+    if (component === undefined) continue
+    if (/<style[\s>]/.test(component))
+      fail(
+        meta.slug,
+        `src/demos/${meta.slug}/Demo.astro: 組のバリエーションに <style> を書かない（切り替えたときに付いてこない）。CSS は main.ts から import するか、組の共通の部品に置く`,
+      )
+    const boot = new RegExp(
+      `from '\\.\\./\\.\\./groups/${meta.group}/main'[\\s\\S]*\\.start\\(`,
+    )
+    if (!boot.test(component))
+      fail(
+        meta.slug,
+        `src/demos/${meta.slug}/Demo.astro が組の main.ts から始めていない。次の形にする:\n${variantTemplate(meta.group)}`,
+      )
+  }
+
   if (errors.length > 0) {
     const message = `デモの決まりに合わないものがある:\n- ${errors.join('\n- ')}`
     if (!import.meta.env.DEV) throw new Error(message)
     console.warn(`${message}\n（開発サーバーなので、このデモを外して続ける）`)
   }
   const folders = Object.keys(metas).map(folderOf)
-  return list
+  const demos = list
     .filter((_, i) => !broken.has(folders[i]))
     .sort(
       (a, b) =>
         BATCHES.indexOf(a.batch) - BATCHES.indexOf(b.batch) ||
         a.slug.localeCompare(b.slug),
     )
+  return {
+    demos,
+    groups: groups
+      .filter((group) => group.variants.every((slug) => !broken.has(slug)))
+      .sort((a, b) => a.name.localeCompare(b.name)),
+  }
 }
 
-let cache: Promise<DemoMeta[]> | undefined
+let cache: ReturnType<typeof collect> | undefined
+const collected = () =>
+  import.meta.env.DEV ? collect() : (cache ??= collect())
 
 /** 全デモの一覧。batch の順、その中は slug の順。開発中は meta.ts の書き換えを拾うため毎回集め直す */
-export const getDemos = () =>
-  import.meta.env.DEV ? collect() : (cache ??= collect())
+export const getDemos = async () => (await collected()).demos
+
+/** 組の一覧。名前の順 */
+export const getGroups = async () => (await collected()).groups
