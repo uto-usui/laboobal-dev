@@ -33,3 +33,7 @@ three の `ShaderMaterial` で、画面いっぱいの板を 1 枚描く。ノ�
 
 - laboobal/docs/canvas/glitchImage.md（`Canvas/GlitchImage`、`GlitchEffectMesh`）
 - [ykob/sketch-threejs](https://github.com/ykob/sketch-threejs) の glitch。旧デモのシェーダーはこれをもとに、強さの周期や揺れの量を変えたもの
+
+## クレジット
+
+- ykob/sketch-threejs: https://github.com/ykob/sketch-threejs （MIT License）

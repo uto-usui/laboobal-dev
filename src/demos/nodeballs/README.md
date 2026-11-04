@@ -37,3 +37,7 @@ Canvas 2D で描いている。毎フレーム画面を消し、奥の層から�
 
 - laboobal-dev の `assets/js/nodeBall/nodeBall.ts`、`Particle.ts`、`pages/nodeBalls/index.vue`（タグ `nuxt2-final`）
 - もとは Misaki Nakano さんの CodePen: https://codepen.io/mnmxmx/pen/mEVxeg
+
+## クレジット
+
+- CodePen mnmxmx/mEVxeg: https://codepen.io/mnmxmx/pen/mEVxeg （CodePen の公開 Pen なので MIT License）

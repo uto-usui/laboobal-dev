@@ -35,3 +35,7 @@ three の最新版。地面は `MeshPhongMaterial`、20 面体は `MeshStandardM
 
 - laboobal/docs/canvas/three/video.md（`Three/Video`）
 - [josdirksen/learning-threejs-third](https://github.com/josdirksen/learning-threejs-third)（『Learning Three.js』第 3 版のサンプル）。カメラ、地面、光の組み方はこれのもの
+
+## クレジット
+
+- learning-threejs: https://github.com/josdirksen/learning-threejs-third （ライセンスの表記がない）
