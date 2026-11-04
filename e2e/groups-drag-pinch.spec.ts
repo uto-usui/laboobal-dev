@@ -100,6 +100,9 @@ test('drag-pinch を iframe の中で切り替えても、縦になぞるとス�
   await expect(frame.locator('.variant-gui select')).toBeVisible()
 
   for (const slug of [...group.variants.slice(1), first]) {
+    // 前の周でデモを触ったので、設定の欄は閉じている（欄の外を押すと閉じる）。開き直す
+    if (await frame.locator('.variant-gui.lil-closed').count())
+      await frame.locator('.variant-gui > .lil-title').click()
     await frame.locator('.variant-gui select').selectOption({
       label: labelOf(slug),
     })
@@ -137,6 +140,8 @@ test('drag-pinch を iframe の中で切り替えても、縦になぞるとス�
     await touch('touchEnd')
     await expect.poll(touchAction, slug).toBe('none')
     await expect(frame.locator('.demo-hint-touch'), slug).toBeHidden()
+    // 欄の外を触ったので、設定の欄は閉じている（触った操作はデモにも届いている）
+    await expect(frame.locator('.variant-gui'), slug).toHaveClass(/lil-closed/)
     const still = await styles()
     const before = await scrollY()
     await touch('touchStart', X, 450)
