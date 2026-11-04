@@ -27,7 +27,7 @@ const FORMATS = {
 }
 // 動画に映さないもの。デモのページに UI を足したら、ここに足す。
 // ページの側で data-capture-hide を付けた要素も隠す
-const HIDE = ['.links', '.lil-gui', '[data-capture-hide]']
+const HIDE = ['.links', '.info', '.lil-gui', '[data-capture-hide]']
 // 読み込んで動き出すまで待つ長さ（ミリ秒）。デモごとに変えたいときは WARMUP_BY_SLUG に書く
 const WARMUP = 1500
 const WARMUP_BY_SLUG = { 'particle-photo': 2600, 'reveal-clip': 2600 }

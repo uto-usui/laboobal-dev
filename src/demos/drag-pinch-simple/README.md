@@ -20,7 +20,7 @@ requestAnimationFrame のループで、毎フレーム `damp` で位置を近�
 
 GSAP の Draggable と InertiaPlugin は使っていない。Draggable は「つかんだ要素が指と一緒に動き、離した位置に残る」前提の道具で、離すと戻るこの動きとは合わない。InertiaPlugin は離したときの勢いで滑らせるためのもので、これも違う。このデモに要るのは押した点からの移動量だけなので、Pointer Events で数行で書ける。
 
-押した点からの移動量は `src/shared/a/pull.ts` にまとめ、drag の 4 本で使い回している。`setPointerCapture` で、指が画面の外に出ても離すまで追い続ける。`touch-action: none` で、スマホで引っぱったときにページがスクロールしないようにしている。
+押した点からの移動量は `src/shared/a/pull.ts` にまとめ、drag の 4 本で使い回している。`setPointerCapture` で、指が画面の外に出ても離すまで追い続ける。スマホでは `touch-action: pan-y` にし、`touchGate`（`src/shared/touch.ts`）で切り替えている。横に引っぱり始めたらデモが受け取り、縦になぞったときはページがスクロールする（記事に埋め込んだとき、デモの上でも記事を読み進められるように）。タップしてからなら縦にも引っぱれる。
 
 ## もとのデモから変えたこと
 

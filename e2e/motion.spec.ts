@@ -1,7 +1,7 @@
 import { devices, expect, test, type Page } from '@playwright/test'
 
 /**
- * 動きを減らす設定（src/shared/motion.ts の決まり）と、指でのスクロールを奪わないこと（src/shared/touch.ts）を見る
+ * 動きを減らす設定（docs/demo-guide.md の 5 章）と、指でのスクロールを奪わないこと（src/shared/touch.ts）を見る
  */
 
 // ひとりでに動き続けるデモ。動きを減らす設定では止まった絵になる

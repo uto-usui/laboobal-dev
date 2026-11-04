@@ -1,6 +1,6 @@
 # デモを出す流れ
 
-新しいデモを作ってから、本番（labobal.dev）に出し、lab の記事からつなぐまでの順番です。デモの作り方そのものは、ルートの [README.md](../README.md) の「デモを足す」にあります。
+新しいデモを作ってから、本番（labobal.dev）に出し、lab の記事からつなぐまでの順番です。デモの作り方そのものは [demo-guide.md](demo-guide.md) にあります。エージェントは `.claude/skills/new-demo/` と `.claude/skills/check-demo/` を使います。
 
 ## 1. ブランチを切る
 
@@ -13,7 +13,7 @@ master に入ると、そのまま本番のビルドが動きます。master に
 
 ## 2. 作って確かめる
 
-- meta の `added` に、本番に出す日（YYYY-MM-DD）を入れる。トップの新着と RSS はこの日付で決まる。もとのデモがあるなら、それを作った日を `created` に入れる
+- meta の `added` に、本番に出す日（YYYY-MM-DD）を入れる。トップの新着、RSS（`/rss.xml`）、更新履歴（`/log/`）はこの日付で決まる。`created` にはもとのデモを作った日（新しく作ったなら `added` と同じ日）を入れる
 - 手元のチェックをまとめて通す。ポートはほかの作業とぶつからないものにする
 
   ```sh
@@ -52,7 +52,14 @@ curl -sI https://labobal.dev/<slug>/ | grep -i content-security-policy
 - ページとプレビューが 200、`/demos.json` に slug が 1 件ある、`frame-ancestors` のヘッダーが付いている、なら出ています
 - ページを足さない変更（デモの直しなど）は、手元の master のビルドと本番で、読んでいる JS の名前が同じかで見ます。`curl -s https://labobal.dev/<slug>/ | grep -o '/_astro/[^"]*\.js'` と `grep -o '/_astro/[^"]*\.js' dist/<slug>/index.html` を比べる
 - ブラウザで本番のページとトップを開き、デモが描かれていること、トップの一覧に出ていること、触れたときにプレビューの動画が出ることを見る
-- RSS と更新履歴に新しいデモが出ていることを見る（meta の `added` から作る）
+- RSS と更新履歴に新しいデモが出ていることを見る。どちらも meta の `added` の新しい順で、RSS は新しい 30 本だけを出す
+
+  ```sh
+  curl -s https://labobal.dev/rss.xml | grep -c '<link>https://labobal.dev/<slug>/</link>'   # 1 なら出ている
+  curl -s https://labobal.dev/log/ | grep -c 'href="/<slug>/"'                               # 1 なら出ている
+  ```
+
+  RSS に出ないときは、`added` が今日の日付になっているか（古い日付だと 30 本の外に落ちる）を見る
 
 ## 7. lab の記事からつなぐ
 
