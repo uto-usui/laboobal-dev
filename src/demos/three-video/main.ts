@@ -74,8 +74,16 @@ if (renderer) {
   onReducedMotion((value) => {
     reduced = value
     // 音のない動画は自動で再生できる。止められても、形と影は描けるので握りつぶす
-    if (reduced) video.pause()
-    else video.play().catch(() => {})
+    if (!reduced) video.play().catch(() => {})
+    // iOS の Safari は再生しないと最初のコマを読まないので、まだ読めていなければ一度再生してすぐ止める
+    else if (video.readyState < video.HAVE_CURRENT_DATA)
+      video.play().then(
+        () => {
+          if (reduced) video.pause()
+        },
+        () => {},
+      )
+    else video.pause()
   })
   // 再生しないままでも最初のコマを貼る。three は新しいコマが出るのを待って貼り直すので、止まった動画では貼られない
   const showFrame = () => (texture.needsUpdate = true)
