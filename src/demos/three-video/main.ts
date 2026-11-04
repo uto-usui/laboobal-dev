@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { loop, onResize } from '../../shared/dom'
 import { createGlStage } from '../../shared/gl'
 import { onReducedMotion } from '../../shared/motion'
+import { touchGate } from '../../shared/touch'
 
 const stage = document.querySelector<HTMLElement>('.video-demo')!
 const canvas = stage.querySelector<HTMLCanvasElement>('canvas')!
@@ -21,6 +22,8 @@ controls.enableZoom = false
 controls.enablePan = false
 // 地面の下へ回り込まない
 controls.maxPolarAngle = Math.PI * 0.56
+// OrbitControls は canvas を touch-action: none にする。記事を読む人の縦のスクロールを奪わないよう、タップするまでは pan-y にする
+touchGate(canvas)
 
 const ground = new THREE.Mesh(
   new THREE.PlaneGeometry(1000, 1000),

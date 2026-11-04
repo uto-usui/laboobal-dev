@@ -1,6 +1,7 @@
 import GUI from 'lil-gui'
 import { loop, onResize, prefersReducedMotion } from '../../shared/dom'
 import { onReducedMotion } from '../../shared/motion'
+import { touchGate } from '../../shared/touch'
 import { washCount, type Mode } from './assign'
 import {
   createRenderer,
@@ -301,6 +302,8 @@ const toWorld = (cx: number, cy: number): [number, number] => {
 }
 
 const bindInput = () => {
+  // 記事を読む人の縦のスクロールを奪わない。タップするまでは pan-y（Demo.astro の none を上書きする）
+  touchGate(canvas)
   canvas.addEventListener('pointermove', (e) => {
     mouse = toWorld(e.clientX, e.clientY)
   })
