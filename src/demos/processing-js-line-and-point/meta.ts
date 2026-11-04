@@ -10,7 +10,7 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
-  created: '2016-08-29',
+  created: '2016-08-30',
   added: '2026-11-04',
   description:
     '点と直線を描き、太い線では端の形を丸・切りっぱなし・伸ばすの 3 通りで見せる。',

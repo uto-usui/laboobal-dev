@@ -10,7 +10,7 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
-  created: '2016-08-31',
+  created: '2016-09-01',
   added: '2026-11-04',
   description:
     '真ん中から出た 3 つの点が、毎フレーム上下左右のどれかへ 1 歩ずつ進み、通った跡を残す。',

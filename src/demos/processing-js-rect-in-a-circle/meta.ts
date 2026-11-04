@@ -10,7 +10,7 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
-  created: '2016-08-30',
+  created: '2016-08-31',
   added: '2026-11-04',
   description:
     '正方形を描くたびに座標を進めて少し回し、20 個の正方形を輪のように並べる。',

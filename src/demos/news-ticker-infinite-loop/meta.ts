@@ -12,7 +12,7 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
-  created: '2017-09-28',
+  created: '2017-09-29',
   added: '2026-11-04',
   description:
     'お知らせの見出しが右から左へ流れ続け、全部が流れきると右の端からまた入ってくる。',

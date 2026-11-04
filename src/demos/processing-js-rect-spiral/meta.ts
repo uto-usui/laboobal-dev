@@ -10,7 +10,7 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
-  created: '2016-08-30',
+  created: '2016-08-31',
   added: '2026-11-04',
   description:
     '真ん中から測る角度と距離を少しずつ増やし、20 個の正方形を渦巻きに並べる。',
