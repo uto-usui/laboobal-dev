@@ -16,7 +16,7 @@ export default defineDemo({
   webgl: false,
   interaction: 'none',
   created: '2019-05-31',
-  added: '2026-11-01',
+  added: '2019-05-31',
   description:
     '大きさと色の違う玉が漂い、近い玉どうしが線で結ばれる。ぶつかると弾き合う。',
   tags: ['particles', 'physics'],
