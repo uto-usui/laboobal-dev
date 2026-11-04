@@ -30,7 +30,7 @@ const draw = (ctx: CanvasRenderingContext2D) => {
   ctx.fill()
 }
 
-const ctx = fiddleCanvas(
+const { ctx } = fiddleCanvas(
   document.querySelector<HTMLCanvasElement>('[data-fiddle-canvas]')!,
   SIZE,
   SIZE,

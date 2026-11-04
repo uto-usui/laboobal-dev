@@ -19,6 +19,11 @@ interface Options {
   leave?: 'center' | 'stay'
 }
 
+/** trackPointer の戻り値。dispose で見張りを外す */
+export interface TrackedPointer extends Pointer {
+  dispose: () => void
+}
+
 /**
  * el の中でのポインターの位置。動かす前は真ん中にしておく。
  * 大きさが変わったときに、まだ動かしていなければ真ん中に置き直す
@@ -26,15 +31,15 @@ interface Options {
 export const trackPointer = (
   el: HTMLElement,
   { units = 'px', touch = 'follow', leave = 'stay' }: Options = {},
-): Pointer => {
+): TrackedPointer => {
   const center = () =>
     units === 'px'
       ? { x: el.clientWidth / 2, y: el.clientHeight / 2 }
       : { x: 0, y: 0 }
-  const pointer: Pointer = { ...center(), inside: false }
+  const pointer = { ...center(), inside: false } as TrackedPointer
   let moved = false
 
-  el.addEventListener('pointermove', (e) => {
+  const onMove = (e: PointerEvent) => {
     if (touch === 'ignore' && isHoverless()) return
     const rect = el.getBoundingClientRect()
     const x = e.clientX - rect.left
@@ -43,16 +48,25 @@ export const trackPointer = (
     pointer.y = units === 'px' ? y : (y / rect.height) * 2 - 1
     pointer.inside = true
     moved = true
-  })
-  el.addEventListener('pointerleave', () => {
+  }
+  const onLeave = () => {
     pointer.inside = false
     if (leave === 'stay') return
     Object.assign(pointer, center())
     moved = false
-  })
-  new ResizeObserver(() => {
+  }
+  el.addEventListener('pointermove', onMove)
+  el.addEventListener('pointerleave', onLeave)
+  const observer = new ResizeObserver(() => {
     if (!moved) Object.assign(pointer, center())
-  }).observe(el)
+  })
+  observer.observe(el)
+
+  pointer.dispose = () => {
+    el.removeEventListener('pointermove', onMove)
+    el.removeEventListener('pointerleave', onLeave)
+    observer.disconnect()
+  }
   return pointer
 }
 

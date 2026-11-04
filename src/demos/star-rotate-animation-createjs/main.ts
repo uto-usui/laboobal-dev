@@ -52,7 +52,7 @@ const draw = (ctx: CanvasRenderingContext2D) => {
   ctx.restore()
 }
 
-const ctx = fiddleCanvas(
+const { ctx } = fiddleCanvas(
   document.querySelector<HTMLCanvasElement>('[data-fiddle-canvas]')!,
   WIDTH,
   HEIGHT,

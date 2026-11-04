@@ -19,13 +19,18 @@ onRunningChange(sync)
 
 /**
  * ひとりでに動き続ける tween や timeline を渡す。動きを減らす設定の間は、still（1 回分の進み具合 0〜1）の姿で止める。
- * 設定が戻ったらそこから動かす（決まりは docs/demo-guide.md の 5 章）
+ * 設定が戻ったらそこから動かす（決まりは docs/demo-guide.md の 5 章）。戻り値で、設定の見張りを外して animation を kill する
  */
-export const autoplay = (animation: gsap.core.Animation, still = 0) =>
-  onReducedMotion((reduced) => {
+export const autoplay = (animation: gsap.core.Animation, still = 0) => {
+  const off = onReducedMotion((reduced) => {
     if (reduced) animation.progress(still).pause()
     else animation.play()
   })
+  return () => {
+    off()
+    animation.kill()
+  }
+}
 
 export { gsap }
 export default gsap

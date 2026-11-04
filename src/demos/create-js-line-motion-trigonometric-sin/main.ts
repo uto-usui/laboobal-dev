@@ -23,7 +23,7 @@ const draw = (ctx: CanvasRenderingContext2D) => {
   ctx.stroke()
 }
 
-const ctx = fiddleCanvas(
+const { ctx } = fiddleCanvas(
   document.querySelector<HTMLCanvasElement>('[data-fiddle-canvas]')!,
   SIZE,
   SIZE,

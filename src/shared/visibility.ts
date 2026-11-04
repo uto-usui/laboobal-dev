@@ -47,11 +47,14 @@ export const setPaused = (reason: Reason, paused: boolean) => {
 
 /**
  * 画面に入ってタブが表に出ているときに 1 回だけ呼ぶ。読み込んだ時点で見えていれば、最初の判定のあとすぐに呼ぶ。
- * 1 回だけ再生するデモが、画面の外で再生を終えてしまわないようにする
+ * 1 回だけ再生するデモが、画面の外で再生を終えてしまわないようにする。戻り値で、まだ呼んでいなければ取りやめる
  */
 export const whenVisible = (callback: () => void) => {
   visibleListeners.add(callback)
   flushVisible()
+  return () => {
+    visibleListeners.delete(callback)
+  }
 }
 
 const watch = (el: Element) => {
@@ -66,6 +69,7 @@ const watch = (el: Element) => {
   })
 }
 
-// デモのページでだけ見張る。トップのページが dom.ts 経由で読んでも何もしない
+// デモのページでだけ見張る。トップのページが dom.ts 経由で読んでも何もしない。
+// main.demo は組の中でバリエーションを切り替えても入れ替えないので、ページを閉じるまで見張り続ける
 const main = document.querySelector('main.demo')
 if (main) watch(main)

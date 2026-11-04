@@ -33,7 +33,7 @@ interface Options {
 
 /**
  * 2 枚の写真を、模様でゆがませながら入れ替えるスライダー。
- * 描くのは切り替えている間と、大きさが変わったときだけ
+ * 描くのは切り替えている間と、大きさが変わったときだけ。戻り値で止めて片付ける（canvas も外す）
  */
 export const createDistortionSlider = ({
   root,
@@ -45,12 +45,16 @@ export const createDistortionSlider = ({
 }: Options) => {
   const canvas = document.createElement('canvas')
   root.prepend(canvas)
-  const render = () => renderer?.render(scene, camera)
+  let disposed = false
+  // 写真の読み込みは片付けたあとに終わることがある。片付けた renderer では描かない
+  const render = () => {
+    if (!disposed) renderer?.render(scene, camera)
+  }
   const renderer = createGlStage(canvas, {
     antialias: false,
     onRestore: render,
   })
-  if (!renderer) return
+  if (!renderer) return () => canvas.remove()
   renderer.setClearColor(0x111111)
 
   const loader = new THREE.TextureLoader()
@@ -90,7 +94,7 @@ export const createDistortionSlider = ({
   }
   setPair()
 
-  onResize(root, ({ width, height }) => {
+  const offResize = onResize(root, ({ width, height }) => {
     size = { width, height }
     renderer.setSize(width, height, false)
     setPair()
@@ -109,10 +113,11 @@ export const createDistortionSlider = ({
     gsap.set(text, { opacity: 0.25 })
     gsap.set(line, { scaleX: 0, transformOrigin: 'left' })
   })
+  let bulletTimeline: gsap.core.Timeline | undefined
   const moveBullet = (from: number, to: number) => {
     const a = parts(bullets[from])
     const b = parts(bullets[to])
-    gsap
+    bulletTimeline = gsap
       .timeline()
       .to(a.text, { opacity: 0.25, duration: 1, ease: 'none' }, 0)
       .set(a.line, { transformOrigin: 'right' }, 0)
@@ -123,11 +128,12 @@ export const createDistortionSlider = ({
   }
 
   let animating = false
+  let progressTween: gsap.core.Tween | undefined
   const go = () => {
     if (animating) return
     animating = true
     moveBullet(current, next())
-    gsap.to(uniforms.uProgress, {
+    progressTween = gsap.to(uniforms.uProgress, {
       value: 1,
       duration,
       ease: 'expo.inOut',
@@ -152,8 +158,22 @@ export const createDistortionSlider = ({
     timer = gsap.delayedCall(interval, autoplay)
     go()
   }
-  onReducedMotion((reduced) => {
+  const offMotion = onReducedMotion((reduced) => {
     timer?.kill()
     timer = reduced ? undefined : gsap.delayedCall(interval, autoplay)
   })
+
+  return () => {
+    disposed = true
+    offMotion()
+    offResize()
+    root.removeEventListener('click', go)
+    timer?.kill()
+    progressTween?.kill()
+    bulletTimeline?.kill()
+    for (const texture of textures) texture.dispose()
+    material.dispose()
+    canvas.remove()
+    renderer.dispose()
+  }
 }
