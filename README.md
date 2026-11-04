@@ -8,7 +8,7 @@
 
 コードは [MIT License](LICENSE) です。ほかの人のコードや写真、フォントを使っているところは、下の「ライセンス」にまとめています。
 
-2026-11-02 に Astro で作り直し、[laboobal](https://github.com/uto-usui/laboobal) のデモもここに移しました（[webmanab#53](https://github.com/uto-usui/webmanab/issues/53)）。まわりのリポジトリとの関係は [docs/context.md](docs/context.md)、作り直しの進め方は [docs/plan.md](docs/plan.md) にあります。作り直す前の Nuxt 2 のコードはタグ `nuxt2-final` にあります。
+2026-11-02 に Astro で作り直し、[laboobal](https://github.com/uto-usui/laboobal) のデモもここに移しました（[webmanab#53](https://github.com/uto-usui/webmanab/issues/53)）。まわりのリポジトリとの関係は [docs/context.md](docs/context.md)、作り直しの記録は [docs/history/](docs/history/) にあります。作り直す前の Nuxt 2 のコードはタグ `nuxt2-final` にあります。
 
 ## ライセンス
 
@@ -47,8 +47,17 @@ pnpm install
 pnpm dev          # localhost:4321
 pnpm build        # dist/ に静的な HTML を出す
 pnpm test:e2e     # dist/ を開いて全デモを確かめる。先に pnpm build が要る
-pnpm verify       # lint、整形、型、ビルド、E2E をまとめて
+pnpm check:budget # ビルドの結果の大きさが上限に収まっているか。先に pnpm build が要る
+pnpm verify       # lint、整形、型、ビルド、大きさ、E2E をまとめて
 ```
+
+## 文書
+
+- [docs/release.md](docs/release.md): デモを出す流れ（ブランチ、確かめ方、プレビュー、PR、本番の確認、lab の記事とのつなぎ、SNS 用の動画）
+- [docs/context.md](docs/context.md): まわりのリポジトリとの関係、決まっていること、今の状態
+- [docs/ideas.md](docs/ideas.md): デモをまたいだ考え方
+- [docs/history/](docs/history/): 作り直しのときの計画と、下げたデモの記録
+- [.claude/skills/](.claude/skills/): コーディングエージェント向けの手順（プレビューの撮り直し、lab の記事とのつなぎ、依存の更新）
 
 ## デモを足す
 
@@ -66,4 +75,4 @@ import meta from '../demos/<slug>/meta'
 </DemoLayout>
 ```
 
-ページを 1 つの動的ルート（`[slug].astro`）にまとめないのは、まとめると全デモの CSS がどのページにも付くためです。ページがない、別のデモを読んでいる、デモのないページがある、のどれかがあるとビルドが落ち、置くべき中身がエラーに出ます。そのほかの共有のファイルは書き換えません。決まりは [docs/plan.md](docs/plan.md) の 5 章、見本は `src/demos/marquee/` と `src/pages/marquee.astro` です。
+ページを 1 つの動的ルート（`[slug].astro`）にまとめないのは、まとめると全デモの CSS がどのページにも付くためです。ページがない、別のデモを読んでいる、デモのないページがある、のどれかがあるとビルドが落ち、置くべき中身がエラーに出ます。そのほかの共有のファイルは書き換えません。決まりは [作り直しの計画](docs/history/rebuild-plan.md) の 5 章、見本は `src/demos/marquee/` と `src/pages/marquee.astro` です。

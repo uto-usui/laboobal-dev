@@ -1,6 +1,8 @@
 # labobal.dev 作り直しの計画
 
-labobal.dev を Astro で作り直し、laboobal と jsfiddle のデモを移す作業の進め方です。前提（まわりのリポジトリとの関係、決まっていること、今の状態）は [context.md](context.md) にあります。[webmanab#53](https://github.com/uto-usui/webmanab/issues/53) と食い違ったら #53 に従います。2026-11-01 時点の計画です。
+> 2026-11 の作り直し（#10）のときの計画で、記録として残しています。書いてあるパスはそのときのもので、そのあと `docs/plan.md` はこのファイルに、`docs/dropped/` は [`docs/history/dropped/`](dropped/) に移り、デモのメモは `notes.md` から `README.md` に名前が変わりました。jsfiddle の残りのデモは [#22](https://github.com/uto-usui/laboobal-dev/issues/22) で進めていて、移すときの考え方（1 章と 3 章）は今も使います。
+
+labobal.dev を Astro で作り直し、laboobal と jsfiddle のデモを移す作業の進め方です。前提（まわりのリポジトリとの関係、決まっていること、今の状態）は [context.md](../context.md) にあります。[webmanab#53](https://github.com/uto-usui/webmanab/issues/53) と食い違ったら #53 に従います。2026-11-01 時点の計画です。
 
 ## 1. 作り直しの考え方
 

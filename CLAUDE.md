@@ -6,6 +6,13 @@
 
 作業を始める前に [docs/context.md](docs/context.md) を読んでください。まわりのリポジトリ（webmanab、作者の vault、laboobal）との関係、決まっていること、今の状態、作業の流れ、参考にするものをまとめています。
 
+## 文書とスキル
+
+- [docs/release.md](docs/release.md): デモを作ってから本番に出し、lab の記事からつなぐまでの順番
+- [docs/ideas.md](docs/ideas.md): デモをまたいだ考え方
+- [docs/history/](docs/history/): 作り直し（2026-11）の計画と、下げたデモの記録。今の決まりではない
+- スキル（`.claude/skills/`）: `capture-preview`（プレビューを 1 本撮り直す）、`link-lab-article`（デモと lab の記事をつなぐ）、`deps-update`（依存の更新）
+
 ## 守ること
 
 - 公開リポジトリです。vault の名前や中身、claude.ai の URL（`Claude-Session:` 行を含む）、手元の絶対パス、勤務先のこと、アカウント ID やトークンを書かない（docs/context.md の 7 章）

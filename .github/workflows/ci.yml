@@ -7,7 +7,7 @@ on:
       - 'CLAUDE.md'
       - 'AGENTS.md'
       - '.claude/**'
-      - 'src/demos/*/notes.md'
+      - 'src/demos/*/README.md'
   push:
     branches: [master]
     paths-ignore:
@@ -16,7 +16,7 @@ on:
       - 'CLAUDE.md'
       - 'AGENTS.md'
       - '.claude/**'
-      - 'src/demos/*/notes.md'
+      - 'src/demos/*/README.md'
 
 permissions:
   contents: read
@@ -36,6 +36,7 @@ jobs:
       - run: pnpm format:check
       - run: pnpm check
       - run: pnpm build
+      - run: pnpm check:budget
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e
       - run: pnpm audit --audit-level high
