@@ -39,7 +39,7 @@ test('トップの OGP', async ({ page }) => {
   expect(await meta(page, 'og:title')).toBe('labobal.dev')
   expect(await meta(page, 'og:url')).toBe('https://labobal.dev/')
   expect(await meta(page, 'og:type')).toBe('website')
-  expect(await meta(page, 'og:image')).toBe('https://labobal.dev/og.png')
+  expect(await meta(page, 'og:image')).toBe('https://labobal.dev/og.jpg')
   expect(await meta(page, 'og:image:width')).toBe('1200')
   expect(await meta(page, 'og:image:height')).toBe('630')
   expect(await meta(page, 'twitter:card')).toBe('summary_large_image')
@@ -48,7 +48,7 @@ test('トップの OGP', async ({ page }) => {
     page.locator('link[rel="alternate"][type="application/rss+xml"]'),
   ).toHaveAttribute('href', 'https://labobal.dev/rss.xml')
   // og:image がちゃんと配られているか
-  expect((await page.request.get('/og.png')).status()).toBe(200)
+  expect((await page.request.get('/og.jpg')).status()).toBe(200)
 })
 
 test('デモのページの OGP', async ({ page }) => {

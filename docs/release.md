@@ -76,3 +76,11 @@ node scripts/capture-social.mjs <slug> --seconds 8 --formats vertical
 ```
 
 `social/` はコミットしません。
+
+## トップの見た目を変えたとき
+
+トップの OG 画像（`public/og.jpg`、1200×630）は、トップを撮ったものです。ピックアップや並びの見た目を変えたら撮り直します。
+
+- `pnpm build && pnpm preview` を立て、ブラウザの大きさを 1200×630、DPR 1 にしてトップを開く
+- ピックアップの帯が上の端に来るところまでスクロールして撮る（2026-11-04 は `scrollTo(0, 205)`）。絞り込みの件数（all 90 など）は、デモが増えると古くなるので写さない
+- JPEG（画質 82 ほど）で `public/og.jpg` に置く
