@@ -16,4 +16,6 @@ export default defineDemo({
     '灰色の箱が左右に揺れながら奥と手前を行き来し、上から見ると円を描くように回り続ける。',
   tags: ['3d', 'trigonometry'],
   tech: ['gsap'],
+  group: 'trigonometry',
+  variant: '奥行きのある円',
 })

@@ -27,7 +27,7 @@ three の `ShaderMaterial` で、画面いっぱいの板を 1 枚描く。ノ�
 
 - 旧デモは写真をいったん別の描画先に描き、それを読み直して崩していた。1 回で描けるので、写真を直に読むようにした（画面に貼るときの切り取りは、シェーダーの中で読むたびにする）
 - 写真は旧デモと同じ Unsplash の写真（photo-1547962041-6d2d7c4bdf6e）を落として置いた
-- webmanab の lab/noise-glitch とは別物として残した。あちらは DOM の文字を CSS の transform で震わせるもの（codrops の glitchFx）で、こちらは写真を GLSL で崩すもの
+- 文字が震えるグリッチ（webmanab の lab の記事。デモは 2026-11-04 に下げた。docs/history/dropped/B3.md）とは別物として残した。あちらは DOM の文字を CSS の transform で震わせるもの（codrops の glitchFx）で、こちらは写真を GLSL で崩すもの
 
 ## もと
 

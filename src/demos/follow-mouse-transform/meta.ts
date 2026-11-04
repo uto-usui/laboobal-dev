@@ -16,4 +16,6 @@ export default defineDemo({
     'マウスを追う玉が、置いていかれた分だけふくらみ、追いつくと元の大きさに戻る。',
   tags: ['cursor', 'physics'],
   tech: ['js'],
+  group: 'follow-mouse',
+  variant: 'ふくらむ',
 })

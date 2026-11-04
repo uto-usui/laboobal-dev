@@ -17,4 +17,6 @@ export default defineDemo({
     '丸が 1 つ、位置・奥行き・色をそれぞれ別の sin で揺らされて、画面の中を漂う。',
   tags: ['3d', 'random', 'trigonometry'],
   tech: ['js'],
+  group: 'trigonometry',
+  variant: 'ふわふわ漂う',
 })

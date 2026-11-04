@@ -16,4 +16,6 @@ export default defineDemo({
     '写真が横に少しずれながら重なり、次の写真へ入れ替わる。クリックで切り替わる。',
   tags: ['slider', 'image', 'distortion'],
   tech: ['three', 'glsl', 'gsap'],
+  group: 'distortion-slider',
+  variant: 'ずらし',
 })

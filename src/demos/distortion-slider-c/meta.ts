@@ -16,4 +16,6 @@ export default defineDemo({
     '写真が横に引き裂かれ、流れる筋の中から次の写真が現れる。クリックで切り替わる。',
   tags: ['slider', 'image', 'distortion', 'noise'],
   tech: ['three', 'glsl', 'gsap'],
+  group: 'distortion-slider',
+  variant: '横',
 })

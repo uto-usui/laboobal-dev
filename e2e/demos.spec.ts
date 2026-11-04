@@ -75,8 +75,8 @@ const isBlank = async (page: Page, target: Locator) => {
   const jpeg = await target.screenshot({
     type: 'jpeg',
     quality: 60,
-    // 隅のリンクが重なると 1 色にならないので、写すときだけ隠す
-    style: '.links { visibility: hidden }',
+    // 隅のリンクや組の切り替えが重なると 1 色にならないので、写すときだけ隠す
+    style: '.links, .variant-toggle, .lil-gui { visibility: hidden }',
   })
   return page.evaluate(async (base64) => {
     const blob = await (await fetch(`data:image/jpeg;base64,${base64}`)).blob()
@@ -151,8 +151,12 @@ test.beforeEach(async ({ page }) => {
 test('トップに全デモが並ぶ', async ({ page }) => {
   const errors = watchErrors(page)
   await page.goto('/')
+  // 組のバリエーションは、組の名前（トップから開くもの）とバリエーションのリンクの 2 つになることがある
   for (const demo of demos) {
-    await expect(page.locator(`.list a[href="/${demo.slug}/"]`)).toHaveCount(1)
+    expect(
+      await page.locator(`.list a[href="/${demo.slug}/"]`).count(),
+      demo.slug,
+    ).toBeGreaterThan(0)
   }
   expect(errors).toEqual([])
 })

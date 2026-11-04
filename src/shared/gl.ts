@@ -14,6 +14,10 @@ interface GlStageOptions extends THREE.WebGLRendererParameters {
  *   取れたら three は同じ context を使う（getContext は 2 回目から同じものを返す）
  * - context を失っている間は loop() と GSAP を止め、取り戻したら動かし直す。three は lost のときに preventDefault して、取り戻すと作り直す
  * - 画素比は 2 で止める
+ * - 片付けは renderer.dispose()。three の dispose に加えて、ここで足した listener を外し、context を手放す（forceContextLoss）。
+ *   手放さないと、組の中でバリエーションを切り替えるたびに context が増える。
+ *   失ったという知らせは後から届くので、同じ処理の中で canvas を DOM から外す（組の切り替えは中身ごと入れ替えるので外れる）。
+ *   dispose のあとに render しない（写真の読み込みの完了など、後から来る処理で描かない）
  */
 export const createGlStage = (
   canvas: HTMLCanvasElement,
@@ -39,13 +43,24 @@ export const createGlStage = (
   renderer.setPixelRatio(pixelRatio())
 
   // three の listener より後に足す。取り戻したときは three が作り直してから描く
-  canvas.addEventListener('webglcontextlost', () =>
-    setPaused('context-lost', true),
-  )
-  canvas.addEventListener('webglcontextrestored', () => {
+  const onLost = () => setPaused('context-lost', true)
+  const onRestored = () => {
     setPaused('context-lost', false)
     onRestore?.()
-  })
+  }
+  canvas.addEventListener('webglcontextlost', onLost)
+  canvas.addEventListener('webglcontextrestored', onRestored)
+
+  const disposeThree = renderer.dispose.bind(renderer)
+  renderer.dispose = () => {
+    // 先に listener を外す。外さずに手放すと、止めたまま取り戻しが来ないので、ページ全体が止まったままになる
+    canvas.removeEventListener('webglcontextlost', onLost)
+    canvas.removeEventListener('webglcontextrestored', onRestored)
+    const lost = context.isContextLost()
+    if (lost) setPaused('context-lost', false)
+    disposeThree()
+    if (!lost) renderer.forceContextLoss()
+  }
   return renderer
 }
 

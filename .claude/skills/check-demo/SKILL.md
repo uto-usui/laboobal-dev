@@ -19,6 +19,16 @@ rg -n "requestAnimationFrame|setInterval|new THREE.WebGLRenderer" src/demos/<slu
 rg -n "https?://" src/demos/<slug>/*.ts src/demos/<slug>/Demo.astro   # 実行時に外から読んでいないか
 ```
 
+組のバリエーション（meta に `group` がある）なら、次も見ます（demo-guide.md の 12 章）。
+
+```sh
+rg -n "document\.querySelector" src/demos/<slug>/main.ts   # stage.querySelector で探す
+rg -n "lil-gui" src/demos/<slug>/                           # 自分で lil-gui を出さず params に書く
+rg -n "^(loop|autoplayLoop|onResize|touchGate|whenVisible|createGlStage)\(" src/demos/<slug>/main.ts   # top-level で動かしていないか
+```
+
+mount の中で受けた共有の部品の戻り値（demo-guide.md の 4 章の表）を、返す関数で全部呼んでいるかも読みます。
+
 meta の `tags` と `tech` が `src/lib/demos.ts` の `TAGS` と `TECH` にあるか、README.md に demo-guide.md の 3 章の節があるかも見ます。
 
 ## 2. ビルド、大きさ、E2E
@@ -31,6 +41,11 @@ E2E_PORT=4399 pnpm verify
 - このデモの大きさは `node scripts/check-budget.mjs --report | grep "^<slug>,"` で見る（ふつうの出力は分け方ごとの最大だけ）。上限は demo-guide.md の 9 章の表か、`scripts/check-budget.mjs` の `demoOverride`。超えたときは、そのページで読むファイルが大きい順に出る
 - E2E のうち、このデモの分だけを見直すなら `E2E_PORT=4399 pnpm test:e2e --grep <slug>`。ほかの作業と同時なら `--output test-results/<名前>` を付ける
 - ひとりでに動き続けるデモが `e2e/motion.spec.ts` の `AUTOPLAY` に、指で引っぱるデモが `DRAG` に入っているか
+- 組のバリエーションなら、組のテストも回す。3 周の切り替え（前のバリエーションの rAF、WebGL の context、エラーが残らない）、動きを減らす設定、iframe の 3 本が回る
+
+```sh
+E2E_PORT=4399 pnpm test:e2e --output test-results/<名前> e2e/groups.spec.ts --grep <組>
+```
 
 ## 3. ブラウザで見る
 
@@ -47,6 +62,8 @@ agent-browser を使うときは、zsh では関数にする: `ab(){ agent-brows
 5. 動きを減らす設定を入れて開き直す（`ab set media reduced-motion`。Playwright なら `reducedMotion: 'reduce'`）。demo-guide.md の 5 章のとおり、ひとりでに動くものは止まった絵に、1 回きりの再生は終わりの姿に、操作についてくる動きは残っているか
 6. 指で引っぱるデモは、`e2e/motion.spec.ts` の `DRAG` のテスト（iPhone の大きさとタッチで、本物のタッチを CDP で送る）が通っていることで見る。目で見るなら Playwright の `devices['iPhone 13']` で開き、左上に「tap to drag」が出ることを見る。agent-browser の `set device` は画面の大きさが変わるだけで、タッチの端末（`pointer: coarse`）にはならない
 
+7. 組のバリエーションなら、右上の「設定」を押し、組の全部のバリエーションに切り替えて、それぞれ canvas が描かれていること、コンソールにエラーがないことを見る。パラメーターがあれば動かして、作り直したあとも描かれるかを見る。lab の記事のように iframe に入れて、中でも 1 回切り替える
+
 見終わったらプレビューを止めます（`pnpm exec astro preview stop`、または立てたプロセスを止める）。
 
 ## 4. 埋め込み
@@ -58,5 +75,6 @@ E2E が別のオリジンの iframe に入れて開いています。それに�
 次を貼ります。
 
 - `pnpm verify` の結果（落ちたものがあればその行）と、このデモの `check:budget` の数字
+- 組のバリエーションなら、`e2e/groups.spec.ts --grep <組>` の結果と、切り替えて見たバリエーション
 - 開いた大きさごとのスクショ（ふつう、800×500、スマホの幅、パネルを開いたところ、動きを減らす設定）の場所
 - 見つけて直したことと、直していないこと

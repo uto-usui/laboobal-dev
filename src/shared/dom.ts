@@ -99,11 +99,12 @@ export const changeGate = (eps = 0.001) => {
 
 /**
  * デモの上に一行の案内を出す（WebGL が使えないときなど）。見た目は particle-photo の WebGPU の案内に合わせ、
- * デモの中身を覆う。形は base.css の .demo-fallback
+ * デモの中身を覆う。形は base.css の .demo-fallback。戻り値で消す
  */
 export const showFallback = (message: string) => {
   const note = document.createElement('p')
   note.className = 'demo-fallback'
   note.textContent = message
   ;(document.querySelector('main.demo') ?? document.body).append(note)
+  return () => note.remove()
 }

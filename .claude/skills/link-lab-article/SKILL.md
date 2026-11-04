@@ -45,7 +45,7 @@ description: labobal.dev のデモと、それを説明する webmanab の lab �
      ></iframe>
    </p>
 
-   [別のタブで開く](https://labobal.dev/<slug>/)</slug>
+   [別のタブで開く](https://labobal.dev/<slug>/)
    ```
 
    - `loading="lazy"` を付ける。WebGL のデモを 1 本の記事に置くのは 4 つまで（描画のコンテキストを同時にいくつも作らないため）

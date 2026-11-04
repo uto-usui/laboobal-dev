@@ -18,7 +18,7 @@
 
 - 公開リポジトリです。vault の名前や中身、claude.ai の URL（`Claude-Session:` 行を含む）、手元の絶対パス、勤務先のこと、アカウント ID やトークンを書かない（docs/context.md の 7 章）
 - Netlify のサイトとのつながり、ドメイン、DNS は触らない
-- 公開したデモの URL（`/<slug>/`。前からある 7 本の `/amoeba/` などの小文字のパスも含む）と、プレビュー（`public/previews/<slug>.webm` と `.jpg`、480×300）の名前と大きさを変えない。lab の記事と webmanab のページが直接読んでいる
+- 公開したデモの URL（`/<slug>/`。前からある 7 本の `/amoeba/` などの小文字のパスも含む）と、プレビュー（`public/previews/<slug>.webm` と `.jpg`、480×300）の名前と大きさを変えない。lab の記事と webmanab のページが直接読んでいる。作者が下げたデモは、ページとプレビューを消し、URL を `netlify.toml` の `[[redirects]]` でトップへ 301 する（[docs/history/dropped/B3.md](docs/history/dropped/B3.md)）
 - 決まったことは [webmanab#53](https://github.com/uto-usui/webmanab/issues/53) にあります。計画書と食い違ったら #53 に従う
 - 見た目（トップの見た目など）は作者が決めます。案を作り、スクショで見てもらってから入れる
 - パッケージマネージャは pnpm

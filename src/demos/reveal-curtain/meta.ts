@@ -16,4 +16,6 @@ export default defineDemo({
     '右から伸びる緑の幕が写真の場所を覆い、幕が縮むと写真が現れる。クリックでもう一度。',
   tags: ['reveal', 'image'],
   tech: ['gsap'],
+  group: 'reveal',
+  variant: '幕',
 })

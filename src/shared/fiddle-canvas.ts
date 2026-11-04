@@ -3,7 +3,7 @@ import { fitCanvas, onResize } from './dom'
 /**
  * CreateJS で書いていた fiddle のデモで使う。もとの fiddle の canvas（width × height の固定の大きさ）の座標のまま描けるようにする。
  * 入れ物に収まる大きさまで canvas を広げ（もとの 2 倍まで）、2D の文脈をその倍率で拡大しておく。
- * 大きさが変わるたびに draw を呼ぶので、止まっている間も絵が消えない
+ * 大きさが変わるたびに draw を呼ぶので、止まっている間も絵が消えない。dispose で見張りを外す
  */
 export const fiddleCanvas = (
   canvas: HTMLCanvasElement,
@@ -14,7 +14,7 @@ export const fiddleCanvas = (
   const ctx = canvas.getContext('2d')!
   // 枠の点線（outline）の分をあけておく
   const gap = 8
-  onResize(canvas.parentElement!, (size) => {
+  const dispose = onResize(canvas.parentElement!, (size) => {
     const scale = Math.max(
       0,
       Math.min((size.width - gap) / width, (size.height - gap) / height, 2),
@@ -25,5 +25,5 @@ export const fiddleCanvas = (
     ctx.scale(scale, scale)
     draw(ctx)
   })
-  return ctx
+  return { ctx, dispose }
 }

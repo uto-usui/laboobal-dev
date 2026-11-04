@@ -16,5 +16,7 @@ export default defineDemo({
     '写真が斜めに溶けて崩れ、その中から次の写真が組み上がる。クリックで切り替わる。',
   tags: ['slider', 'image', 'distortion', 'noise'],
   tech: ['three', 'glsl', 'gsap'],
+  group: 'distortion-slider',
+  variant: '斜め',
   pick: true,
 })

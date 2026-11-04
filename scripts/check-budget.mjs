@@ -2,43 +2,43 @@
 // `--report` を付けると、全デモの表を出す（上限を見直すときに使う）。
 // 測るもの:
 // - トップと各デモのページで、開いた直後に読む HTML、CSS、JS の合計（brotli で圧縮した大きさ）。
-//   JS は <script src> から静的な import をたどった全部。import() で後から読むものは入れない
+//   JS は <script src> から静的な import をたどった全部。import() で後から読むものと、<template> の中の script
+//   （組の切り替えのしくみ。設定のボタンを押したときに読む）は入れない
 // - トップで読みうるフォント（woff2）の合計。unicode-range がトップの HTML の文字に当たる @font-face だけを数える
 // - public/previews の 1 ファイルあたりの大きさ（拡張子ごと）
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, posix } from 'node:path'
 import { brotliCompressSync, constants, gzipSync } from 'node:zlib'
 
-// 上限。単位は KB（1000 バイト）。2026-11-04 に測った値（コメントの数字）に、2〜3 割の余裕を足した。
+// 上限。単位は KB（1000 バイト）。2026-11-04 に、そのとき測った値に 2〜3 割の余裕を足して決めた。
+// コメントの数字は、2026-11-04 にデモを 21 本下げたあとのビルドで測り直した値（`--report` で見られる）。
 // 上げるときは、何が増えたのかをコミットに書く
 const BUDGET = {
-  // 7.3 → 12.7（並び替え・ピックアップ・スマホの主役・板の遷移・長い slug で 3.5、一覧のデモ 35 本で 1.7）
+  // 7.3 → 12.7（並び替え・ピックアップ・スマホの主役・板の遷移・長い slug で 3.5、一覧のデモ 35 本で 1.7）→ 12.9（組の行）→ 12.0（デモを 21 本下げた）
   top: 15,
-  // 32.5（montserrat-ascii-400、montserrat-latin-700、molle-mark の 3 個）
+  // 33.1（montserrat-ascii-400、montserrat-latin-700、molle-mark の 3 個）
   topFonts: 42,
   // デモは、読むライブラリで 3 つに分ける。gsap と three の本体は別のチャンクになるので、その名前で見分ける
   demo: {
-    // ライブラリなし。最大 4.2（toc）
+    // ライブラリなし。最大 7.3（processing-js-circle-at-the-mouse-position。組の切り替えで 1.3 増えた）
     plain: 8,
-    // gsap を読む。最大 29.9（tweenmax-easing-of-scroll-parallax）
+    // gsap を読む。最大 31.7（tweenmax-easing-of-scroll-parallax）
     gsap: 36,
-    // three を読む。最大 140.6（distortion-slider-b）
+    // three を読む。最大 144.1（distortion-slider-b）
     three: 170,
   },
   // 上の分け方に収まらないデモ。ライブラリがデモのチャンクに入っているもの
   demoOverride: {
-    // ScrollTrigger。42.8
+    // ScrollTrigger。45.3
     'tweenmax-visual-range-animation-class': 52,
-    // MotionPathPlugin。36.1
+    // MotionPathPlugin。37.8
     'gsap-motion-path': 44,
-    // lil-gui と WebGPU のシェーダー。21.5
+    // lil-gui と WebGPU のシェーダー。24.4
     'particle-photo': 27,
-    // locomotive-scroll。13.3
+    // locomotive-scroll。15.1
     scrollmanager: 17,
-    // lil-gui。10.8
-    nodeballs: 14,
   },
-  // 1 ファイルの最大。jpg 36.4、webm 324.1、webp 32.1
+  // 1 ファイルの最大。jpg 36.4、webm 324.1、webp 25.8
   previews: { jpg: 45, webm: 400, webp: 40 },
 }
 
@@ -87,7 +87,10 @@ const collectJs = (file, seen) => {
 
 /** ページを開いた直後に読むファイル（HTML 自身、CSS、JS） */
 const initialFiles = (html) => {
-  const source = readFileSync(html, 'utf8')
+  const source = readFileSync(html, 'utf8').replace(
+    /<template[\s\S]*?<\/template>/g,
+    '',
+  )
   const files = new Set([html])
   for (const m of source.matchAll(
     /<link[^>]+rel="(?:stylesheet|modulepreload)"[^>]*>/g,

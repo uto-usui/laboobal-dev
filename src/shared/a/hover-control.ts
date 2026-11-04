@@ -4,7 +4,7 @@ type Thenable = { then: (onFulfilled: () => unknown) => unknown }
 /**
  * ホバーのアニメーションを、途中で止めずに最後まで動かす。
  * 動いている間にマウスが出入りしたら、今の動きが終わってから、そのときの状態に合わせて次を動かす。
- * over と out は、動き終わったら解決する Promise（GSAP の tween もそのまま渡せる）を返す
+ * over と out は、動き終わったら解決する Promise（GSAP の tween もそのまま渡せる）を返す。戻り値で見張りを外す
  */
 export const hoverControl = (
   el: HTMLElement,
@@ -27,13 +27,19 @@ export const hoverControl = (
     if (isOver) playOver()
   }
 
-  // mouseover と mouseout は子要素に出入りしたときにも起きるので、enter と leave を使う
-  el.addEventListener('pointerenter', () => {
+  const onEnter = () => {
     isOver = true
     if (!playing) playOver()
-  })
-  el.addEventListener('pointerleave', () => {
+  }
+  const onLeave = () => {
     isOver = false
     if (!playing) playOut()
-  })
+  }
+  // mouseover と mouseout は子要素に出入りしたときにも起きるので、enter と leave を使う
+  el.addEventListener('pointerenter', onEnter)
+  el.addEventListener('pointerleave', onLeave)
+  return () => {
+    el.removeEventListener('pointerenter', onEnter)
+    el.removeEventListener('pointerleave', onLeave)
+  }
 }

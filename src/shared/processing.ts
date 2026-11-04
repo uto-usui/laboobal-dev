@@ -9,7 +9,8 @@ export const DEFAULT_BACKGROUND = 'rgb(204 204 204)'
  * Processing の size(width, height) の代わり。canvas を表示の大きさと devicePixelRatio に合わせ、
  * draw には width×height の座標のまま描ける ctx を渡す。大きさが変わるたびに描き直す。
  * 描く前に、Processing の既定（白で塗る、黒の 1px の線）にしておく。
- * 返す ctx はその座標のままなので、毎フレーム描き足すスケッチは draw() の外でもそのまま描ける。redraw で全体を描き直す
+ * 返す ctx はその座標のままなので、毎フレーム描き足すスケッチは draw() の外でもそのまま描ける。redraw で全体を描き直す。
+ * dispose で見張りを外す
  */
 export const sketch = (
   canvas: HTMLCanvasElement,
@@ -29,12 +30,12 @@ export const sketch = (
     ctx.clearRect(0, 0, width, height)
     draw(ctx)
   }
-  onResize(canvas, () => {
+  const dispose = onResize(canvas, () => {
     const { width: shown, dpr } = fitCanvas(canvas)
     scale = (shown / width) * dpr
     redraw()
   })
-  return { ctx, redraw }
+  return { ctx, redraw, dispose }
 }
 
 /** Processing の colorMode(HSB, 360, 100, 100, 100) の色を、canvas に渡せる rgb() にする */

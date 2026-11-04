@@ -37,12 +37,12 @@ export const touchGate = (el: HTMLElement) => {
   arm(false)
 
   let start: { id: number; x: number; y: number } | undefined
-  el.addEventListener('pointerdown', (e) => {
+  const onDown = (e: PointerEvent) => {
     if (e.pointerType !== 'touch') return
     clearTimeout(timer)
     start = { id: e.pointerId, x: e.clientX, y: e.clientY }
-  })
-  el.addEventListener('pointerup', (e) => {
+  }
+  const onUp = (e: PointerEvent) => {
     if (e.pointerType !== 'touch') return
     const tapped =
       start?.id === e.pointerId &&
@@ -52,9 +52,25 @@ export const touchGate = (el: HTMLElement) => {
       arm(true)
       timer = window.setTimeout(() => arm(false), IDLE_MS)
     }
-  })
-  el.addEventListener('pointercancel', () => (start = undefined))
-  onRunningChange((running) => {
+  }
+  const onCancel = () => {
+    start = undefined
+  }
+  el.addEventListener('pointerdown', onDown)
+  el.addEventListener('pointerup', onUp)
+  el.addEventListener('pointercancel', onCancel)
+  const off = onRunningChange((running) => {
     if (!running) arm(false)
   })
+
+  /** 見張りと添え書きを外し、touch-action を CSS の値に戻す */
+  return () => {
+    clearTimeout(timer)
+    off()
+    el.removeEventListener('pointerdown', onDown)
+    el.removeEventListener('pointerup', onUp)
+    el.removeEventListener('pointercancel', onCancel)
+    el.style.touchAction = ''
+    hint?.remove()
+  }
 }

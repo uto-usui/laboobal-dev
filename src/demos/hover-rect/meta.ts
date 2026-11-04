@@ -16,4 +16,6 @@ export default defineDemo({
     '番号の付いた緑の四角にマウスを乗せると、赤くなって暗い枠が付き、番号が大きくなる。',
   tags: ['hover'],
   tech: ['gsap'],
+  group: 'hover-control',
+  variant: '格子',
 })

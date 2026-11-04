@@ -1,0 +1,34 @@
+---
+// follow-mouse、-spring、-transform に共通の、マウスを追う大小 2 つの玉
+---
+
+<div class="stage">
+  <div class="ball"></div>
+  <div class="ball ball--sm"></div>
+</div>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    /* 記事に埋め込んだとき、縦に指を動かせば記事がスクロールするようにする。横の動きはデモが受け取る */
+    touch-action: pan-y;
+  }
+
+  .ball {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5rem;
+    aspect-ratio: 1;
+    pointer-events: none;
+    background: #25ecb7;
+    border-radius: 50%;
+  }
+
+  .ball--sm {
+    width: 1.5rem;
+    background: color-mix(in oklab, #25ecb7, #000 25%);
+  }
+</style>

@@ -12,6 +12,7 @@ description: labobal.dev に新しいデモを 1 本足す。slug を決め、sr
 
 - slug: 小文字のケバブケース。lab の記事があるなら記事の slug と同じ。`ls src/demos` で重なりがないかを見る。一度出したら変えない
 - 何が気持ちいいのか: もとのデモがあるなら、先に動かして見て、速さ、遅れ方、手ざわりを言葉にしてから作る。コードの形は合わせない
+- 組に入れるか: 似たデモがすでにあるかを見る（`ls src/groups`、`rg -n "group:" src/demos/*/meta.ts`、トップの組の行）。ある組とパラメーターの値や作りの一部だけが違うなら、別のデモにせず、その組のバリエーションとして足すかを考える。足すなら demo-guide.md の 12 章の「新しいデモを組に足す」の順で作る。迷ったら、組に入れる案と入れない案を作者に見せる
 - 使うもの: ネイティブの API で同じ質が出せるならそれ、出せないならライブラリ（three、gsap、locomotive-scroll、lil-gui は入っている）。新しい依存は足す前に作者に聞く（大きさの上限にも関わる）
 - 見た目が変わる大きな判断（色、レイアウト、トップでの見え方）は、案を作ってスクショで作者に見てもらう
 
@@ -33,7 +34,7 @@ git switch -c feat/<slug>
    - `tags` と `tech` は `src/lib/demos.ts` の `TAGS` と `TECH` から。合うものがなければ、先にそこへ足してコメントに意味を書く
    - `pick` は付けない（ピックアップは作者が決める）
 2. `src/demos/<slug>/Demo.astro`: マークアップと style。寸法は `cqw`、`%` など入れ物の基準で。右の端（とくに右下）には何も置かない（info のボタンがある）
-3. `src/demos/<slug>/main.ts`: 動かす script。`src/shared/` の部品を使う（demo-guide.md の 4 章）
+3. `src/demos/<slug>/main.ts`: 動かす script。`src/shared/` の部品を使う（demo-guide.md の 4 章）。組でないデモは今までどおり top-level に書いてよい。組のバリエーションは `mount(stage, params)` を export して dispose を返し、Demo.astro の script を 3 行の形にする（demo-guide.md の 12 章）
    - 毎フレームは `loop`、ひとりでに動き続けるものは `autoplayLoop`
    - GSAP は `src/shared/gsap` から読む
    - three は `createGlStage` で renderer を作る

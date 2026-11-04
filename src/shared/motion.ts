@@ -16,17 +16,22 @@ export const onReducedMotion = (listener: (reduced: boolean) => void) => {
 
 /**
  * ひとりでに動き続ける loop()。動きを減らす設定の間は回さず、代わりに still を 1 回呼んで止まった絵を描く。
- * 設定が戻ったら loop を始め直す（elapsed は 0 から数え直す）
+ * 設定が戻ったら loop を始め直す（elapsed は 0 から数え直す）。戻り値で、設定の見張りとループの両方を止める
  */
 export const autoplayLoop = (
   callback: (dt: number, elapsed: number) => void,
   still?: () => void,
 ) => {
   let stop: (() => void) | undefined
-  return onReducedMotion((reduced) => {
+  const off = onReducedMotion((reduced) => {
     stop?.()
     stop = undefined
     if (reduced) still?.()
     else stop = loop(callback)
   })
+  return () => {
+    off()
+    stop?.()
+    stop = undefined
+  }
 }

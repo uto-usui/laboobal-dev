@@ -1,6 +1,7 @@
 ---
 import Base from './Base.astro'
-import type { DemoMeta } from '../lib/demos'
+import VariantSwitcher from './VariantSwitcher.astro'
+import { type DemoMeta, getDemos, getGroups } from '../lib/demos'
 
 interface Props {
   demo: DemoMeta
@@ -14,12 +15,46 @@ const meta = [
   { key: 'tags', value: demo.tags?.join(' / ') },
   { key: 'tech', value: demo.tech?.join(' / ') },
 ].filter((row) => row.value)
+
+// 組のバリエーションなら、切り替えの欄に並べる slug と呼び名を埋め込む（src/shared/variant-switcher.ts が読む）。
+// 題やパネルの中身は、切り替えたときに読むそのバリエーションのページから取る
+const group = demo.group
+  ? (await getGroups()).find((g) => g.name === demo.group)
+  : undefined
+const demos = group ? await getDemos() : []
+const groupData = group && {
+  variants: group.variants.map((slug) => ({
+    slug,
+    label: demos.find((d) => d.slug === slug)!.variant,
+  })),
+}
 ---
 
 <Base title={`${demo.title} | labobal.dev`} description={demo.description}>
-  <main class="demo" data-slug={demo.slug}>
+  <main class="demo" data-slug={demo.slug} data-group={demo.group}>
     <slot />
   </main>
+  {groupData && (
+    <>
+      <script
+        id="demo-group"
+        type="application/json"
+        is:inline
+        set:html={JSON.stringify(groupData).replaceAll('<', '\\u003c')}
+      />
+      <template id="variant-switcher">
+        <VariantSwitcher />
+      </template>
+      <button
+        class="variant-toggle"
+        type="button"
+        aria-expanded="false"
+        data-capture-hide
+      >
+        設定
+      </button>
+    </>
+  )}
   <!-- links は e2e/demos.spec.ts と scripts/capture-previews.mjs が、canvas を写すときに隠すための名前 -->
   <div class="info links">
     <button
@@ -60,7 +95,7 @@ const meta = [
             </a>
           </li>
         )}
-        <li>
+        <li class="info-code">
           <a href={codeUrl} target="_top"> コード </a>
         </li>
         <li>
@@ -275,5 +310,40 @@ const meta = [
   .info-links a:focus-visible {
     color: var(--color-accent);
     text-decoration: underline;
+  }
+
+  /* 組の切り替え（src/shared/variants.ts）。押すと lil-gui を読んで、同じ場所に開く。
+     閉じた形は lil-gui の閉じた題に似せ、幅は字の分だけにしてデモを隠さない */
+  .variant-toggle {
+    position: fixed;
+    top: 0;
+    right: 15px;
+    z-index: 1001;
+    height: 25px;
+    padding: 0 8px 0 4px;
+    font:
+      600 11px / 1 -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      Arial,
+      sans-serif;
+    color: #ebebeb;
+    cursor: pointer;
+    background: #111;
+    border: 0;
+  }
+
+  .variant-toggle::before {
+    padding-right: 2px;
+    content: "▸";
+  }
+
+  .variant-toggle:hover {
+    opacity: 0.85;
+  }
+
+  :global(.variant-gui.lil-closed) {
+    width: auto;
   }
 </style>

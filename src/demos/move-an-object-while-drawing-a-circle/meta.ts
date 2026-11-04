@@ -16,4 +16,6 @@ export default defineDemo({
     '緑の玉が、横を sin、縦を cos で動かして、薄い線の円の上をぐるぐる回り続ける。',
   tags: ['shape', 'trigonometry'],
   tech: ['gsap'],
+  group: 'trigonometry',
+  variant: '円を描く玉',
 })

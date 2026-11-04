@@ -16,4 +16,6 @@ export default defineDemo({
     '暗くした写真の上を、マウスについてくる光が照らす。光の当たった所だけ明るく見える。',
   tags: ['cursor', 'image'],
   tech: ['js'],
+  group: 'follow-mouse',
+  variant: '照らす',
 })

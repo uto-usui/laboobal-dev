@@ -4,7 +4,9 @@
 </div>
 
 <script>
-  import './main'
+  import { start } from '../../shared/variants'
+  import * as variant from './main'
+  start(variant)
 </script>
 
 <style>
@@ -34,8 +36,11 @@
 
   /* 画面の下から 100px 入ったところで 0、下端が画面の上を出たところで 1 */
   @supports (animation-timeline: view()) {
+    /* 縮める処理が animation の一括指定に view() を入れてしまい、Chrome がその宣言ごと捨てるので、1 つずつ書く */
     .target {
-      animation: progress linear both;
+      animation-name: progress;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
       animation-timeline: view();
       animation-range: cover 100px cover 100%;
     }
