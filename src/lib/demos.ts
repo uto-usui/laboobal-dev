@@ -7,6 +7,7 @@ export type Interaction = 'drag' | 'hover' | 'scroll' | 'click' | 'none'
  * - text 文字 / image 写真や絵 / video 動画
  * - scroll スクロール / parallax 視差 / cursor マウスの位置 / drag 引っぱる / hover マウスを乗せる
  * - noise ノイズ / particles たくさんの粒 / 3d 奥行き / shape 形が変わる / physics ばね・摩擦・衝突 / random 乱数
+ * - trigonometry sin・cos で動かす
  * - slider 写真の切り替え / distortion ゆがみ / reveal 現れ方
  * - layout 組み方 / form 入力欄 / ui 目次などの部品
  */
@@ -25,6 +26,7 @@ export const TAGS = [
   'shape',
   'physics',
   'random',
+  'trigonometry',
   'slider',
   'distortion',
   'reveal',

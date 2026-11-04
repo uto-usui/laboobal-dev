@@ -14,6 +14,6 @@ export default defineDemo({
   added: '2026-11-04',
   description:
     '灰色の丸が右へ進みながら sin で上下に揺れ、右の端まで行くと左から出直す。',
-  tags: ['shape'],
+  tags: ['shape', 'trigonometry'],
   tech: ['canvas2d'],
 })

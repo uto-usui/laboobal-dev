@@ -10,7 +10,7 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
-  created: '2016-06-12',
+  created: '2016-08-23',
   added: '2026-11-04',
   description: '頂点が 5 つの星を描き、開くたびに変わるでたらめな色で塗る。',
   tags: ['shape', 'random'],

@@ -10,10 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
-  created: '2016-06-26',
+  created: '2017-03-01',
   added: '2026-11-04',
   description:
     'ペン先が右へ進みながら sin で上下に振れ、灰色の波の線を少しずつ描いていく。',
-  tags: ['shape'],
+  tags: ['shape', 'trigonometry'],
   tech: ['canvas2d'],
 })

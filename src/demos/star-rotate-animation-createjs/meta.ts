@@ -10,7 +10,7 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
-  created: '2016-06-12',
+  created: '2016-08-24',
   added: '2026-11-04',
   description: 'でたらめな色で塗った星が、1 秒に 30 度ずつゆっくり回り続ける。',
   tags: ['shape', 'random'],

@@ -14,6 +14,6 @@ export default defineDemo({
   added: '2026-11-04',
   description:
     '真ん中の灰色の丸が、sin で大きさを 0.5 倍から 1.5 倍まで変え、脈打つように伸び縮みする。',
-  tags: ['shape'],
+  tags: ['shape', 'trigonometry'],
   tech: ['canvas2d'],
 })

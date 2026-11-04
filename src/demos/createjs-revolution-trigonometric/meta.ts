@@ -14,6 +14,6 @@ export default defineDemo({
   added: '2026-11-04',
   description:
     '小さな丸が、cos で横、sin で縦の位置を決められ、薄い円の上をゆっくり回り続ける。',
-  tags: ['shape'],
+  tags: ['shape', 'trigonometry'],
   tech: ['canvas2d'],
 })

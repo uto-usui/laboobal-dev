@@ -10,7 +10,7 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
-  created: '2016-06-26',
+  created: '2017-03-01',
   added: '2026-11-04',
   description:
     '30 個の点が漂い、近い点どうしが線で結ばれて引き合う。端から出ると反対の端から戻る。',
