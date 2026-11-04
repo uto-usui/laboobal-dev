@@ -67,4 +67,5 @@ WebGPU のパイプラインの layout を `'auto'` にすると、そのシェ�
 
 ## クレジット
 
+- stegu/webgl-noise（Ashima Arts、Stefan Gustavson）: https://github.com/stegu/webgl-noise （MIT License。3D simplex noise を WGSL に書き直して `shaders.ts` に入れた）
 - 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真ごとの出どころは上の「写真」）

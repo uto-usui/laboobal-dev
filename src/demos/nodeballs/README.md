@@ -40,4 +40,4 @@ Canvas 2D で描いている。毎フレーム画面を消し、奥の層から�
 
 ## クレジット
 
-- CodePen mnmxmx/mEVxeg: https://codepen.io/mnmxmx/pen/mEVxeg （CodePen の公開 Pen なので MIT License）
+- CodePen mnmxmx/mEVxeg（Misaki Nakano）: https://codepen.io/mnmxmx/pen/mEVxeg （CodePen の公開 Pen なので MIT License）
