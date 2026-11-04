@@ -1,6 +1,6 @@
 # デモの作り方
 
-labobal.dev に新しいデモを足すときの決まりです。出すまでの順番（ブランチ、PR、本番の確認）は [release.md](release.md) にあります。見本は `src/demos/marquee/`（CSS だけ）と `src/demos/drag-pinch-simple/`（script あり、指で引っぱる）です。
+labobal.dev に新しいデモを足すときの決まりです。出すまでの順番（ブランチ、PR、本番の確認）は [release.md](release.md) にあります。見本は `src/demos/marquee/`（CSS だけ）と `src/demos/drag-pinch-simple/`（script あり、指で引っぱる）です。ほかのデモとパラメーターや作りだけが違うデモは、組に入れて 1 ページで切り替えられるようにします（12 章。見本は `src/groups/random-color/`）。
 
 ## 1. 置くファイル
 
@@ -30,7 +30,7 @@ import meta from '../demos/<slug>/meta'
 
 - slug は小文字のケバブケースで、フォルダ名と同じにする。そのまま URL（`/<slug>/`）になる。lab の記事があるなら、記事の slug にそろえる
 - 一度出した slug は変えない。lab の記事の iframe と webmanab の記事ページが URL で読んでいる
-- 一覧は `src/lib/demos.ts` がフォルダから集めるので、ほかの共有のファイルに足すものはない。ファイルが欠けている、別のデモを読んでいる、meta が決まりに合わない、のどれかがあるとビルドが落ち、置くべき中身がエラーに出る（開発サーバーでは、そのデモだけ外して警告にする）
+- 一覧は `src/lib/demos.ts` がフォルダから集めるので、ほかの共有のファイルに足すものはない。ファイルが欠けている、別のデモを読んでいる、meta が決まりに合わない、組の決まり（12 章）に合わない、のどれかがあるとビルドが落ち、置くべき中身がエラーに出る（開発サーバーでは、そのデモだけ外して警告にする）
 
 ## 2. meta.ts
 
@@ -73,6 +73,8 @@ export default defineDemo({
 | `tags` | 要る | 何を見せるデモか。`src/lib/demos.ts` の `TAGS` の中から選ぶ |
 | `tech` | 要る | 何で作ったか。`src/lib/demos.ts` の `TECH` の中から選ぶ |
 | `pick` | 省略可 | `true` にするとトップのピックアップに出る。どれを出すかは作者が決める |
+| `group` | 省略可 | 入っている組の名前（`src/groups/<組>/` のフォルダ名）。組に入れるときだけ（12 章） |
+| `variant` | 組なら要る | 組の中での短い呼び名。日本語でよい。切り替えの欄とトップの組の行に出る |
 
 `tags` と `tech` に合う言葉がないときは、先に `src/lib/demos.ts` の `TAGS` か `TECH` に足し、上のコメントに意味を一言書きます。ないものを書くとビルドが落ちます。
 
@@ -129,20 +131,28 @@ export default defineDemo({
 
 ### 共有の部品（`src/shared/`）
 
-| 部品 | 使うとき |
-| --- | --- |
-| `loop(callback)`（dom.ts） | 毎フレーム動かす。dt は 0〜0.1 秒に収まる。画面の外やタブが裏にある間は回らない。requestAnimationFrame を直に使わない |
-| `autoplayLoop(callback, still)`（motion.ts） | ひとりでに動き続けるループ。動きを減らす設定の間は回さず `still` で止まった絵を描く（5 章） |
-| `pixelRatio()`、`fitCanvas(canvas, ctx)`（dom.ts） | canvas の解像度。devicePixelRatio は 2 で止める。2D は CSS の px の座標のまま書ける |
-| `onResize(el, callback)`（dom.ts） | 大きさが変わったとき。登録した時点で 1 回呼ぶ |
-| `changeGate()`（dom.ts） | 追いつきかけて動きが小さくなったフレームで style を書かない |
-| `trackPointer(el, options)`、`pointerOrWander()`（pointer.ts） | ポインターの位置。マウスのない端末で、マウスの代わりにゆっくり動かす |
-| `touchGate(el)`（touch.ts） | 指で引っぱるデモ（6 章） |
-| `createGlStage(canvas, options)`（gl.ts） | three の WebGLRenderer を作る入口。WebGL が使えなければ一行の案内を出して `undefined` を返す。context を失ったら止め、取り戻したら動かし直す。`new THREE.WebGLRenderer` を直に作らない |
-| `showFallback(message)`（dom.ts） | 使えない機能があるときの一行の案内（WebGPU など） |
-| `gsap`、`autoplay(animation, still)`（gsap.ts） | GSAP は `'gsap'` からではなく `src/shared/gsap` から読む。画面の外にいる間、GSAP の動きをまとめて止めるため。ひとりでに動き続ける tween や timeline は `autoplay` に渡す |
-| `whenVisible(callback)`（visibility.ts） | 1 回だけ再生するもの。画面の外で再生を終えてしまわないよう、見えてから始める |
-| `lerp`、`damp`、`clamp`、`map` など（math.ts）、`splitText`（split-text.ts）、`createNoise`（noise.ts）、`simplex-noise.glsl`（glsl/） | 数の補間、文字を 1 文字ずつの span に分ける、ノイズ |
+始めたものを止める部品は、どれも止める関数か `dispose` を返します。組でないデモは、今までどおりモジュールの top-level で呼んで、戻り値を受けなくてかまいません（ページを閉じれば終わるため）。組のバリエーションは、戻り値を全部受けて、mount が返す関数の中で呼びます（12 章）。
+
+| 部品 | 使うとき | 戻り値 |
+| --- | --- | --- |
+| `loop(callback)`（dom.ts） | 毎フレーム動かす。dt は 0〜0.1 秒に収まる。画面の外やタブが裏にある間は回らない。requestAnimationFrame を直に使わない | 止める関数 |
+| `autoplayLoop(callback, still)`（motion.ts） | ひとりでに動き続けるループ。動きを減らす設定の間は回さず `still` で止まった絵を描く（5 章） | 止める関数（設定の見張りとループの両方） |
+| `onReducedMotion(listener)`（motion.ts） | 動きを減らす設定が変わったときに切り替える（5 章）。登録した時点で 1 回呼ぶ | 外す関数 |
+| `pixelRatio()`、`fitCanvas(canvas, ctx)`（dom.ts） | canvas の解像度。devicePixelRatio は 2 で止める。2D は CSS の px の座標のまま書ける | `fitCanvas` は `{ width, height, dpr }` |
+| `onResize(el, callback)`（dom.ts） | 大きさが変わったとき。登録した時点で 1 回呼ぶ | 止める関数 |
+| `changeGate()`（dom.ts） | 追いつきかけて動きが小さくなったフレームで style を書かない | 比べる関数（止めるものはない） |
+| `trackPointer(el, options)`、`pointerOrWander()`（pointer.ts） | ポインターの位置。マウスのない端末で、マウスの代わりにゆっくり動かす | `trackPointer` は位置と `.dispose()` |
+| `trackPull(el)`（a/pull.ts） | 画面のどこを押しても、押した点からどれだけ引っぱったか | 量と `.dispose()` |
+| `touchGate(el)`（touch.ts） | 指で引っぱるデモ（6 章） | 止める関数（listener、timer、「tap to drag」の添え書きを外す） |
+| `hoverControl(el, over, out)`（a/hover-control.ts） | ホバーの動きを途中で止めずに最後まで動かす | 止める関数 |
+| `createGlStage(canvas, options)`（gl.ts） | three の WebGLRenderer を作る入口。WebGL が使えなければ一行の案内を出して `undefined` を返す。context を失ったら止め、取り戻したら動かし直す。`new THREE.WebGLRenderer` を直に作らない | renderer。片付けは `renderer.dispose()`（three の後片付けに加え、context を手放す） |
+| `showFallback(message)`（dom.ts） | 使えない機能があるときの一行の案内（WebGPU など） | 消す関数 |
+| `gsap`、`autoplay(animation, still)`（gsap.ts） | GSAP は `'gsap'` からではなく `src/shared/gsap` から読む。画面の外にいる間、GSAP の動きをまとめて止めるため。ひとりでに動き続ける tween や timeline は `autoplay` に渡す | `autoplay` は止める関数（見張りを外し、animation を kill する） |
+| `whenVisible(callback)`（visibility.ts） | 1 回だけ再生するもの。画面の外で再生を終えてしまわないよう、見えてから始める | 取りやめる関数（まだ呼んでいなければ） |
+| `onRunningChange(listener)`（visibility.ts） | 画面の外やタブが裏に回って止まったとき、戻ったとき | 外す関数 |
+| `fiddleCanvas(canvas, width, height, draw)`（fiddle-canvas.ts） | CreateJS で書いていた fiddle のデモ。もとの固定の大きさの座標のまま描く | `{ ctx, dispose }` |
+| `sketch(canvas, width, height, draw)`（processing.ts） | Processing.js で書いていたスケッチ（processing-js-* のデモ） | `{ ctx, redraw, dispose }` |
+| `lerp`、`damp`、`clamp`、`map` など（math.ts）、`splitText`（split-text.ts）、`createNoise`（noise.ts）、`simplex-noise.glsl`（glsl/） | 数の補間、文字を 1 文字ずつの span に分ける、ノイズ | |
 
 - 画面の外やタブが裏にある間は、`loop()` と `src/shared/gsap` と CSS の animation（`html[data-offscreen]`）が止まる。自前で requestAnimationFrame や setInterval を回すと止まらない
 - 1 本の lab の記事に WebGL のデモを置くのは 4 つまで。重いデモを作るときは、それを前提にする
@@ -179,7 +189,8 @@ lab の記事に iframe で埋め込んだとき、デモの上を指で縦に�
 - デモの側でリンクを作らない。記事やトップへのリンクはパネルが出す
 - 小さな部品は `src/styles/base.css` にある。左上の添え書き（`.demo-hint`、scroll-reveal の「scroll」など）と、左下のもう一度ボタン（`.demo-replay`、reveal の 2 本）
 - lil-gui は右上に出る。使うデモは、パネルと重ならないかを見る
-- デモの上に UI を足したら、プレビューと SNS の動画から隠す。`scripts/capture-previews.mjs` の隠す一覧（今は `.links, .info, .lil-gui`）に足すか、SNS の動画なら要素に `data-capture-hide` を付ける
+- 組のバリエーションのページは、右上に「設定」のボタンが出る（`DemoLayout` が置く。押すと lil-gui で切り替えの欄とパラメーターが開く）。組のバリエーションは自分で lil-gui を出さず、欄は `params` に書く（12 章）
+- デモの上に UI を足したら、プレビューと SNS の動画から隠す。`scripts/capture-previews.mjs` の隠す一覧（今は `.links, .info, .variant-toggle, .lil-gui`）に足すか、SNS の動画なら要素に `data-capture-hide` を付ける
 
 ## 8. プレビュー
 
@@ -203,12 +214,133 @@ lab の記事に iframe で埋め込んだとき、デモの上を指で縦に�
 
 - `e2e/demos.spec.ts`: 全デモを開き、コンソールのエラーがないこと、canvas が描ける大きさになっていること（`.demo-fallback` が出ていない）、`interaction` に合わせてマウスを動かしてもエラーが出ないこと、幅 800px と高さ 500px に縮めても横にはみ出さないこと、別のオリジンの iframe に入れても動くことを見る。canvas が 1 色のままでないかは、GPU のない CI では見ず、手元でだけ見る
 - `e2e/motion.spec.ts`: 動きを減らす設定（`AUTOPLAY`）と、指のスクロール（`DRAG`）。足すのは自分で（5 章と 6 章）
+- `e2e/groups.spec.ts`: 組ごとに、バリエーションを 3 周切り替えても前のものが残らないこと、動きを減らす設定で切り替えても止まった絵になること、iframe の中でも切り替えられて画面の外では止まること。組の定義（`src/groups/*/meta.ts`）から自動でできる。組に固有の確かめ（引っぱる組の縦なぞりなど）は `e2e/groups-<組>.spec.ts` に足す（12 章）
 - `e2e/panel.spec.ts`、`e2e/top.spec.ts`、`e2e/seo.spec.ts`: パネル、トップの並びとピックアップ、OGP、sitemap、RSS、`/log/`
 
-テストの名前は `@<batch> <slug>` なので、1 本だけなら `pnpm test:e2e --grep <slug>` で回せます。ほかの作業と同時に回すときは、`E2E_PORT` でポートを、`--output test-results/<名前>` で出力先を分けます。Playwright は始めに出力先を消すので、同じフォルダだとほかの人の結果を消します。
+テストの名前は `@<batch> <slug>` なので、1 本だけなら `pnpm test:e2e --grep <slug>` で回せます。組のテストの名前には組の名前が入るので、`pnpm test:e2e e2e/groups.spec.ts --grep <組>` で回せます。ほかの作業と同時に回すときは、`E2E_PORT` でポートを、`--output test-results/<名前>` で出力先を分けます。Playwright は始めに出力先を消すので、同じフォルダだとほかの人の結果を消します。
 
 `/demos.json` は webmanab の `pnpm check:demos` が読む一覧です（slug、article など）。項目は足すだけにし、名前を変えたり消したりしません。
 
 ## 11. 確かめる
 
 「動いた」と言う前に、ブラウザで開いて canvas が描かれていることまで見ます。手順は `.claude/skills/check-demo/SKILL.md` にまとめてあります。
+
+## 12. 組（似たデモを 1 ページで切り替える）
+
+パラメーターの値や作りの一部だけが違うデモ（色だけ違う、形だけ違う、同じ動きを別の書き方で書いた、など）は、組にまとめます。組のどのデモのページでも、右上の「設定」を押すと、組のほかのデモ（バリエーション）へ切り替えたり、パラメーターを動かしたりできます。トップでは組を 1 行にまとめ、名前の下に各バリエーションへのリンクを並べます。
+
+- URL は今までどおりバリエーションごと（`/<slug>/`）で、組だけのページは作らない。プレビュー（`public/previews/<slug>.*`）も slug ごと。切り替えると URL、`document.title`、info のパネルが、切り替えた先のものに替わる。OGP と canonical は開いたページのまま
+- バリエーションのコードは `src/demos/<slug>/` に置く。`src/groups/<組>/` に置くのは、組の定義と、全バリエーションで同じマークアップや style、コードだけ
+- 切り替えると、しくみ（`src/shared/variants.ts`、`src/shared/variant-switcher.ts`）が次のバリエーションのページを読み、head の CSS を足し、そのページの script を import して mount する。ほかのバリエーションのコードと CSS は、切り替えたときにだけ読む
+- 組でないデモは今の書き方のままでよい。mount の形に書き直すのは、組に入れるときだけ
+
+### 組の定義 `src/groups/<組>/meta.ts`
+
+```ts
+import { defineGroup } from '../../lib/demos'
+
+export default defineGroup({
+  name: 'random-color', // フォルダ名と同じ
+  title: 'でたらめな色の図形', // トップの組の行に出る
+  description: '円、四角、星を、開くたびに変わるでたらめな色で塗る。星は回すこともできる。',
+  variants: [
+    'random-color-circle-createjs',
+    'random-color-square-createjs',
+    'star-random-color-createjs',
+    'star-rotate-animation-createjs',
+  ], // 切り替えの欄とトップの行はこの順
+  default: 'random-color-circle-createjs', // トップの組の名前から開くバリエーション
+})
+```
+
+variants は 2 本以上で、同じ slug を 2 回書かない。default は variants の中から選ぶ。
+
+### バリエーションの meta.ts
+
+2 章の項目に、`group: '<組>'` と `variant: '<短い呼び名>'` を足します。呼び名は切り替えの欄とトップのリンクの字になるので、日本語の短い言葉にします（random-color なら「円」「四角」）。`/demos.json` にはこの 2 つが増えるだけで、ほかの項目は変わりません。
+
+### バリエーションの main.ts
+
+`mount(stage, params)` を export し、始めたものを全部止める関数（dispose）を返します。型は `src/shared/variants.ts` の `Mount` と `Params` です。下は短くした例で、実物は `src/demos/star-rotate-animation-createjs/main.ts` です。
+
+```ts
+import { autoplayLoop } from '../../shared/motion'
+import type { Mount, Params } from '../../shared/variants'
+
+// あれば。lil-gui の欄になる。数（min、max、step）、真偽、選択（options）が使える
+export const params = {
+  speed: { label: '1 秒に回る角度', value: 30, min: 0, max: 360, step: 1 },
+} satisfies Params
+
+export const mount: Mount<typeof params> = (stage, { speed }) => {
+  // 要素は stage（main.demo）の中から探す
+  const el = stage.querySelector<HTMLElement>('.star')!
+  let rotation = 0
+  const stop = autoplayLoop(
+    (dt) => {
+      rotation += speed * dt
+      el.style.rotate = `${rotation}deg`
+    },
+    // 動きを減らす設定では、回る前の向きで止める
+    () => {
+      el.style.rotate = '0deg'
+    },
+  )
+  return () => {
+    stop()
+  }
+}
+```
+
+- import しただけでは何も動かさない。ほかのページから import されるので、モジュールの top-level には定数と関数だけを置く。top-level で要素を探すと、ほかのページで落ちる
+- 要素は `document.querySelector` ではなく `stage.querySelector` で探す
+- 共有の部品の戻り値（4 章の表）を全部受け、返す関数の中で呼ぶ。`window` や `document` に足した listener、`setTimeout`、GSAP の tween や timeline（`gsap.context()` で作って `revert()` するか、持っておいて `kill()`）も止める。three は `renderer.dispose()` まで呼ぶ（呼ばないと、切り替えるたびに WebGL の context が増える）
+- 写真の読み込みなど後から来る処理は、片付けたあとに描かない（`src/groups/distortion-slider/slider.ts` の `disposed` の印）
+- `let` の状態（角度、色など）は mount の中に置く。外に置くと、切り替えて戻ったときに前の値が残る
+- パラメーターを出すなら、もとの値を `value` にする。値を替えると、スライダーを離したときに dispose → マークアップを戻す → mount し直す、の順で作り直す
+- 自分で lil-gui を出さない。右上の「設定」と重なるので、欄は `params` に移す
+- dispose のあと、stage そのものの class と style はしくみが元に戻す。切り替えや作り直しのときは、stage の中身もそのページを開いたときのマークアップに入れ替わる
+
+### バリエーションの Demo.astro
+
+マークアップと `<style>` はいつもどおり書きます。script だけ次の 3 行にします（ビルドがこの形かを見る）。`is:inline` にしない（切り替えのしくみは `src` のある module の script を読む）。
+
+```astro
+<script>
+  import { start } from '../../shared/variants'
+  import * as variant from './main'
+  start(variant)
+</script>
+```
+
+`src/pages/<slug>.astro` は 1 章の形のままです。
+
+### 書いてはいけないもの
+
+切り替えて足した CSS はページに残り、切り替えのたびに script を import します。そのため、次のものはビルドで落ちます。
+
+- バリエーションの Demo.astro の `<style is:global>`
+- バリエーションの Demo.astro で、行の頭が `:global(` で始まる規則。ほかのバリエーションにもかかる。`.stage :global(canvas)` のように、自分の要素の下に絞ったものはよい
+- 組の共通の部品（`src/groups/<組>/` の `.astro`）の `<script>`。main.demo の中に出て、切り替えたときにバリエーションの script と一緒に import される。HTML のコメントの中に書いた `<script` でも落ちる。動かす処理はバリエーションの main.ts に書き、共通のコードは `src/groups/<組>/*.ts` に置いて main.ts から import する
+
+top-level で動かすこと（上の main.ts の節）はビルドでは見ていません。E2E の 3 周で見ます。
+
+### 新しいデモを組に足す
+
+新しく作るデモが、ある組とパラメーターや作りの一部だけしか違わないなら、別のデモにせず、その組のバリエーションとして足すかを考えます。足すなら次の順です。
+
+1. 1 章のとおりにファイルを置く（meta.ts、Demo.astro、main.ts、README.md、`src/pages/<slug>.astro`）
+2. meta.ts に `group` と `variant` を書く
+3. `src/groups/<組>/meta.ts` の `variants` に slug を足す。並びが切り替えの欄とトップの順になる
+4. main.ts を上の mount の形で書き、Demo.astro の script を 3 行にする。組の共通の部品やコード（`src/groups/<組>/`）があれば使う
+5. 下の「確かめる」をやり、プレビューを撮る（8 章）
+
+今あるデモを組へ移すときも同じ順です。もとの main.ts の top-level の処理を mount の中へ移し、`Math.random` を呼ぶ順を変えないようにします（次の節の RMSE で比べるため）。
+
+### 確かめる
+
+- `pnpm build`。組の決まりに合わないと、ここで落ちる。メッセージのとおりに直す
+- `pnpm check:budget`。組のページには、切り替えのしくみの最初の部分と組の一覧の JSON が増える（1 KB ほど）
+- `E2E_PORT=<ポート> pnpm test:e2e --output test-results/<名前> e2e/groups.spec.ts --grep <組>`。3 周の切り替え、動きを減らす設定、iframe の 3 本が回る（組の名前が別の組の名前に含まれていると、両方回る）。ほかに `--grep <slug>` で demos.spec と motion.spec も
+- ブラウザで開き、「設定」を押して全部のバリエーションに切り替え、それぞれ canvas が描かれているかを見る。パラメーターも動かしてみる。iframe の中でも 1 回切り替える
+- 今あるデモを組へ移したときだけ、移す前（master）のビルドと移したあとのビルドを同じ大きさで撮り、画素の差（RMSE）を比べる。「設定」のボタンを隠して 0 になるか、差が出たら理由があるかを見る。新しく足すバリエーションには比べる相手がないので要らない
