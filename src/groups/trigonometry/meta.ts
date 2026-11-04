@@ -17,5 +17,5 @@ export default defineGroup({
     'give-speed-and-angle-as-separate-random-values',
     'trigonometry-random-floating',
   ],
-  default: 'smooth-movement-using-sin-wave',
+  default: 'rotate-elements-arranged-on-the-circumference',
 })

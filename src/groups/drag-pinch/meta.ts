@@ -11,5 +11,5 @@ export default defineGroup({
     'drag-pinch-lines',
     'drag-pinch-word',
   ],
-  default: 'drag-pinch-simple',
+  default: 'drag-pinch-lines',
 })

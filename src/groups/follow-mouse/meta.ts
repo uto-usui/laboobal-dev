@@ -11,5 +11,5 @@ export default defineGroup({
     'follow-mouse-transform',
     'follow-mouse-spotlight',
   ],
-  default: 'follow-mouse',
+  default: 'follow-mouse-spotlight',
 })
