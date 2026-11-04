@@ -9,16 +9,17 @@ const ground = SIZE - size
 const STEP = 1 / 60
 
 export const params = {
+  // 1 フレームに下向きに増える速さ
   gravity: {
-    label: '重力（1 フレームに増える速さ）',
+    label: '重力',
     value: 0.5,
     min: 0.05,
     max: 2,
     step: 0.05,
   },
-  // 1 にすると速さが減らず、弾み続ける
+  // 1 フレームに残る速さの割合。1 にすると速さが減らず、弾み続ける
   friction: {
-    label: '摩擦（1 フレームに残る速さの割合）',
+    label: '摩擦で残る割合',
     value: 0.95,
     min: 0.8,
     max: 1,
