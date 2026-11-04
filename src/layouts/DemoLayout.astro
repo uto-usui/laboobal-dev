@@ -95,10 +95,12 @@ const meta = [
     setOpen(false)
   }
 
-  toggle.addEventListener('click', () => setOpen(panel.hidden))
+  const isOpen = () => toggle.getAttribute('aria-expanded') === 'true'
+
+  toggle.addEventListener('click', () => setOpen(!isOpen()))
   panel.querySelector('.info-close')!.addEventListener('click', close)
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && !panel.hidden) close()
+    if (event.key === 'Escape' && isOpen()) close()
   })
 
   // lab の記事に埋め込まれているときは、その記事を読んでいるので「記事」は出さない
