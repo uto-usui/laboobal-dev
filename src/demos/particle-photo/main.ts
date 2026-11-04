@@ -1,5 +1,6 @@
 import GUI from 'lil-gui'
 import { loop, onResize, prefersReducedMotion } from '../../shared/dom'
+import { onReducedMotion } from '../../shared/motion'
 import { washCount, type Mode } from './assign'
 import {
   createRenderer,
@@ -118,6 +119,7 @@ const images: { id: number; button: HTMLButtonElement }[] = []
 let currentId: number | null = null
 let lastSwitch = 0
 let nextImageId = 0
+let reduced = prefersReducedMotion()
 
 const alloc = (count: number) => {
   n = count
@@ -260,12 +262,13 @@ const frame = (rawDt: number) => {
       : 0
   const a = P.abstract + Math.max(0, P.swell - P.abstract) * swellEnv
   const spring = 70 - 62 * a
-  // 視線はマウスへゆっくり寄せ、触っていないときは小さく揺らす
+  // 視線はマウスへゆっくり寄せ、触っていないときは小さく揺らす。動きを減らす設定では揺らさない
   const hovering = mouse[0] < 100
+  const idle = reduced ? 0 : 1
   const mx = hovering
     ? mouse[0] / Math.max(aspect, 1)
-    : Math.sin(time * 0.21) * 0.3
-  const my = hovering ? mouse[1] : Math.sin(time * 0.17 + 1) * 0.25
+    : Math.sin(time * 0.21) * 0.3 * idle
+  const my = hovering ? mouse[1] : Math.sin(time * 0.17 + 1) * 0.25 * idle
   cam[0] += (mx * 0.32 * P.parallax - cam[0]) * Math.min(1, dt * 2.5)
   cam[1] += (-my * 0.32 * P.parallax - cam[1]) * Math.min(1, dt * 2.5)
   const prog = (time - tStart) / (P.wave + 1.8)
@@ -388,6 +391,7 @@ const buildGui = () => {
   }
   view.add(actions, 'explode').name('吹き飛ばす (E)')
   view.add(actions, 'next').name('次へ (Space)')
+  return gui
 }
 
 // ---------- 起動 ----------
@@ -404,7 +408,16 @@ try {
   gpu.resize(pixelSize.w, pixelSize.h, P.night)
   alloc(P.count)
   bindInput()
-  buildGui()
+  const gui = buildGui()
+  // 動きを減らす設定に切り替えたら、自動で次の写真へ送るのも止める（決まりは shared/motion.ts）
+  onReducedMotion((value) => {
+    if (value === reduced) return
+    reduced = value
+    P.auto = !value
+    lastSwitch = performance.now()
+    for (const controller of gui.controllersRecursive())
+      controller.updateDisplay()
+  })
   loop(frame)
   // 6 枚を一度に読み始め、足すのは並びの順にする（1 枚目は Demo.astro の preload で先に読んでいる）
   const blobs = PHOTOS.map((url) => fetch(url).then((res) => res.blob()))

@@ -1,10 +1,6 @@
 import GUI from 'lil-gui'
-import {
-  fitCanvas,
-  loop,
-  onResize,
-  prefersReducedMotion,
-} from '../../shared/dom'
+import { fitCanvas, onResize } from '../../shared/dom'
+import { autoplayLoop } from '../../shared/motion'
 import { distance, random } from '../../shared/math'
 
 interface Ball {
@@ -162,9 +158,7 @@ onResize(canvas, () => {
   draw(0)
 })
 
-if (!prefersReducedMotion()) {
-  loop((dt) => draw(dt * 60))
-}
+autoplayLoop((dt) => draw(dt * 60))
 
 const gui = new GUI({ title: 'nodeballs' })
 gui.add(params, 'speed', 0.25, 50).name('弾く速さ')

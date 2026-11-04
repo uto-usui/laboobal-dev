@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { loop, onResize, pixelRatio } from '../../shared/dom'
+import { onResize, pixelRatio } from '../../shared/dom'
 import {
   FULLSCREEN_VERTEX,
   createFullscreenScene,
@@ -7,6 +7,7 @@ import {
 } from '../../shared/gl'
 import noise from '../../shared/glsl/simplex-noise.glsl?raw'
 import typo from './assets/typo.frag?raw'
+import { autoplayLoop } from '../../shared/motion'
 
 const stage = document.querySelector<HTMLElement>('.typo')!
 const canvas = stage.querySelector<HTMLCanvasElement>('canvas')!
@@ -51,7 +52,8 @@ const material = new THREE.ShaderMaterial({
   fragmentShader: noise + typo,
 })
 const { scene, camera } = createFullscreenScene(material)
-const renderer = createGlStage(canvas)
+const render = () => renderer?.render(scene, camera)
+const renderer = createGlStage(canvas, { onRestore: render })
 
 if (renderer) {
   renderer.setClearColor(0x000000)
@@ -60,10 +62,12 @@ if (renderer) {
     renderer.setSize(width, height, false)
     uniforms.uResolution.value.set(width, height)
     drawText(width, height)
+    render()
   })
 
-  loop((_dt, elapsed) => {
+  // 動きを減らす設定では、そのときの 1 コマで止める
+  autoplayLoop((_dt, elapsed) => {
     uniforms.uTime.value = elapsed
-    renderer.render(scene, camera)
-  })
+    render()
+  }, render)
 }

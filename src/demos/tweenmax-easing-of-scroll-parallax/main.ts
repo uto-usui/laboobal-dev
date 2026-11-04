@@ -16,35 +16,34 @@ const notches = (event: WheelEvent) =>
     ? event.deltaY * 40
     : event.deltaY * 1.2
 
-if (!prefersReducedMotion()) {
-  addEventListener(
-    'wheel',
-    (event) => {
-      // 横のスクロールと、ctrl を押しながらの拡大（トラックパッドのピンチ）は、そのままにする
-      if (event.deltaY === 0 || event.ctrlKey) return
-      const max = document.documentElement.scrollHeight - innerHeight
-      // 端まで来ていたら止めない。記事の iframe の中で、外のページへスクロールを渡すため
-      if (
-        (event.deltaY < 0 && scrollY <= 0) ||
-        (event.deltaY > 0 && scrollY >= max)
-      )
-        return
-      event.preventDefault()
-      gsap.to(window, {
-        duration: SCROLL_TIME,
-        scrollTo: {
-          y: clamp(scrollY + notches(event) * DISTANCE, 0, max),
-          // スクロールバーやキーで動かされたら、そちらに任せて止める
-          autoKill: true,
-        },
-        ease: 'power1.out',
-        overwrite: true,
-      })
-    },
-    // preventDefault するので passive にしない
-    { passive: false },
-  )
-}
+addEventListener(
+  'wheel',
+  (event) => {
+    // 横のスクロールと、ctrl を押しながらの拡大（トラックパッドのピンチ）は、そのままにする。
+    // 動きを減らす設定の間も奪わない。ホイールを回すたびに見るので、途中で設定を変えても効く
+    if (event.deltaY === 0 || event.ctrlKey || prefersReducedMotion()) return
+    const max = document.documentElement.scrollHeight - innerHeight
+    // 端まで来ていたら止めない。記事の iframe の中で、外のページへスクロールを渡すため
+    if (
+      (event.deltaY < 0 && scrollY <= 0) ||
+      (event.deltaY > 0 && scrollY >= max)
+    )
+      return
+    event.preventDefault()
+    gsap.to(window, {
+      duration: SCROLL_TIME,
+      scrollTo: {
+        y: clamp(scrollY + notches(event) * DISTANCE, 0, max),
+        // スクロールバーやキーで動かされたら、そちらに任せて止める
+        autoKill: true,
+      },
+      ease: 'power1.out',
+      overwrite: true,
+    })
+  },
+  // preventDefault するので passive にしない
+  { passive: false },
+)
 
 // - - スクロールに合わせて、点を倍率の分だけずらす
 // 倍率をこの数で割って使う。大きいほど動きが小さい

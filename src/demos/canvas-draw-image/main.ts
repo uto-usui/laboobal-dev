@@ -1,4 +1,5 @@
 import { fitCanvas, loop, onResize } from '../../shared/dom'
+import { onReducedMotion } from '../../shared/motion'
 import photo from './assets/photo.jpg'
 
 const stage = document.querySelector<HTMLElement>('.draw-image')!
@@ -20,6 +21,8 @@ let source = { x: 0, y: 0, width: 0, height: 0 }
 let mode: 'scan' | 'show' = 'scan'
 let x = 0
 let direction = 1
+let reduced = false
+onReducedMotion((value) => (reduced = value))
 
 const fitSource = () => {
   const view = size.width / size.height
@@ -61,8 +64,9 @@ const setMode = (next: typeof mode) => {
 
 loop((dt) => {
   if (mode === 'scan') {
-    // 1 列を画面の幅いっぱいに引き伸ばす。どの列を使うかが左右に往復するので、縞が移り変わり続ける
-    x += direction * SCAN_SPEED * dt
+    // 1 列を画面の幅いっぱいに引き伸ばす。どの列を使うかが左右に往復するので、縞が移り変わり続ける。
+    // 動きを減らす設定の間は列を動かさず、縞を止めておく。クリックで写真を出すのは読む人が始めるので残す
+    if (!reduced) x += direction * SCAN_SPEED * dt
     if (x >= size.width) direction = -1
     if (x <= 0) direction = 1
     x = Math.min(Math.max(x, 0), size.width)

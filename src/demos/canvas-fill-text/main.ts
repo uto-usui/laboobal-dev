@@ -1,4 +1,9 @@
-import { fitCanvas, loop, onResize } from '../../shared/dom'
+import {
+  fitCanvas,
+  loop,
+  onResize,
+  prefersReducedMotion,
+} from '../../shared/dom'
 import { distance, random } from '../../shared/math'
 
 interface Circle {
@@ -80,14 +85,16 @@ const pickLetter = () => {
   return next
 }
 
-const start = (next = pickLetter()) => {
+/** animate が false なら、詰め終わるまで先に計算して、終わりの絵を 1 回だけ描く */
+const start = (next = pickLetter(), animate = true) => {
   stopLoop?.()
   letter = next
   spots = collectSpots(letter)
   circles = []
   let idle = 0
 
-  stopLoop = loop((dt) => {
+  /** 1 コマ分進める。詰め終わったら true */
+  const step = (dt: number) => {
     const before = circles.length
     for (let i = 0; i < TRIES; i++) trySpawn()
     // 新しい円が置けない時間が続き、伸びている円もなくなったら止める
@@ -111,8 +118,19 @@ const start = (next = pickLetter()) => {
         growing++
       }
     }
+    return idle > 1 && growing === 0
+  }
+
+  if (!animate) {
+    // 詰め終わらない形のときのために、60 秒分で打ち切る
+    for (let i = 0; i < 3600 && !step(1 / 60); i++);
     draw()
-    if (idle > 1 && growing === 0) stopLoop?.()
+    return
+  }
+  stopLoop = loop((dt) => {
+    const done = step(dt)
+    draw()
+    if (done) stopLoop?.()
   })
 }
 
@@ -120,8 +138,9 @@ onResize(stage, ({ width, height }) => {
   if (width === size.width && height === size.height) return
   size = { width, height }
   fitCanvas(canvas, ctx)
-  // 大きさが変わったら、同じ文字で詰め直す
-  start(letter || undefined)
+  // 大きさが変わったら、同じ文字で詰め直す。開いたときと大きさが変わったときはひとりでに動くので、
+  // 動きを減らす設定では終わりの絵だけを出す。クリックで次の文字を詰めるのは、読む人が始めるので動かす
+  start(letter || undefined, !prefersReducedMotion())
 })
 
 stage.addEventListener('click', () => start())
