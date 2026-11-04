@@ -21,4 +21,6 @@ export default defineDemo({
     '大きさと色の違う玉が漂い、近い玉どうしが線で結ばれる。ぶつかると弾き合う。',
   tags: ['particles', 'physics'],
   tech: ['canvas2d'],
+  group: 'nodes',
+  variant: '弾く玉',
 })
