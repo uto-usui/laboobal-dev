@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'scroll',
+  created: '2019-01-21',
+  added: '2026-11-01',
+  description:
+    'スクロールで通り過ぎる横長の箱が、奥へ倒れた形から起き上がり、上で手前へ倒れる。',
+  tags: ['scroll', '3d'],
+  tech: ['js'],
 })

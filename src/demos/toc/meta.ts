@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'scroll',
+  created: '2017-01-25',
+  added: '2026-11-02',
+  description:
+    '本文の見出しを拾って入れ子の目次を作る。項目を押すと、その見出しまでスクロールする。',
+  tags: ['ui', 'scroll'],
+  tech: ['js'],
 })
