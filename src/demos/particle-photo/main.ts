@@ -282,6 +282,7 @@ const frame = (rawDt: number) => {
   const env = prog > 0 && prog < 1 ? Math.sin(Math.PI * prog) ** 1.5 : 0
   const [qw, qh] = gpu.quarter
   // 並びは shaders.ts の struct U と同じ
+  // biome-ignore format: struct U の 1 行（vec4）ずつに並べてある
   U.set([
     time, dt, tStart, live,
     mouse[0], mouse[1], 0.14, pressed ? 70 : 5,
@@ -293,7 +294,7 @@ const frame = (rawDt: number) => {
     cam[0], cam[1], P.depth, P.dof,
     P.bloom, env, 2.4, qh,
     washCount(n), P.impasto, P.shadow, 0,
-  ]) // prettier-ignore
+  ])
   gpu.render(U, live, washCount(n), P.night)
 }
 

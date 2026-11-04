@@ -1,6 +1,6 @@
 import { gsap } from '../../shared/gsap'
 import {
-  BufferAttribute,
+  type BufferAttribute,
   Color,
   DirectionalLight,
   HemisphereLight,

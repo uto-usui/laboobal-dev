@@ -6,7 +6,8 @@
 
   <section class="box">
     <p class="count" aria-live="polite">
-      <span data-remaining>0</span> / <span data-total>0</span>
+      <span data-remaining>0</span>
+      / <span data-total>0</span>
     </p>
     <ul class="list" data-list></ul>
     <form class="add" data-form>
@@ -16,15 +17,16 @@
         placeholder="add a todo here"
         aria-label="やること"
         autocomplete="off"
-      />
+      >
       <button type="submit">Add</button>
     </form>
   </section>
 
   <template data-item>
     <li>
+      <!-- biome-ignore lint/a11y/noLabelWithoutControl: 中の span の文言は main.ts が入れる -->
       <label>
-        <input type="checkbox" />
+        <input type="checkbox">
         <span></span>
       </label>
     </li>
