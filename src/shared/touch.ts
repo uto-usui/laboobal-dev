@@ -23,7 +23,7 @@ export const touchGate = (el: HTMLElement) => {
   let hint: HTMLElement | undefined
   if (isCoarsePointer()) {
     hint = document.createElement('p')
-    hint.className = 'demo-hint'
+    hint.className = 'demo-hint demo-hint-touch'
     hint.textContent = 'tap to drag'
     ;(document.querySelector('main.demo') ?? document.body).append(hint)
   }

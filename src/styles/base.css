@@ -81,6 +81,14 @@ html[data-offscreen] * {
   letter-spacing: 0.1em;
 }
 
+/* touchGate の添え書きは、どのデモの背景の上にも出るので、info のボタンと同じく背景との差で色を出す */
+.demo-hint-touch {
+  z-index: 2147483646;
+  color: #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
 .demo-replay {
   position: absolute;
   bottom: 8px;
