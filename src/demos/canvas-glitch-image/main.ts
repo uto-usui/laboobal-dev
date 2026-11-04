@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { loop, onResize } from '../../shared/dom'
+import { onResize } from '../../shared/dom'
 import {
   FULLSCREEN_VERTEX,
   coverScale,
@@ -8,7 +8,8 @@ import {
   createGlStage,
 } from '../../shared/gl'
 import noise from '../../shared/glsl/simplex-noise.glsl?raw'
-import photo from './assets/photo.jpg'
+import { autoplayLoop } from '../../shared/motion'
+import photo from './assets/photo.webp'
 import glitch from './assets/glitch.frag?raw'
 
 const stage = document.querySelector<HTMLElement>('.glitch-image')!
@@ -30,7 +31,8 @@ const material = new THREE.ShaderMaterial({
   fragmentShader: noise + glitch,
 })
 const { scene, camera } = createFullscreenScene(material)
-const renderer = createGlStage(canvas)
+const render = () => renderer?.render(scene, camera)
+const renderer = createGlStage(canvas, { onRestore: render })
 
 if (renderer) {
   onResize(stage, ({ width, height }) => {
@@ -38,11 +40,19 @@ if (renderer) {
     // ずれの量は px で書いているので、CSS の px の大きさを渡す
     uniforms.uResolution.value.set(width, height)
     coverScale(width, height, photo.width, photo.height, uniforms.uCover.value)
+    render()
   })
 
-  loop((_dt, elapsed) => {
-    // time * time を使う式があるので、大きくなりすぎないよう 10 分で戻す（3 秒の周期の倍数）
-    uniforms.uTime.value = elapsed % 600
-    renderer.render(scene, camera)
-  })
+  autoplayLoop(
+    (_dt, elapsed) => {
+      // time * time を使う式があるので、大きくなりすぎないよう 10 分で戻す（3 秒の周期の倍数）
+      uniforms.uTime.value = elapsed % 600
+      render()
+    },
+    // 動きを減らす設定では、崩れの強さが 0 になる時刻（3 秒の周期の真ん中）の 1 コマで止める。点滅させない
+    () => {
+      uniforms.uTime.value = 1.5
+      render()
+    },
+  )
 }

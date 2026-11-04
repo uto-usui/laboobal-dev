@@ -12,7 +12,7 @@ html {
 body {
   margin: 0;
   font-family:
-    Montserrat, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic',
+    Montserrat, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic",
     sans-serif;
   color: var(--color-fg);
   background: var(--color-bg);
@@ -23,6 +23,16 @@ body {
   --color-fg: #eee;
   --color-accent: #4ecca3;
   --color-muted: #808080;
+}
+
+/* Picture（AVIF と WebP を出し分ける）の包み。中の img がそのまま親の grid や flex に並ぶよう、箱を作らない。
+   source は UA の CSS で隠れていないので、grid の中で空の行を作らないよう隠す */
+main.demo picture {
+  display: contents;
+}
+
+main.demo picture > source {
+  display: none;
 }
 
 img,
@@ -37,6 +47,14 @@ svg {
    デモの animation の一括指定は play-state を running に戻すうえ、デモの style の方が詳細度が高いので !important にする */
 html[data-offscreen] * {
   animation-play-state: paused !important;
+}
+
+/* 動きを減らす設定のとき、ひとりでに動き続ける CSS の animation を止める（決まりは docs/demo-guide.md の 5 章）。
+   読み込んだときから止めると最初のコマで止まる。スクロールに合わせて動く animation は止めないので、印を付けた要素だけにする */
+@media (prefers-reduced-motion: reduce) {
+  [data-motion="auto"] {
+    animation-play-state: paused !important;
+  }
 }
 
 /* WebGL が使えないときの一行の案内（showFallback）。particle-photo の WebGPU の案内と同じ見た目 */
@@ -61,6 +79,14 @@ html[data-offscreen] * {
   font-size: 11px;
   color: var(--color-muted);
   letter-spacing: 0.1em;
+}
+
+/* touchGate の添え書きは、どのデモの背景の上にも出るので、info のボタンと同じく背景との差で色を出す */
+.demo-hint-touch {
+  z-index: 2147483646;
+  color: #fff;
+  mix-blend-mode: difference;
+  pointer-events: none;
 }
 
 .demo-replay {

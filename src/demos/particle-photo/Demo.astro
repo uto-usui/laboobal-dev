@@ -4,7 +4,7 @@
 import firstPhoto from './assets/01.jpg?url'
 ---
 
-<link rel="preload" href={firstPhoto} as="fetch" crossorigin="anonymous" />
+<link rel="preload" href={firstPhoto} as="fetch" crossorigin="anonymous">
 
 <div class="particle-photo">
   <canvas
@@ -21,10 +21,8 @@ import firstPhoto from './assets/01.jpg?url'
       ＋
     </button>
   </div>
-  <input type="file" accept="image/*" multiple hidden />
-  <div class="drop" aria-hidden="true">
-    ここに写真をドロップ
-  </div>
+  <input type="file" accept="image/*" multiple hidden>
+  <div class="drop" aria-hidden="true">ここに写真をドロップ</div>
   <p class="unsupported">このブラウザは WebGPU に対応していません</p>
   <pre class="error" hidden></pre>
 </div>
@@ -57,32 +55,25 @@ import firstPhoto from './assets/01.jpg?url'
   .view {
     width: 100%;
     height: 100%;
-    touch-action: none;
+    /* 縦のスクロールは記事に渡す。タップしたあとは main.ts の touchGate が none にする */
+    touch-action: pan-y;
     cursor: crosshair;
   }
 
-  /* 右下は labobal.dev のリンクがあるので、写真の列は左下に置く */
+  /* 右の端には info のボタン（src/layouts/DemoLayout.astro）があるので、写真の列は左下から右へ 48px 手前まで */
   .strip {
     position: absolute;
     bottom: 8px;
     left: 8px;
     display: flex;
     gap: 6px;
-    max-width: calc(100% - 160px);
+    max-width: calc(100% - 56px);
     padding: 5px;
     overflow-x: auto;
     background: var(--card);
     backdrop-filter: blur(14px);
     border: 1px solid var(--line);
     border-radius: 8px;
-  }
-
-  /* 狭い幅では右下のリンク（高さ約 20px）と横に並びきらないので、リンクの上へ上げる */
-  @media (width < 560px) {
-    .strip {
-      bottom: 36px;
-      max-width: calc(100% - 16px);
-    }
   }
 
   .strip :global(button) {
@@ -117,7 +108,7 @@ import firstPhoto from './assets/01.jpg?url'
   .strip :global(.is-busy)::after {
     position: absolute;
     inset: 0;
-    content: '';
+    content: "";
     background: color-mix(in srgb, var(--paper) 55%, transparent);
   }
 

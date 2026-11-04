@@ -12,13 +12,12 @@ git diff --quiet "$CACHED_COMMIT_REF" "$COMMIT_REF" -- . \
   ':(exclude)README.md' \
   ':(exclude)CLAUDE.md' \
   ':(exclude)AGENTS.md' \
-  ':(exclude)src/demos/*/notes.md' \
+  ':(exclude)src/demos/*/README.md' \
   ':(exclude).claude' \
   ':(exclude).github' \
   ':(exclude)e2e' \
+  ':(exclude)scripts' \
   ':(exclude)playwright.config.ts' \
-  ':(exclude)eslint.config.js' \
-  ':(exclude).prettierrc' \
-  ':(exclude).prettierignore' \
+  ':(exclude)biome.json' \
   ':(exclude).editorconfig' \
   ':(exclude).gitignore'

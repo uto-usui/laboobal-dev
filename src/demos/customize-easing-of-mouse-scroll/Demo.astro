@@ -1,0 +1,30 @@
+<div class="smooth" data-smooth-root>
+  <div class="content" data-content>
+    {Array.from({ length: 10 }, () => <section class="inner">🍣</section>)}
+  </div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-size: 25vh;
+    background-image: linear-gradient(60deg, blue, #e1f5c4);
+  }
+
+  /*
+   * 滑らかにする間は、中身を画面に貼り付け、translateY で動かす。
+   * 外の箱に中身と同じ高さ（main.ts が入れる）を持たせて、ページはふつうにスクロールできるようにしておく
+   */
+  .smooth[data-on] .content {
+    position: fixed;
+    inset: 0 0 auto;
+    will-change: transform;
+  }
+</style>

@@ -1,4 +1,4 @@
-import { isHoverless } from './dom'
+import { isHoverless, prefersReducedMotion } from './dom'
 
 export interface Pointer {
   /** units が 'px' なら el の左上を 0 とした px、'unit' なら真ん中が 0 で端が -1 と 1 */
@@ -58,14 +58,14 @@ export const trackPointer = (
 
 /**
  * マウスを重ねられない端末で、マウスの代わりにゆっくり 8 の字を描く位置（units: 'unit' のとき）。
- * マウスの端末では pointer をそのまま返す
+ * マウスの端末と、動きを減らす設定のとき（docs/demo-guide.md の 5 章の 3）は pointer をそのまま返す
  */
 export const pointerOrWander = (
   pointer: Pointer,
   elapsed: number,
   amount = 0.6,
 ) =>
-  isHoverless() && !pointer.inside
+  isHoverless() && !pointer.inside && !prefersReducedMotion()
     ? {
         x: Math.sin(elapsed * 0.5) * amount,
         y: Math.sin(elapsed * 0.8) * amount * 0.6,

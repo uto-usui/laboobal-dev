@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'hover',
+  created: '2019-01-21',
+  added: '2026-11-01',
+  description:
+    '番号の付いた緑の四角にマウスを乗せると、赤くなって暗い枠が付き、番号が大きくなる。',
+  tags: ['hover'],
+  tech: ['gsap'],
 })

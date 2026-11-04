@@ -5,6 +5,7 @@ import '@fontsource/molle/400-italic.css'
 <div class="two-step">
   <h1>block animation</h1>
   <section class="frame">
+    <!-- biome-ignore lint/a11y/useValidAnchor: 記事の「リンクにマウスを乗せる」見本なので、行き先のないリンクのままにする -->
     <a class="block" href="#">
       <span>HOVER</span>
     </a>
@@ -70,7 +71,7 @@ import '@fontsource/molle/400-italic.css'
     position: absolute;
     inset: 0;
     pointer-events: none;
-    content: '';
+    content: "";
     transform: scaleY(0);
     transform-origin: bottom;
   }

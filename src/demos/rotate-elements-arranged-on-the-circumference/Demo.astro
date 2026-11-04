@@ -1,0 +1,52 @@
+---
+const count = 12
+---
+
+<div class="stage">
+  <div class="wrap" data-stage>
+    {Array.from({ length: count }, () => <div class="target" data-target />)}
+  </div>
+  <h1>smooth animation</h1>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .wrap {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    perspective: 500px;
+  }
+
+  .target {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background-color: lightgray;
+  }
+
+  /* 板より奥に置く。position を付けないので、絶対配置の .wrap の下に描かれる */
+  h1 {
+    display: inline-block;
+    margin: 0.67em 8px;
+    font-size: 8vw;
+    font-weight: bold;
+    line-height: 1;
+    color: lightgray;
+    text-transform: capitalize;
+    letter-spacing: -0.01em;
+    background-color: black;
+  }
+</style>

@@ -15,4 +15,11 @@ export default defineDemo({
   ],
   webgl: true,
   interaction: 'none',
+  created: '2019-02-05',
+  added: '2026-11-01',
+  description:
+    '白黒の写真がいつも細かく震え、数秒おきに一瞬、色がずれて筋とブロックで崩れる。',
+  tags: ['image', 'distortion', 'noise'],
+  tech: ['three', 'glsl'],
+  pick: true,
 })

@@ -1,4 +1,5 @@
-import { loop, onResize, prefersReducedMotion } from '../../shared/dom'
+import { onResize } from '../../shared/dom'
+import { autoplayLoop } from '../../shared/motion'
 import { map, random, toRadian } from '../../shared/math'
 
 const stage = document.querySelector<HTMLElement>('[data-stage]')!
@@ -21,6 +22,7 @@ let width = 0
 let height = 0
 onResize(stage, (size) => {
   ;({ width, height } = size)
+  draw()
 })
 
 const draw = () => {
@@ -33,11 +35,14 @@ const draw = () => {
   ball.style.backgroundColor = `hsl(${map(sin(waves.hue), -1, 1, 0, 259)} 80% 70%)`
 }
 
-if (prefersReducedMotion()) {
-  onResize(stage, draw)
-} else {
-  loop((dt) => {
+autoplayLoop(
+  (dt) => {
     for (const wave of Object.values(waves)) wave.angle += wave.speed * dt
     draw()
-  })
-}
+  },
+  // 動きを減らす設定では、玉を真ん中に置いて止める。でたらめな角度のままだと、画面の外で止まることがある
+  () => {
+    for (const wave of [waves.x, waves.y, waves.z]) wave.angle = 0
+    draw()
+  },
+)

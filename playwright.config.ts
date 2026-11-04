@@ -7,7 +7,7 @@ const external = process.env.E2E_BASE_URL
 
 export default defineConfig({
   testDir: 'e2e',
-  // 担当ごとに --output で分ける（Playwright は実行の始めに出力先を消すため。docs/plan.md の 5 章）
+  // 担当ごとに --output で分ける（Playwright は実行の始めに出力先を消すため。docs/demo-guide.md の 10 章）
   outputDir: 'test-results/all',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,

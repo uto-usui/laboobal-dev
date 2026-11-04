@@ -11,7 +11,7 @@ const text = 'marquee infinite animation'
       aria-hidden={dir ? 'true' : undefined}
     >
       {/* 同じ文を 4 つ並べ、1 つ分（全体の 25%）だけ動かして初めに戻す。つなぎ目が見えない */}
-      <p class="track">
+      <p class="track" data-motion="auto">
         {Array.from({ length: 4 }, (_, i) => (
           <span aria-hidden={i > 0 ? 'true' : undefined}>{text}</span>
         ))}
@@ -42,15 +42,15 @@ const text = 'marquee infinite animation'
   }
 
   /* 向きを変えるのは行ごと。文字の流れ方は 4 行とも同じ */
-  .row[data-dir='tb'] {
+  .row[data-dir="tb"] {
     transform: translateX(0.5em) rotate(-90deg);
   }
 
-  .row[data-dir='bt'] {
+  .row[data-dir="bt"] {
     transform: translateX(-0.5em) rotate(90deg);
   }
 
-  .row[data-dir='diag'] {
+  .row[data-dir="diag"] {
     transform: translateX(2em) rotate(210deg);
   }
 

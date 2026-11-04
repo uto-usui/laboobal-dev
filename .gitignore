@@ -19,3 +19,9 @@ playwright/.cache/
 # OS / IDE
 .DS_Store
 .idea/
+
+# Claude Code のエージェントの作業場所（.claude/skills は追跡する）
+.claude/worktrees/
+
+# scripts/capture-social.mjs の出力（SNS 用の動画）
+/social/

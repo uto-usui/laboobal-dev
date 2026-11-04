@@ -1,0 +1,89 @@
+---
+import webm from './assets/clip.webm'
+import mp4 from './assets/clip.mp4'
+---
+
+<div class="stage">
+  <div class="wrap" data-wrap>
+    <video muted loop playsinline preload="auto" data-video>
+      <source src={webm} type="video/webm">
+      <source src={mp4} type="video/mp4">
+    </video>
+    <button class="btn" type="button" aria-pressed="false" data-sound>
+      sound
+    </button>
+  </div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    color-scheme: light;
+    background: #fff;
+  }
+
+  .wrap {
+    position: relative;
+    width: 90%;
+    height: 90%;
+    overflow: hidden;
+    background: #000;
+    transition: transform 1s;
+  }
+
+  /* 黒を color-burn で重ねる。下の色のうち、明るさが振り切れたところだけが残り、ほかは黒に沈む */
+  .wrap::after {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    content: "";
+    background-color: #000;
+    mix-blend-mode: color-burn;
+    transition: opacity 0.5s;
+  }
+
+  .wrap:hover {
+    transform: scale(1.05);
+  }
+
+  .wrap:hover::after {
+    opacity: 0;
+  }
+
+  /* 明るさとコントラストを 2 倍にして、強くぼかす。sound を押すと外れる */
+  video {
+    position: absolute;
+    /* ぼかすと縁が透けて黒く沈む。枠より 40px ずつ大きくして、縁を枠の外に逃がす */
+    inset: -40px;
+    width: calc(100% + 80px);
+    max-width: none;
+    height: calc(100% + 80px);
+    object-fit: cover;
+    filter: brightness(200%) contrast(200%) blur(20px);
+    transition: filter 1s;
+  }
+
+  .wrap[data-clear] video {
+    filter: none;
+  }
+
+  .btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    padding: 2px 8px;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+</style>

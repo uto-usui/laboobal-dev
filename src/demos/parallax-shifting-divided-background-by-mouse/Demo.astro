@@ -1,10 +1,14 @@
 ---
 import photo from './assets/photo.jpg'
+import { getImage } from 'astro:assets'
+
+// CSS の background に敷くので、Picture の代わりに WebP だけを作る
+const background = await getImage({ src: photo, format: 'webp' })
 
 const strips = Array.from({ length: 5 }, (_, i) => i)
 ---
 
-<div class="divided" style={`--photo: url(${photo.src})`}>
+<div class="divided" style={`--photo: url(${background.src})`}>
   {strips.map((i) => (
     <div class="strip" style={`--i: ${i}`}>
       <div class="positioner">
@@ -39,7 +43,7 @@ const strips = Array.from({ length: 5 }, (_, i) => i)
     inset: 0 0 auto;
     z-index: 1;
     height: 1px;
-    content: '';
+    content: "";
     background: #333;
   }
 

@@ -1,0 +1,76 @@
+---
+import '@fontsource/molle/400-italic.css'
+---
+
+<div class="sketch">
+  <h1>processing.js</h1>
+  <p class="lead">
+    variable / for <br>
+    gradation dot
+  </p>
+  <div class="frame" style="--w: 320; --h: 320">
+    <canvas
+      aria-label="6 列 6 行の水玉。左の列の青緑から右の列の赤紫へ、列ごとに色が移る。真ん中に細い線の正方形"
+    ></canvas>
+  </div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .sketch {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow: hidden;
+    color: #32355a;
+    color-scheme: light;
+    text-align: center;
+    background-image: linear-gradient(-30deg, #f7cac9 20%, #91a8d0 85%);
+    container-type: size;
+  }
+
+  h1,
+  .lead {
+    margin: 0;
+    font-family: Molle, cursive;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  h1 {
+    font-size: 42px;
+  }
+
+  .lead {
+    font-size: 18px;
+  }
+
+  /* 見出しの分を引いた高さと、幅の両方に収める。もとの大きさの 2 倍より大きくはしない */
+  .frame {
+    flex: none;
+    width: min(
+      100%,
+      max(80px, (100cqh - 150px) * var(--w) / var(--h)),
+      var(--w) *
+      2px
+    );
+    margin-top: 12px;
+    background-color: rgb(255 255 255 / 15%);
+    border: 3px dashed rgb(50 53 90 / 55%);
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    aspect-ratio: var(--w) / var(--h);
+  }
+</style>

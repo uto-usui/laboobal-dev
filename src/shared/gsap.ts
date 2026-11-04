@@ -1,4 +1,5 @@
 import { gsap } from 'gsap'
+import { onReducedMotion } from './motion'
 import { isRunning, onRunningChange } from './visibility'
 
 // GSAP を使うデモは gsap をここから読む。画面の外にいる間は、そのページの GSAP の動きをまとめて止める。
@@ -15,6 +16,16 @@ const sync = (running: boolean) => {
 }
 if (!isRunning()) sync(false)
 onRunningChange(sync)
+
+/**
+ * ひとりでに動き続ける tween や timeline を渡す。動きを減らす設定の間は、still（1 回分の進み具合 0〜1）の姿で止める。
+ * 設定が戻ったらそこから動かす（決まりは docs/demo-guide.md の 5 章）
+ */
+export const autoplay = (animation: gsap.core.Animation, still = 0) =>
+  onReducedMotion((reduced) => {
+    if (reduced) animation.progress(still).pause()
+    else animation.play()
+  })
 
 export { gsap }
 export default gsap

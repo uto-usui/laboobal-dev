@@ -2,6 +2,59 @@
 export type Batch = 'current' | 'A' | 'B1' | 'B2' | 'F6' | 'new'
 export type Interaction = 'drag' | 'hover' | 'scroll' | 'click' | 'none'
 
+/**
+ * tags に使える言葉。何を見せるデモか。増やすときはここに足す
+ * - text 文字 / image 写真や絵 / video 動画
+ * - scroll スクロール / parallax 視差 / cursor マウスの位置 / drag 引っぱる / hover マウスを乗せる
+ * - noise ノイズ / particles たくさんの粒 / 3d 奥行き / shape 形が変わる / physics ばね・摩擦・衝突 / random 乱数
+ * - trigonometry sin・cos で動かす
+ * - slider 写真の切り替え / distortion ゆがみ / reveal 現れ方
+ * - layout 組み方 / form 入力欄 / ui 目次などの部品
+ */
+export const TAGS = [
+  'text',
+  'image',
+  'video',
+  'scroll',
+  'parallax',
+  'cursor',
+  'drag',
+  'hover',
+  'noise',
+  'particles',
+  '3d',
+  'shape',
+  'physics',
+  'random',
+  'trigonometry',
+  'slider',
+  'distortion',
+  'reveal',
+  'layout',
+  'form',
+  'ui',
+] as const
+export type Tag = (typeof TAGS)[number]
+
+/**
+ * tech に使える言葉。何で作ったか
+ * - js はライブラリを使わずに DOM を動かすもの。css は CSS が動きの主役のもの
+ * - locomotive-scroll は中で Lenis を動かしている
+ */
+export const TECH = [
+  'three',
+  'glsl',
+  'webgpu',
+  'wgsl',
+  'canvas2d',
+  'gsap',
+  'locomotive-scroll',
+  'svg',
+  'css',
+  'js',
+] as const
+export type Tech = (typeof TECH)[number]
+
 export interface DemoMeta {
   /** フォルダ名と同じ。URL になる */
   slug: string
@@ -20,6 +73,18 @@ export interface DemoMeta {
   webgpu?: boolean
   /** テストでマウスをどう動かすか */
   interaction: Interaction
+  /** もとのデモを作った日（YYYY-MM-DD、日が分からなければ YYYY-MM）。トップの「新しい順」はこれで並べる */
+  created: string
+  /** labobal.dev に出した日（YYYY-MM-DD）。RSS と新着はこれで決める */
+  added: string
+  /** 一文の説明。ページの description と OGP、詳細のパネルに出す */
+  description: string
+  /** トップのピックアップに出す */
+  pick?: boolean
+  /** 何を見せるデモか。TAGS の中から選ぶ */
+  tags: Tag[]
+  /** 使っている技術。TECH の中から選ぶ */
+  tech: Tech[]
 }
 
 export const defineDemo = (meta: DemoMeta) => meta
@@ -32,7 +97,7 @@ const metaLoaders = import.meta.glob<DemoMeta>('../demos/*/meta.ts', {
   import: 'default',
 })
 // 中身は読まない。あるかどうかだけを見る
-const notes = import.meta.glob('../demos/*/notes.md', {
+const notes = import.meta.glob('../demos/*/README.md', {
   query: '?raw',
   import: 'default',
 })
@@ -48,7 +113,7 @@ const pages = import.meta.glob<string>('../pages/*.astro', {
   import: 'default',
 })
 /** src/pages の .astro のうち、デモのページでないもの */
-const NON_DEMO_PAGES = ['index']
+const NON_DEMO_PAGES = ['index', '404']
 
 const pageTemplate = (slug: string) => `---
 import DemoLayout from '../layouts/DemoLayout.astro'
@@ -64,7 +129,7 @@ const folderOf = (path: string) => path.split('/').at(-2)!
 const pageSlugOf = (path: string) => path.match(/([^/]+)\.astro$/)![1]
 
 /**
- * meta.ts を集めて確かめる。決まりに合わないものがあればビルドを落とす（docs/plan.md の 5 章）。
+ * meta.ts を集めて確かめる。決まりに合わないものがあればビルドを落とす（docs/demo-guide.md の 1 章と 2 章）。
  * 開発サーバーでは、作りかけのデモがあっても全ページが 500 にならないよう、そのデモだけ外して警告にする
  */
 const collect = async () => {
@@ -111,6 +176,30 @@ const collect = async () => {
         folder,
         `${where}: interaction が ${INTERACTIONS.join(' | ')} のどれでもない`,
       )
+    for (const key of ['created', 'added'] as const) {
+      const value = meta[key]
+      if (typeof value !== 'string' || !/^\d{4}-\d{2}(-\d{2})?$/.test(value))
+        fail(folder, `${where}: ${key} が YYYY-MM-DD か YYYY-MM でない`)
+    }
+    if (typeof meta.description !== 'string' || !meta.description.trim())
+      fail(folder, `${where}: description がない`)
+    for (const [key, words] of [
+      ['tags', TAGS],
+      ['tech', TECH],
+    ] as const) {
+      const value: unknown = meta[key]
+      if (!Array.isArray(value) || value.length === 0)
+        fail(folder, `${where}: ${key} がない`)
+      else
+        for (const word of value)
+          if (!(words as readonly unknown[]).includes(word))
+            fail(
+              folder,
+              `${where}: ${key} の "${word}" が ${key.toUpperCase()} にない（src/lib/demos.ts に足す）`,
+            )
+    }
+    if (meta.pick !== undefined && typeof meta.pick !== 'boolean')
+      fail(folder, `${where}: pick が true / false でない`)
     if (meta.slug !== folder)
       fail(folder, `${where}: slug "${meta.slug}" がフォルダ名と違う`)
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(folder))
@@ -118,7 +207,7 @@ const collect = async () => {
     if (seen.has(meta.slug)) fail(folder, `${where}: slug が重なっている`)
     seen.add(meta.slug)
     if (!noteFolders.has(folder))
-      fail(folder, `src/demos/${folder}/notes.md がない`)
+      fail(folder, `src/demos/${folder}/README.md がない`)
     if (!componentFolders.has(folder))
       fail(folder, `src/demos/${folder}/Demo.astro がない`)
     const page = pageSources.get(folder)

@@ -32,6 +32,10 @@ export const distance = (x0: number, y0: number, x1: number, y1: number) =>
 export const random = (min: number, max: number) =>
   min + Math.random() * (max - min)
 
+/** 配列から 1 つをでたらめに選ぶ */
+export const pick = <T>(items: ArrayLike<T>): T =>
+  items[Math.floor(Math.random() * items.length)]
+
 export const shuffle = <T>(items: readonly T[]): T[] => {
   const array = [...items]
   for (let i = array.length - 1; i > 0; i--) {

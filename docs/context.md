@@ -40,7 +40,7 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 - jsfiddle のデモ（F6）: 壊れている 4 本は、説明文があればそれをもとに作り直し、なければ下げる。tip の jsfiddle 25 本はあとで確かめる
 - `labobal.dev` のドメインは Cloudflare への移管が済み、自動更新が有効なことを確かめた（2026-11-01）
 
-2026-11-01 に作者と会話で決めたこと（[plan.md](plan.md) の 1 章）:
+2026-11-01 に作者と会話で決めたこと（[作り直しの計画](history/rebuild-plan.md) の 1 章）:
 
 - どのデモも、最新版のライブラリで作り直す。壊れているものも同じ
 - そっくり移さず、旧デモの雰囲気をつかんで再現する
@@ -54,7 +54,7 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 - 作り直す道具。計画書は Astro を推しています。webmanab と道具をそろえられることと、デモの一覧とページを 1 つのリストから作れることが理由です
 - デモだけのもの（記事を作らないもの）32 個の見せ方
 - トップの見た目。見た目は作者が決めるので、案を作ってスクショで見てもらう
-- 計測を入れるか。[plan.md](plan.md) の 3 章では「入れない」と決めた。ただ、記事のないデモやトップの読まれ方は webmanab の側からは見えないので、見直すかを考えている
+- 計測を入れるか。[作り直しの計画](history/rebuild-plan.md) の 3 章では「入れない」と決めた。ただ、記事のないデモやトップの読まれ方は webmanab の側からは見えないので、見直すかを考えている
 
 ## 3. 今の状態（2026-11-02）
 
@@ -62,7 +62,7 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 
 - Astro 7.4（静的出力）、TypeScript、GLSL、pnpm 10。Node は 26（`.nvmrc`）
 - 作り直す前の Nuxt 2 のコードは、タグ `nuxt2-final` に残しています
-- デモは 55 本です。`src/demos/<slug>/` に 1 本ずつあり、`/<slug>/` のページとトップの一覧に出ます。laboobal から移す候補のうち 19 本は下げました。理由は `docs/dropped/` にあります
+- デモは 55 本です。`src/demos/<slug>/` に 1 本ずつあり、`/<slug>/` のページとトップの一覧に出ます。laboobal から移す候補のうち 19 本は下げました。理由は [`docs/history/dropped/`](history/dropped/) にあります
 - 移すのではなく、ここで新しく作ったデモは `batch: 'new'` にします。今は particle-photo（WebGPU）の 1 本です。WebGPU のデモは meta に `webgpu: true` を付けます。今はどこからも読んでいない目印で、使えないブラウザで一行の案内を出すのはデモの側の処理です
 - `public/previews/<slug>.webm` と `.jpg`（480×300）は、トップの一覧と webmanab の記事のページの両方が使います。webmanab は URL で直接読むので、名前と大きさを変えません
 - 前からある 7 本は、パスを変えずに作り直しました
@@ -89,7 +89,7 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 
 - サイト `labobal-dev` は、このリポジトリの master につながっています。ビルドの設定は `netlify.toml` にあります（`pnpm build`、公開フォルダは `dist`）
 - master に入ると本番のビルドが動き、そのまま公開されます
-- PR のデプロイプレビューは 2026-11-02 に止めました（Netlify の Branches and deploy contexts で「Don't deploy pull requests」）。PR のたびにビルド時間を使わないためです。PR は CI と手元のビルド（`pnpm build && pnpm preview`）で確かめます。plan.md の中のデプロイプレビューで確かめる手順は、作り直しのときのものです
+- PR のデプロイプレビューは 2026-11-02 に止めました（Netlify の Branches and deploy contexts で「Don't deploy pull requests」）。PR のたびにビルド時間を使わないためです。PR は CI と手元のビルド（`pnpm build && pnpm preview`）で確かめます。[作り直しの計画](history/rebuild-plan.md) の中のデプロイプレビューで確かめる手順は、作り直しのときのものです
 - docs やテストだけの変更では、`scripts/netlify-ignore.sh` がビルドを止めます。キャッシュがないビルドでは前のコミットと比べられないので、止めずにビルドします（#11。これがなかったため、#10 のマージのビルドが止まりました）
 - Netlify の無料枠のビルド時間は、webmanab と同じアカウントで分け合っています
 
@@ -108,14 +108,14 @@ webmanab#53 で 2026-10-27 に作者と決めたことです。
 
 ### 作り直しの進め方
 
-マルチエージェントで作業を分けて進め、PR は大きくなっても 1 本にまとめます。担当の分け方、全員が守る決まり、デモごとの slug と担当、確かめ方は [plan.md](plan.md) にあります。
+マルチエージェントで作業を分けて進め、PR は大きくなっても 1 本にまとめます。担当の分け方、全員が守る決まり、デモごとの slug と担当、確かめ方は [作り直しの計画](history/rebuild-plan.md) にあります。
 
 ### デモを作る・移す（このリポジトリ）
 
 1. 1 デモ 1 ページで作る。ページの中身はデモだけにして画面いっぱいに描き、iframe の大きさに合わせて描き直す
-2. ページの隅に、lab の記事へのリンク（記事があるときだけ）と labobal.dev のトップへのリンクを置く
+2. 説明やリンクは、デモに重ならないよう、右下の小さな「info」のボタンで開くパネルにまとめる（`src/layouts/DemoLayout.astro`）。パネルは閉じて始まり、題、一文の説明、作った日、tags と tech（`meta.ts` の値）と、lab の記事（記事があるときだけ）、コード（GitHub のそのデモのフォルダ）、labobal.dev のトップへのリンクを出す。lab の記事に埋め込まれているとき（iframe の中）は、記事へのリンクを出さない。デモの部品は右の端の下を空けておく
 3. 画像、動画、フォントはリポジトリに置く。外の画像サービスに直リンクしない。`source.unsplash.com` と `placekitten.com` が止まって、lab のデモが 4 本壊れている
-4. ほかの人のコードをもとにしたデモは、もとのリンクをページとリポジトリの両方に残す。今わかっているのは scrollManager（codrops の TileScroll）、nodeBalls（CodePen の mnmxmx/mEVxeg）、laboobal の three/video（learning-threejs）
+4. ほかの人のコードや素材をもとにしたデモは、`meta.ts` の `credits` に書き、そのデモの `README.md` の最後に「クレジット」の節を置く。1 つにつき `- <名前>: <URL> （<ライセンス>）` の 1 行で、ライセンスが分からなければそう書く。ページには出さない。リポジトリ全体の第三者のコードと素材は、ルートの `README.md` の「ライセンス」にまとめる
 5. push して labobal.dev に出たことを確かめる
 
 ### lab の記事から埋め込む（vault と webmanab の作業）
@@ -149,7 +149,7 @@ laboobal の 30 ページを 3 つに分けています。
 
 対象は A が 22 個、B が 32 個です。laboobal のページには本文がほとんどなく、説明はコードの中の日本語のコメントにあります。
 
-コードはそのまま移さず、最新版のライブラリで、旧デモの雰囲気を再現するように作り直します。B のうち価値の薄いものは下げます。どのデモにも考え方のメモを残します。詳しくは [plan.md](plan.md) の 1 章と 4 章にあります。
+コードはそのまま移さず、最新版のライブラリで、旧デモの雰囲気を再現するように作り直します。B のうち価値の薄いものは下げます。どのデモにも考え方のメモを残します。詳しくは [作り直しの計画](history/rebuild-plan.md) の 1 章と 4 章にあります。
 
 URL は 1 つの平らな並びにします。laboobal から移すものは `/<何のデモか分かる小文字のケバブケース>/`（例: `/drag-pinch-simple/`）、jsfiddle から移すものは `/<webmanab の lab の記事の slug>/` にします。同じ slug が 2 つあったらビルドで落とします。
 
@@ -177,15 +177,15 @@ webmanab の lab の記事 47 本が jsfiddle を埋め込んでいます。2026
 - ソースは、ブラウザで `https://jsfiddle.net/yutousui/<id>/` を開き、エディタの `<form>` の `code_html`、`code_css`、`code_js`、`js_lib`、`panel_css`（1 なら SCSS）を読んで取り出します。`curl` には 403 を返します
 - jQuery や TweenMax、Processing.js、CreateJS は使わず、最新の書き方で、記事の説明にある動きを再現します。記事の本文のコードの抜粋は古い書き方のまま残るので、違いはデモのメモに書きます
 - 作り直したら記事の iframe の `src` と `demoUrl` だけを書き換えます。fiddle は消しません
-- 順番は、壊れている 4 本、jQuery (edge) を使う 8 本、Processing.js と CreateJS の 24 本、残り 11 本です（取り出したソースで数え直した数。[plan.md](plan.md) の 7 章）。2026-11-03 の時点で、はじめの 2 つ（12 本）は済んでいます。jQuery (edge) と、jsfiddle のライブラリの選択肢に頼っているものは、jsfiddle の都合で止まりうるためです
+- 順番は、壊れている 4 本、jQuery (edge) を使う 8 本、Processing.js と CreateJS の 24 本、残り 11 本です（取り出したソースで数え直した数。[作り直しの計画](history/rebuild-plan.md) の 7 章）。2026-11-03 の時点で、はじめの 2 つ（12 本）は済んでいます。jQuery (edge) と、jsfiddle のライブラリの選択肢に頼っているものは、jsfiddle の都合で止まりうるためです
 
 ## 5. 作り直すときの設定
 
-道具と使うライブラリは [plan.md](plan.md) の 3 章、ファイルの置き方とテストは 5 章、`netlify.toml` と応答ヘッダーは 6 章の段階 1 にあります。
+今のデモの作り方（ファイルの置き方、meta、共有の部品、テスト）は [demo-guide.md](demo-guide.md) にあります。作り直しのときに決めた道具と使うライブラリは [作り直しの計画](history/rebuild-plan.md) の 3 章、`netlify.toml` と応答ヘッダーは 6 章の段階 1 にあります。
 
 ほかに知っておくこと:
 
-- webmanab とそろえるもの: Node 26（`.nvmrc`）、pnpm 10（`packageManager`）、Playwright 1.64.1、ESLint と Prettier の設定、依存の更新のやり方（webmanab の `.claude/skills/deps-update/SKILL.md`）
+- webmanab とそろえるもの: Node 26（`.nvmrc`）、pnpm 10（`packageManager`）、Playwright 1.64.1、依存の更新のやり方（webmanab の `.claude/skills/deps-update/SKILL.md`）。lint と整形は、2026-11-04 からこのリポジトリだけ Biome（`biome.json`）にしている
 - ビルドの設定は `netlify.toml` に書きます。管理画面の設定より優先されます
 - webmanab の `Permissions-Policy` は camera、microphone、geolocation、payment、usb を止めています。埋め込んだ iframe の中でもこれらは使えません。使うデモを作るときは webmanab 側のヘッダーを変える必要があります
 
@@ -200,7 +200,7 @@ webmanab の lab の記事 47 本が jsfiddle を埋め込んでいます。2026
 | webmanab の `src/lib/schema.ts` | 記事の frontmatter の形（`demoUrl` など） |
 | webmanab の `src/pages/lab/[slug].astro`、`src/components/EntryDemo.astro` | lab のページと、tip のページで `demoUrl` を出している部品 |
 | webmanab の `netlify.toml` | CSP、`Permissions-Policy` |
-| webmanab の `scripts/netlify-ignore.sh`、`playwright.config.ts`、`eslint.config.js` | ビルドの止め方、テストと lint の設定 |
+| webmanab の `scripts/netlify-ignore.sh`、`playwright.config.ts` | ビルドの止め方、テストの設定 |
 | `uto-usui/laboobal` の `docs/` | 移すデモのもと（`.vue` と `*Script.js`） |
 | このリポジトリの 9e996ba のコミット本文 | Nuxt 2 のまま本番を直したやり方 |
 

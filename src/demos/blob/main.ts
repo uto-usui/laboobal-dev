@@ -1,6 +1,6 @@
 import { gsap } from '../../shared/gsap'
 import {
-  BufferAttribute,
+  type BufferAttribute,
   Color,
   DirectionalLight,
   HemisphereLight,
@@ -11,8 +11,9 @@ import {
   Scene,
 } from 'three'
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js'
-import { loop, onResize, prefersReducedMotion } from '../../shared/dom'
+import { loop, onResize } from '../../shared/dom'
 import { createGlStage } from '../../shared/gl'
+import { onReducedMotion } from '../../shared/motion'
 import { damp, map } from '../../shared/math'
 import { createNoise } from '../../shared/noise'
 
@@ -23,7 +24,7 @@ let height = 0
 const renderer = createGlStage(canvas, {
   antialias: true,
   alpha: true,
-  onRestore: () => update(0, now),
+  onRestore: () => update(0),
 })
 
 const scene = new Scene()
@@ -62,7 +63,10 @@ const noise = createNoise()
 const force = { y: 0.5 }
 const mouse = { x: 0 }
 let angle = 0
-let now = 0
+/** 揺れと回転の時計（秒） */
+let clock = 0
+let reduced = false
+onReducedMotion((value) => (reduced = value))
 
 /** 頂点ごとに、場所と時間で決まるノイズで球の半径を伸び縮みさせる */
 const deform = (ms: number) => {
@@ -85,11 +89,14 @@ const deform = (ms: number) => {
   geometry.computeVertexNormals()
 }
 
-const update = (dt: number, elapsed: number) => {
-  now = elapsed
-  deform(elapsed * 1000)
-  shape.rotation.x += 0.3 * dt
-  shape.rotation.y += 0.3 * dt
+const update = (dt: number) => {
+  // 動きを減らす設定の間は、ひとりでに進む揺れと回転を止める。マウスに合わせた動きは残す
+  if (!reduced) {
+    clock += dt
+    shape.rotation.x += 0.3 * dt
+    shape.rotation.y += 0.3 * dt
+  }
+  deform(clock * 1000)
 
   // マウスの横の位置を 0〜360 度にし、カメラをゆっくり球のまわりに回す
   const target = (mouse.x / (width || 1)) * Math.PI * 2
@@ -123,8 +130,8 @@ if (renderer) {
     renderer.setSize(width, height, false)
     camera.aspect = width / height
     camera.updateProjectionMatrix()
-    update(0, now)
+    update(0)
   })
 
-  if (!prefersReducedMotion()) loop(update)
+  loop(update)
 }

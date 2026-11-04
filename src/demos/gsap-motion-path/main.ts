@@ -1,6 +1,5 @@
-import { gsap } from '../../shared/gsap'
+import { autoplay, gsap } from '../../shared/gsap'
 import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
-import { prefersReducedMotion } from '../../shared/dom'
 
 gsap.registerPlugin(MotionPathPlugin)
 
@@ -21,4 +20,5 @@ timeline
   // 通ったところを同じ ease で塗る。線の伸び方で、端でゆっくり、真ん中で速いのが見える
   .to(trail, { attr: { 'stroke-dashoffset': 0 } }, 0)
 
-if (prefersReducedMotion()) timeline.progress(0.5).pause()
+// 動きを減らす設定では、道の真ん中で止める
+autoplay(timeline, 0.5)

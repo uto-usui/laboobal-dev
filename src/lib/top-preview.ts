@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { pixelRatio } from '../shared/dom'
 
 /** 板の今の位置と傾き。名前の帯（DOM）を板に合わせて動かすのに使う */
 export interface PreviewFrame {
@@ -91,7 +92,7 @@ const sizeOf = () => {
   return { width, height: (width * 10) / 16 }
 }
 
-const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3)
+const easeOutCubic = (t: number) => 1 - (1 - t) ** 3
 
 /**
  * トップで名前に触れたときの動画を、WebGL の板に貼ってカーソルを追わせる。
@@ -109,7 +110,7 @@ export const createGlPreview = (
   } catch {
     return null
   }
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+  renderer.setPixelRatio(pixelRatio())
   renderer.setClearColor(0x000000, 0)
 
   const scene = new THREE.Scene()
@@ -236,7 +237,7 @@ export const createGlPreview = (
       swap === 0
         ? 0
         : swap < SWAP_AT
-          ? Math.pow(swap / SWAP_AT, 2)
+          ? (swap / SWAP_AT) ** 2
           : 1 - easeOutCubic((swap - SWAP_AT) / (1 - SWAP_AT))
     uniforms.uOpen.value = easeOutCubic(open)
     uniforms.uClose.value = close

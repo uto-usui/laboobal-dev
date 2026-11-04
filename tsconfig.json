@@ -1,5 +1,9 @@
 {
   "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    // import のないデモの main.ts も 1 本ずつのモジュールとして見る。見ないと、ほかのデモと名前がぶつかる
+    "moduleDetection": "force"
+  },
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist", "docs"]
 }

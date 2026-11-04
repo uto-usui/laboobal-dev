@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
+  created: '2019-11-19',
+  added: '2026-11-01',
+  description:
+    '灰色の S 字の線の上を緑の粒が進んでは引き返し、通った所を緑に塗っていく。',
+  tags: ['shape'],
+  tech: ['gsap', 'svg'],
 })
