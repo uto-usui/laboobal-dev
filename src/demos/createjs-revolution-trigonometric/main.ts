@@ -8,7 +8,8 @@ const centerX = SIZE / 2
 const centerY = SIZE / 2
 
 export const params = {
-  radius: { label: '軌道の半径', value: 100, min: 10, max: 120, step: 1 },
+  // 玉の半径 10 を足しても canvas（250×250）からはみ出さない 115 まで
+  radius: { label: '軌道の半径', value: 100, min: 10, max: 115, step: 1 },
   speed: {
     label: '1 フレームに進む角度（ラジアン）',
     value: 0.01,
