@@ -8,7 +8,7 @@ export const params = {
   // もとは 1 フレームに 2 度（60fps で 120 度）
   speed: { label: '1 秒に進む角度', value: 120, min: 0, max: 360, step: 1 },
   depth: {
-    label: '奥行き（横の振れ幅の何倍か）',
+    label: '奥行きの倍率',
     value: 1.5,
     min: 0,
     max: 3,

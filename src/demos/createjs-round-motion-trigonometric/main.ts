@@ -11,7 +11,7 @@ const xSpeed = 1
 export const params = {
   range: { label: '上下の振れ幅', value: 50, min: 0, max: 100, step: 1 },
   ySpeed: {
-    label: '1 フレームに進む角度（ラジアン）',
+    label: '1 フレームの角度',
     value: 0.05,
     min: 0,
     max: 0.3,

@@ -16,7 +16,7 @@ export const params = {
     step: 0.05,
   },
   speed: {
-    label: '1 フレームに進む角度（ラジアン）',
+    label: '1 フレームの角度',
     value: 0.1,
     min: 0,
     max: 0.5,

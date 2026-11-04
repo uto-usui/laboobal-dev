@@ -10,14 +10,14 @@ const ballRatio = 0.5
 export const params = {
   // もとは 60fps で書かれていて、1 フレームに線は差の 7.5%、玉は 10% ずつ近づく。線が少し遅れて流れてくる
   lineEase: {
-    label: '線が 1 フレームで近づく割合',
+    label: '線の近づく割合',
     value: 0.075,
     min: 0.01,
     max: 0.5,
     step: 0.005,
   },
   ballEase: {
-    label: '玉が 1 フレームで近づく割合',
+    label: '玉の近づく割合',
     value: 0.1,
     min: 0.01,
     max: 0.5,
