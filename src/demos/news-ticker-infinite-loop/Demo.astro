@@ -1,0 +1,78 @@
+<section class="hero">
+  <div class="ticker">
+    <ul>
+      <li>
+        <a>
+          <strong>【緊急告知】</strong>特別番組の放送が決まりました
+        </a>
+      </li>
+      <li>
+        <a>
+          <strong>【キャンペーン】</strong>秋のキャンペーンを始めました
+        </a>
+      </li>
+      <li>
+        <a>
+          <strong>【お知らせ】</strong>メンテナンスのお知らせ
+        </a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .hero {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    color: #fff;
+    color-scheme: light;
+    background-image: linear-gradient(
+      141deg,
+      #009e6c 0%,
+      #00d1b2 71%,
+      #00e7eb 100%
+    );
+  }
+
+  .ticker {
+    width: 100%;
+    overflow: hidden;
+    line-height: 1;
+  }
+
+  /* 中身の幅にして、流しきったかを ul の幅で測れるようにする */
+  ul {
+    width: max-content;
+    padding: 0.5rem 0;
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+    white-space: nowrap;
+    list-style: none;
+    will-change: transform;
+  }
+
+  li {
+    display: inline-block;
+  }
+
+  li + li {
+    margin-left: 30px;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  strong {
+    font-weight: inherit;
+  }
+</style>
