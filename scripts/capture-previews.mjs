@@ -145,9 +145,9 @@ for (const demo of targets) {
   const started = Date.now()
   const page = await context.newPage()
   await page.goto(`${BASE}/${demo.slug}/`)
-  // 隅のリンクと lil-gui のパネルは一覧のサムネイルには要らない
+  // info のボタンとパネル、lil-gui のパネルは一覧のサムネイルには要らない
   await page.addStyleTag({
-    content: '.links, .lil-gui { display: none !important }',
+    content: '.links, .info, .lil-gui { display: none !important }',
   })
   const tune = TUNE[demo.slug] ?? {}
   await wait(page, tune.warmup ?? WARMUP)

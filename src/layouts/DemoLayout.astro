@@ -7,32 +7,106 @@ interface Props {
 }
 
 const { demo } = Astro.props
+// リポジトリの名前は laboobal-dev（ドメインの labobal.dev とつづりが違う）
+const codeUrl = `https://github.com/uto-usui/laboobal-dev/tree/master/src/demos/${demo.slug}/`
+const meta = [
+  { key: 'created', value: demo.created },
+  { key: 'tags', value: demo.tags?.join(' / ') },
+  { key: 'tech', value: demo.tech?.join(' / ') },
+].filter((row) => row.value)
 ---
 
-<Base title={`${demo.title} | labobal.dev`}>
+<Base title={`${demo.title} | labobal.dev`} description={demo.description}>
   <main class="demo" data-slug={demo.slug}>
     <slot />
   </main>
-  <nav class="links" aria-label="リンク">
-    {demo.article && (
-      <a href={demo.article} target="_top">
-        記事
-      </a>
-    )}
-    {demo.credits.map((credit) => (
-      <a href={credit.url} target="_top">
-        {credit.label}
-      </a>
-    ))}
-    <a href="/" target="_top">
-      labobal.dev
-    </a>
-  </nav>
+  <!-- links は e2e/demos.spec.ts と scripts/capture-previews.mjs が、canvas を写すときに隠すための名前 -->
+  <div class="info links">
+    <button
+      class="info-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="demo-info"
+    >
+      info
+    </button>
+    <aside
+      id="demo-info"
+      class="info-panel"
+      aria-label="このデモについて"
+      hidden
+    >
+      <button class="info-close" type="button">
+        close
+      </button>
+      <p class="info-slug" aria-hidden="true">
+        {demo.slug}
+      </p>
+      <h2 class="info-title">{demo.title}</h2>
+      {demo.description && <p class="info-description">{demo.description}</p>}
+      {meta.length > 0 && (
+        <dl class="info-meta">
+          {meta.map((row) => (
+            <div>
+              <dt>{row.key}</dt>
+              <dd>{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      <ul class="info-links">
+        {demo.article && (
+          <li class="info-article">
+            <a href={demo.article} target="_top">
+              記事
+            </a>
+          </li>
+        )}
+        <li>
+          <a href={codeUrl} target="_top">
+            コード
+          </a>
+        </li>
+        <li>
+          <a href="/" target="_top">
+            labobal.dev
+          </a>
+        </li>
+      </ul>
+    </aside>
+  </div>
 </Base>
 
 <script>
   // 画面の外やタブが裏にある間、デモの動きを止める
   import '../shared/visibility'
+
+  const root = document.querySelector<HTMLElement>('.info')!
+  const toggle = root.querySelector<HTMLButtonElement>('.info-toggle')!
+  const panel = root.querySelector<HTMLElement>('.info-panel')!
+
+  const setOpen = (open: boolean) => {
+    toggle.setAttribute('aria-expanded', String(open))
+    panel.hidden = !open
+  }
+  const close = () => {
+    // 隠す前に戻す。パネルの中に focus があるまま隠すと、focus が body に落ちる
+    toggle.focus()
+    setOpen(false)
+  }
+
+  toggle.addEventListener('click', () => setOpen(panel.hidden))
+  panel.querySelector('.info-close')!.addEventListener('click', close)
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !panel.hidden) close()
+  })
+
+  // lab の記事に埋め込まれているときは、その記事を読んでいるので「記事」は出さない
+  if (window.top !== window) {
+    root.dataset.embedded = ''
+    const article = panel.querySelector<HTMLElement>('.info-article')
+    if (article) article.hidden = true
+  }
 </script>
 
 <style>
@@ -41,29 +115,169 @@ const { demo } = Astro.props
     min-height: 100dvh;
   }
 
-  /* どの背景の上でも読めるよう、背景との差で色を出す */
-  .links {
+  /* 右の端に縦に置く。どの背景の上でも読めるよう、背景との差で色を出す */
+  .info-toggle {
     position: fixed;
-    right: 8px;
+    right: 0;
     bottom: 8px;
     z-index: 2147483647;
-    display: flex;
-    gap: 12px;
+    padding: 8px 6px;
+    font: inherit;
     font-size: 11px;
     line-height: 1;
+    color: #fff;
+    letter-spacing: 0.16em;
+    writing-mode: vertical-rl;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    opacity: 0.5;
     mix-blend-mode: difference;
   }
 
-  .links a {
-    padding: 4px 2px;
-    color: #fff;
-    text-decoration: none;
-    opacity: 0.6;
+  .info-toggle:hover,
+  .info-toggle:focus-visible,
+  .info-toggle[aria-expanded='true'] {
+    opacity: 1;
   }
 
-  .links a:hover,
-  .links a:focus-visible {
+  .info-toggle:focus-visible {
+    outline: 1px solid #fff;
+    outline-offset: -2px;
+  }
+
+  .info-panel {
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    /* トグルより 1 つ下。開いている間もトグルを上に出して、閉じるのに使えるようにする */
+    z-index: 2147483646;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: min(360px, 100% - 40px);
+    /* 右は縦のトグルの分あける */
+    padding: 20px 40px 24px 24px;
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #eee;
+    background: rgb(20 22 26 / 92%);
+    backdrop-filter: blur(12px);
+    border-left: 1px solid var(--color-accent);
+    transition:
+      transform 0.5s var(--ease),
+      display 0.5s allow-discrete;
+  }
+
+  /* author の display: flex が UA の [hidden] に勝つので、閉じた形をここで書く */
+  .info-panel[hidden] {
+    display: none;
+    transform: translateX(100%);
+  }
+
+  @starting-style {
+    .info-panel:not([hidden]) {
+      transform: translateX(100%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .info-panel {
+      transition: none;
+    }
+  }
+
+  .info-close {
+    align-self: flex-start;
+    padding: 4px 0;
+    font: inherit;
+    font-size: 11px;
+    color: var(--color-muted);
+    letter-spacing: 0.16em;
+    cursor: pointer;
+    background: none;
+    border: 0;
+  }
+
+  .info-close:hover,
+  .info-close:focus-visible {
+    color: #fff;
+  }
+
+  /* トップの一覧と同じ、線だけの名前。長い slug は端で折る */
+  .info-slug {
+    margin: 8px 0 0;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 44px;
+    line-height: 0.95;
+    color: transparent;
+    letter-spacing: -0.04em;
+    overflow-wrap: anywhere;
+    -webkit-text-stroke: 1px var(--color-accent);
+  }
+
+  .info-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .info-description {
+    margin: 0;
+    color: #bbb;
+  }
+
+  .info-meta {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+  }
+
+  .info-meta div {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+  }
+
+  .info-meta dt {
+    font-size: 10px;
+    line-height: 2;
+    color: var(--color-muted);
+    letter-spacing: 0.16em;
+  }
+
+  .info-meta dd {
+    margin: 0;
+  }
+
+  .info-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    padding: 16px 0 0;
+    margin: auto 0 0;
+    list-style: none;
+    border-top: 1px solid rgb(255 255 255 / 12%);
+  }
+
+  .info-links a {
+    color: inherit;
+    text-decoration: none;
+    letter-spacing: 0.08em;
+  }
+
+  .info-links a::after {
+    content: ' ↗';
+    color: var(--color-accent);
+  }
+
+  .info-links a:hover,
+  .info-links a:focus-visible {
+    color: var(--color-accent);
     text-decoration: underline;
-    opacity: 1;
   }
 </style>
