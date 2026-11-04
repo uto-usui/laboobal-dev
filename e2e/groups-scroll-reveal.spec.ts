@@ -16,13 +16,21 @@ const instrument = () => {
   const live = { scroll: new Set<unknown>(), resize: new Set<unknown>() }
   const add = window.addEventListener.bind(window)
   const remove = window.removeEventListener.bind(window)
-  window.addEventListener = ((type: string, listener: unknown, options) => {
+  window.addEventListener = ((
+    type: string,
+    listener: unknown,
+    options?: unknown,
+  ) => {
     if (type === 'scroll' || type === 'resize') live[type].add(listener)
-    add(type, listener as EventListener, options)
+    add(type, listener as EventListener, options as AddEventListenerOptions)
   }) as typeof window.addEventListener
-  window.removeEventListener = ((type: string, listener: unknown, options) => {
+  window.removeEventListener = ((
+    type: string,
+    listener: unknown,
+    options?: unknown,
+  ) => {
     if (type === 'scroll' || type === 'resize') live[type].delete(listener)
-    remove(type, listener as EventListener, options)
+    remove(type, listener as EventListener, options as EventListenerOptions)
   }) as typeof window.removeEventListener
   ;(window as unknown as { __listeners: () => number }).__listeners = () =>
     live.scroll.size + live.resize.size
