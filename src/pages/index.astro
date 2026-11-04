@@ -2,12 +2,26 @@
 import '../fonts/molle-mark.css'
 import Base from '../layouts/Base.astro'
 import { getDemos } from '../lib/demos'
+import { compareBy, DEFAULT_SORT, SORTS, yearOf } from '../lib/top-list'
 
-const demos = await getDemos()
+// JS がなくても初期の並び（新しい順）で出るよう、ここで並べておく
+const demos = (await getDemos()).toSorted(compareBy(DEFAULT_SORT))
+// 新しい順のときは、年が替わる最初の項目に年を出す
+const yearFirst = new Set(
+  demos
+    .filter(
+      (demo, i) =>
+        demo.created && yearOf(demo.created) !== yearOf(demos[i - 1]?.created),
+    )
+    .map((demo) => demo.slug),
+)
 
-// 何をすると動くかで絞る。meta.ts の interaction はテストでも使っていて、どのデモにも確かに入っている
+const picks = demos.filter((demo) => demo.pick)
+
+// 何をすると動くかで絞る。meta.ts の interaction はテストでも使っていて、どのデモにも確かに入っている。pick は meta の pick
 const FILTERS = [
   { key: 'all', label: 'all' },
+  { key: 'pick', label: 'pick!' },
   { key: 'hover', label: 'hover' },
   { key: 'drag', label: 'drag' },
   { key: 'scroll', label: 'scroll' },
@@ -18,7 +32,10 @@ const SPECULATION = {
   prefetch: [
     {
       where: {
-        and: [{ href_matches: '/*' }, { selector_matches: '.list a' }],
+        and: [
+          { href_matches: '/*' },
+          { selector_matches: ['.list a', '.picks a'] },
+        ],
       },
       eagerness: 'moderate',
     },
@@ -27,7 +44,9 @@ const SPECULATION = {
 const countOf = (key: string) =>
   key === 'all'
     ? demos.length
-    : demos.filter((demo) => demo.interaction === key).length
+    : key === 'pick'
+      ? picks.length
+      : demos.filter((demo) => demo.interaction === key).length
 
 // 旧トップの雰囲気（暗い背景、後ろに薄く Molle、線だけの大きな名前）を残し、locomotive をやめて素のスクロールにした案。
 // 見た目は作者に見てもらってから決める（docs/history/rebuild-plan.md の 3 章）
@@ -44,35 +63,108 @@ const countOf = (key: string) =>
   <p class="mark" aria-hidden="true">
     labobal.dev
   </p>
+  <figure class="hero" aria-hidden="true">
+    <img alt="" />
+  </figure>
   <main class="wrap">
     <h1 class="visually-hidden">labobal.dev</h1>
     <p class="lead">
       動きの実験のデモ。説明は{' '}
       <a href="https://webmanab.com/lab/">webmanab の lab</a> に。
     </p>
-    <nav class="filters" aria-label="何をすると動くかで絞る">
-      {FILTERS.map((filter) => (
-        <button
-          class="filter"
-          type="button"
-          data-filter={filter.key}
-          aria-pressed={filter.key === 'all' ? 'true' : 'false'}
-        >
-          {filter.label}
-          <sup>{countOf(filter.key)}</sup>
-        </button>
-      ))}
-    </nav>
-    <ul class="list">
+    {picks.length > 0 && (
+      <section class="picks" aria-labelledby="picks-title">
+        <h2 id="picks-title" class="picks-title">
+          pick!
+        </h2>
+        <ul class="pick-list">
+          {picks.map((demo) => (
+            <li class="pick">
+              <a
+                class="pick-link"
+                href={`/${demo.slug}/`}
+                data-slug={demo.slug}
+              >
+                <span class="pick-frame">
+                  <img
+                    src={`/previews/${demo.slug}.webp`}
+                    width="480"
+                    height="300"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span class="pick-slug">{demo.slug}</span>
+                </span>
+                <span class="pick-name">{demo.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+    <div class="controls">
+      <nav class="filters" aria-label="何をすると動くかで絞る">
+        {FILTERS.map((filter) => (
+          <button
+            class="filter"
+            type="button"
+            data-filter={filter.key}
+            data-molle={filter.key === 'pick' ? '' : undefined}
+            aria-pressed={filter.key === 'all' ? 'true' : 'false'}
+          >
+            {filter.label}
+            <sup>{countOf(filter.key)}</sup>
+          </button>
+        ))}
+      </nav>
+      <nav class="sorts" aria-label="並べ方">
+        {SORTS.map((sort) => (
+          <button
+            class="filter"
+            type="button"
+            data-sort={sort.key}
+            aria-pressed={sort.key === DEFAULT_SORT ? 'true' : 'false'}
+          >
+            {sort.label}
+          </button>
+        ))}
+      </nav>
+    </div>
+    <ul class="list" data-sort={DEFAULT_SORT}>
       {demos.map((demo) => (
-        <li class="item" data-interaction={demo.interaction}>
+        <li
+          class="item"
+          data-interaction={demo.interaction}
+          data-slug={demo.slug}
+          data-created={demo.created}
+          data-pick={demo.pick ? '' : undefined}
+          data-year-first={yearFirst.has(demo.slug) ? '' : undefined}
+        >
+          {demo.created && (
+            <span class="year" aria-hidden="true">
+              {yearOf(demo.created)}
+            </span>
+          )}
           <a
             class="link"
             href={`/${demo.slug}/`}
             data-slug={demo.slug}
             data-title={demo.title}
           >
-            <span class="slug">{demo.slug}</span>
+            <span class="slug">
+              <span class="slug-text">{demo.slug}</span>
+            </span>
+            {demo.batch === 'new' && demo.added && (
+              <span class="new-mark" data-added={demo.added} hidden>
+                new
+              </span>
+            )}
+            {demo.pick && (
+              <span class="pick-mark" aria-hidden="true">
+                pick!
+              </span>
+            )}
             <span class="title">{demo.title}</span>
           </a>
         </li>
@@ -88,28 +180,131 @@ const countOf = (key: string) =>
 
 <script>
   import { isCoarsePointer, prefersReducedMotion } from '../shared/dom'
+  import { watchLongSlugs } from '../lib/top-slug'
   import type { createGlPreview } from '../lib/top-preview'
+  import { watchHero } from '../lib/top-hero'
+  import {
+    compareBy,
+    DEFAULT_SORT,
+    isSortKey,
+    yearOf,
+    type SortKey,
+  } from '../lib/top-list'
+  import { enterDemo, plateOf, type Plate } from '../lib/top-enter'
 
   const list = document.querySelector<HTMLElement>('.list')!
   const items = [...list.querySelectorAll<HTMLElement>('.item')]
-  const filters = [...document.querySelectorAll<HTMLButtonElement>('.filter')]
+  const filters = [
+    ...document.querySelectorAll<HTMLButtonElement>('.filters button'),
+  ]
+  const sorts = [
+    ...document.querySelectorAll<HTMLButtonElement>('.sorts button'),
+  ]
+
+  // 絞り込みと並べ方は URL の ?filter=&sort= に残す。初期の値のときは付けない
+  const params = new URLSearchParams(location.search)
+  const filterParam = params.get('filter')
+  const state = {
+    filter: filters.some((b) => b.dataset.filter === filterParam)
+      ? filterParam!
+      : 'all',
+    sort: isSortKey(params.get('sort')) ? params.get('sort')! : DEFAULT_SORT,
+  } as { filter: string; sort: SortKey }
+
+  const render = () => {
+    items.forEach((item) => {
+      item.hidden =
+        state.filter === 'pick'
+          ? item.dataset.pick === undefined
+          : state.filter !== 'all' && item.dataset.interaction !== state.filter
+    })
+    // CSS の order ではなく DOM の順を替える。読み上げと Tab の順も並びに合わせるため
+    const sorted = items.toSorted((a, b) =>
+      compareBy(state.sort)(
+        { slug: a.dataset.slug!, created: a.dataset.created },
+        { slug: b.dataset.slug!, created: b.dataset.created },
+      ),
+    )
+    if (sorted.some((item, i) => list.children[i] !== item))
+      list.append(...sorted)
+    list.dataset.sort = state.sort
+    let year = ''
+    sorted
+      .filter((item) => !item.hidden)
+      .forEach((item) => {
+        const y = yearOf(item.dataset.created)
+        item.toggleAttribute('data-year-first', y !== '' && y !== year)
+        year = y
+      })
+    filters.forEach((b) =>
+      b.setAttribute('aria-pressed', String(b.dataset.filter === state.filter)),
+    )
+    sorts.forEach((b) =>
+      b.setAttribute('aria-pressed', String(b.dataset.sort === state.sort)),
+    )
+  }
+
+  const update = (change: Partial<typeof state>) => {
+    Object.assign(state, change)
+    const url = new URL(location.href)
+    const set = (key: string, value: string, initial: string) =>
+      value === initial
+        ? url.searchParams.delete(key)
+        : url.searchParams.set(key, value)
+    set('filter', state.filter, 'all')
+    set('sort', state.sort, DEFAULT_SORT)
+    history.replaceState(history.state, '', url)
+    // 並びが詰まる動きは、対応するブラウザでだけ付ける
+    if (document.startViewTransition && !prefersReducedMotion())
+      document.startViewTransition(render)
+    else render()
+  }
 
   filters.forEach((button) =>
-    button.addEventListener('click', () => {
-      const key = button.dataset.filter
-      filters.forEach((b) =>
-        b.setAttribute('aria-pressed', String(b === button)),
-      )
-      const apply = () =>
-        items.forEach((item) => {
-          item.hidden = key !== 'all' && item.dataset.interaction !== key
-        })
-      // 並びが詰まる動きは、対応するブラウザでだけ付ける
-      if (document.startViewTransition && !prefersReducedMotion())
-        document.startViewTransition(apply)
-      else apply()
-    }),
+    button.addEventListener('click', () =>
+      update({ filter: button.dataset.filter }),
+    ),
   )
+  sorts.forEach((button) =>
+    button.addEventListener('click', () =>
+      update({ sort: button.dataset.sort as SortKey }),
+    ),
+  )
+  render()
+  if (!prefersReducedMotion()) watchLongSlugs(list)
+
+  // ここで作ったデモ（移植でないもの）は、出してから 30 日の間 new を付ける。ビルドした日ではなく見た日で決める
+  document.querySelectorAll<HTMLElement>('.new-mark').forEach((mark) => {
+    mark.hidden = Date.now() - Date.parse(mark.dataset.added!) > 30 * 864e5
+  })
+
+  // マウスで触れられない端末では、真ん中に来た名前を主役にする（触れたときの動画の代わり）
+  if (isCoarsePointer())
+    watchHero(list, document.querySelector<HTMLElement>('.hero')!)
+
+  // ピックアップは、マウスを重ねるとポスターの上で動画を流す。動きを減らす設定のときは流さない
+  if (!isCoarsePointer() && !prefersReducedMotion())
+    document
+      .querySelectorAll<HTMLAnchorElement>('.pick-link')
+      .forEach((link) => {
+        let clip: HTMLVideoElement | undefined
+        link.addEventListener('pointerenter', () => {
+          if (!clip) {
+            clip = Object.assign(document.createElement('video'), {
+              muted: true,
+              loop: true,
+              playsInline: true,
+              src: `/previews/${link.dataset.slug}.webm`,
+            })
+            link.querySelector('img')!.after(clip)
+          }
+          clip.play().catch(() => {})
+        })
+        link.addEventListener('pointerleave', () => clip?.pause())
+      })
+
+  // 入るときに広げる板。触れたときの板が出ていれば、そこから広げる
+  let hoverPlate = (): Plate | undefined => undefined
 
   // 触れたときの動画。タッチの端末では出さない（触れた時点で開くので見る間がない）
   const preview = document.querySelector<HTMLElement>('.preview')!
@@ -123,6 +318,19 @@ const countOf = (key: string) =>
     let gl: GlPreview | null = null
     let loaded: GlPreview | null = null
     const pointer = { x: innerWidth / 2, y: innerHeight / 2 }
+    let lastFrame = { x: 0, y: 0, width: 0, tilt: 0 }
+    hoverPlate = () =>
+      !preview.classList.contains('is-active')
+        ? undefined
+        : gl
+          ? {
+              x: lastFrame.x,
+              y: lastFrame.y,
+              width: lastFrame.width,
+              height: (lastFrame.width * 10) / 16,
+              angle: lastFrame.tilt,
+            }
+          : plateOf(preview)
 
     // 項目を替えたときにすぐ出せるよう、画面に入った名前のポスターだけ読んでおく
     const prefetcher = new IntersectionObserver((entries) =>
@@ -155,6 +363,7 @@ const countOf = (key: string) =>
         document.querySelector<HTMLCanvasElement>('.preview-canvas')!,
         (f) => {
           // 名前の帯は板の左下の角に付いていく
+          lastFrame = f
           preview.style.width = `${f.width}px`
           preview.style.transform = `translate3d(${f.x}px, ${f.y}px, 0) translate(-50%, -50%) rotate(${f.tilt}rad) translate(${f.cornerX}px, ${f.cornerY}px)`
         },
@@ -214,6 +423,33 @@ const countOf = (key: string) =>
       link.addEventListener('blur', hide)
     })
   }
+
+  // 名前やポスターを押したら、板を画面いっぱいに広げながら入る（src/lib/top-enter.ts）。
+  // 新しいタブで開くときと、動きを減らす設定のときはふつうに移る
+  if (!prefersReducedMotion())
+    document.addEventListener('click', (event) => {
+      const link = (event.target as Element).closest<HTMLAnchorElement>(
+        '.list .link, .picks .pick-link',
+      )
+      if (
+        !link ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      )
+        return
+      event.preventDefault()
+      const hero = document.querySelector<HTMLElement>('.hero.is-active')
+      const from = link.classList.contains('pick-link')
+        ? plateOf(link.querySelector('img')!, link.closest('.pick')!)
+        : (hoverPlate() ??
+          (hero && link.closest('.is-hero')
+            ? plateOf(hero)
+            : plateOf(link.querySelector('.slug')!)))
+      enterDemo(link.href, `/previews/${link.dataset.slug}.webp`, from)
+    })
 </script>
 
 <style>
@@ -318,12 +554,299 @@ const countOf = (key: string) =>
     }
   }
 
-  .filters {
+  /* ピックアップ。机にばらまいたポスターのように、大きさと傾きを少しずつ変えて重ねる */
+  .picks {
+    position: relative;
+    margin: 0 auto 10vh;
+  }
+
+  .picks-title {
+    position: absolute;
+    top: -0.2em;
+    left: max(0px, 50% - 560px);
+    z-index: 3;
+    margin: 0;
+    font-family: 'Molle Mark', cursive;
+    font-size: clamp(44px, 7vw, 96px);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--color-accent);
+    pointer-events: none;
+    transform: rotate(-12deg);
+  }
+
+  .pick-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 1180px;
+    padding: 0;
+    margin: 0 auto;
+    list-style: none;
+  }
+
+  .pick {
+    --w: 22vw;
+    --r: -4deg;
+    --y: 0px;
+
+    width: min(var(--w), 300px);
+    margin: 0 -10px 56px;
+    transform: translateY(var(--y)) rotate(var(--r));
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .pick:nth-child(8n + 2) {
+    --w: 18vw;
+    --r: 5deg;
+    --y: 36px;
+  }
+
+  .pick:nth-child(8n + 3) {
+    --w: 21vw;
+    --r: -2deg;
+    --y: -8px;
+  }
+
+  .pick:nth-child(8n + 4) {
+    --w: 17vw;
+    --r: 7deg;
+    --y: 28px;
+  }
+
+  .pick:nth-child(8n + 5) {
+    --w: 20vw;
+    --r: 3deg;
+    --y: -14px;
+  }
+
+  .pick:nth-child(8n + 6) {
+    --w: 23vw;
+    --r: -6deg;
+    --y: 40px;
+  }
+
+  .pick:nth-child(8n + 7) {
+    --w: 18vw;
+    --r: 4deg;
+    --y: 6px;
+  }
+
+  .pick:nth-child(8n + 8) {
+    --w: 20vw;
+    --r: -3deg;
+    --y: 30px;
+  }
+
+  .pick:has(.pick-link:hover, .pick-link:focus-visible) {
+    position: relative;
+    z-index: 2;
+    transform: translateY(var(--y)) rotate(0deg) scale(1.08);
+    transition-duration: 0.25s;
+  }
+
+  .pick-link {
+    position: relative;
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .pick-frame {
+    position: relative;
+    display: block;
+  }
+
+  /* 動画はあとから JS で足すので、scoped の印が付かない。:global で拾う */
+  .pick-link img,
+  .pick-link :global(video) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    background: #111;
+    box-shadow: 0 18px 40px rgb(0 0 0 / 0.45);
+  }
+
+  .pick-link :global(video) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    opacity: 0;
+  }
+
+  .pick-link:hover :global(video) {
+    opacity: 1;
+  }
+
+  /* 名前はポスターの下の縁にまたがせる */
+  .pick-slug {
+    position: absolute;
+    bottom: 0;
+    left: -6px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: clamp(20px, 2.4vw, 34px);
+    line-height: 1;
+    color: transparent;
+    letter-spacing: -0.04em;
+    white-space: nowrap;
+    -webkit-text-stroke: 1px #fff;
+    transform: translateY(45%);
+    transition: color 0.4s;
+  }
+
+  .pick-link:hover .pick-slug,
+  .pick-link:focus-visible .pick-slug {
+    color: var(--color-accent);
+    -webkit-text-stroke-color: var(--color-accent);
+  }
+
+  .pick-name {
+    display: block;
+    margin-top: 30px;
+    font-size: 11px;
+    color: var(--color-muted);
+    letter-spacing: 0.08em;
+  }
+
+  .pick-link:focus-visible {
+    outline: 1px solid var(--color-accent);
+    outline-offset: 6px;
+  }
+
+  /* スマホでは横に流す 1 列にする */
+  @media (width < 640px) {
+    .picks {
+      margin-inline: -16px;
+    }
+
+    .picks-title {
+      left: 12px;
+    }
+
+    .pick-list {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      padding: 48px 16px 24px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .pick,
+    .pick:nth-child(n) {
+      --w: 64vw;
+
+      flex: none;
+      margin: 0 -4px 0 0;
+      scroll-snap-align: center;
+    }
+  }
+
+  /* 長い slug は 1 行のまま右で切り、触れたら左へ流して最後まで見せる（src/lib/top-slug.ts）。
+     動きを減らす設定のときは流さず、今までどおりハイフンで折り返す */
+  @media (prefers-reduced-motion: no-preference) {
+    .link {
+      max-width: 100%;
+    }
+
+    .slug {
+      max-width: 100%;
+      padding-block: 0.06em;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .slug-text {
+      display: inline-block;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .is-long .slug {
+      mask-image: linear-gradient(to right, #000 75%, transparent);
+    }
+
+    .is-long:hover .slug,
+    .is-long:focus-visible .slug {
+      mask-image: linear-gradient(to right, transparent, #000 25%);
+    }
+
+    .is-long:hover .slug-text,
+    .is-long:focus-visible .slug-text {
+      transform: translateX(var(--slug-over));
+      transition: transform var(--slug-time) linear 0.2s;
+    }
+
+    /* 右端まで使っているので、印は内側に置く */
+    .is-long .pick-mark {
+      transform: translate(0, -40%) rotate(-14deg);
+    }
+  }
+
+  /* 一覧の名前の右肩の印 */
+  .link {
+    position: relative;
+  }
+
+  .pick-mark {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-family: 'Molle Mark', cursive;
+    font-size: clamp(14px, 2vw, 24px);
+    font-style: italic;
+    color: var(--color-accent);
+    pointer-events: none;
+    transform: translate(70%, -10%) rotate(-14deg);
+  }
+
+  .new-mark {
+    position: absolute;
+    top: 0.6em;
+    left: 0;
+    font-size: 10px;
+    color: var(--color-accent);
+    letter-spacing: 0.3em;
+    transform: translateX(-120%);
+  }
+
+  .filter[data-molle] {
+    font-family: 'Molle Mark', cursive;
+    font-size: 15px;
+    font-style: italic;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0 6vh;
+  }
+
+  .filters,
+  .sorts {
     display: flex;
     flex-wrap: wrap;
     gap: 4px 20px;
     justify-content: center;
-    margin: 0 0 6vh;
+  }
+
+  /* 絞り込みと並べ方の間に斜めの線を 1 本 */
+  .sorts::before {
+    font-size: 12px;
+    color: var(--color-muted);
+    content: '/';
+  }
+
+  /* 狭い画面では並べ方が次の行に回るので、線は要らない */
+  @media (width < 640px) {
+    .sorts::before {
+      content: none;
+    }
   }
 
   .filter {
@@ -350,6 +873,23 @@ const countOf = (key: string) =>
 
   .item {
     view-transition-name: match-element;
+  }
+
+  /* 新しい順のときだけ、年が替わるところに小さく年を出す */
+  .year {
+    display: none;
+    margin: 6vh 0 1vh;
+    font-size: 11px;
+    color: var(--color-accent);
+    letter-spacing: 0.4em;
+  }
+
+  .list[data-sort='new'] .item[data-year-first] .year {
+    display: block;
+  }
+
+  .list[data-sort='new'] .item[data-year-first]:first-child .year {
+    margin-top: 0;
   }
 
   /* 一覧の上に浮かせる。名前の上に乗っても触れたままでいられるよう、ポインタを通す */
@@ -425,5 +965,75 @@ const countOf = (key: string) =>
   .item:has(.link:hover) {
     position: relative;
     z-index: 2;
+  }
+  /* スマホで真ん中に来た名前を主役にする（src/lib/top-hero.ts）。名前を塗り、後ろの板にポスターを出す */
+  .hero {
+    display: none;
+  }
+
+  @media (pointer: coarse) {
+    .wrap {
+      z-index: 1;
+    }
+
+    .hero {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 0;
+      display: block;
+      width: 88vw;
+      aspect-ratio: 16 / 10;
+      margin: 0;
+      pointer-events: none;
+      opacity: 0;
+      clip-path: inset(0);
+      transform: translate(-50%, -50%) rotate(-4deg);
+      transition:
+        opacity 0.4s,
+        clip-path 0.14s ease-in;
+    }
+
+    .hero.is-active {
+      opacity: 0.55;
+    }
+
+    /* 中身を替えるときは横線までつぶし、替えたら広げる */
+    .hero.is-swapping {
+      clip-path: inset(49.5% 0);
+    }
+
+    .hero.is-active:not(.is-swapping) {
+      transition:
+        opacity 0.4s,
+        clip-path 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .is-hero .slug {
+      color: color-mix(in oklch, var(--color-accent), white 24%);
+      transition-duration: 0.3s;
+    }
+
+    .is-hero .slug-text {
+      transform: translateX(var(--slug-over, 0));
+      transition: transform var(--slug-time, 0s) linear 0.4s;
+    }
+
+    .is-hero.is-long .slug {
+      mask-image: linear-gradient(to right, transparent, #000 25%);
+    }
+  }
+
+  @media (pointer: coarse) and (prefers-reduced-motion: reduce) {
+    .hero,
+    .hero.is-active:not(.is-swapping) {
+      transition: none;
+    }
   }
 </style>
