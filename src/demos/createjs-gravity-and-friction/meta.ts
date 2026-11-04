@@ -16,4 +16,6 @@ export default defineDemo({
     '上から落ちた丸が床で弾み、摩擦で弾みが小さくなって止まると、また上から落ちる。',
   tags: ['physics'],
   tech: ['canvas2d'],
+  group: 'nodes',
+  variant: '重力と摩擦',
 })

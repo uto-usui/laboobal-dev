@@ -16,4 +16,6 @@ export default defineDemo({
     '黒い画面で 50 個の点が壁に跳ね返りながら漂い、近づくと線で結ばれて引き合い、速さを増す。',
   tags: ['particles', 'physics'],
   tech: ['canvas2d'],
+  group: 'nodes',
+  variant: 'ばね',
 })

@@ -16,4 +16,6 @@ export default defineDemo({
     '30 個の点が漂い、近い点どうしが線で結ばれて引き合う。端から出ると反対の端から戻る。',
   tags: ['particles', 'physics'],
   tech: ['canvas2d'],
+  group: 'nodes',
+  variant: '引き合う点',
 })
