@@ -10,4 +10,9 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'none',
+  created: '2019-11-19',
+  added: '2026-11-01',
+  description: '四角い板を、1 秒ごとに乱数で決めた大きさと向きへ回し続ける。',
+  tags: ['3d', 'random'],
+  tech: ['gsap'],
 })

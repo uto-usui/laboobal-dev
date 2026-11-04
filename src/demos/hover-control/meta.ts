@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'hover',
+  created: '2019-01-21',
+  added: '2026-11-01',
+  description:
+    'マウスを乗せると帯が左から赤く塗られ、すぐ外しても最後まで伸びきってから戻る。',
+  tags: ['hover'],
+  tech: ['gsap'],
 })

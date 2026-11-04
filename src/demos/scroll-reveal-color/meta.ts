@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'scroll',
+  created: '2019-01-21',
+  added: '2026-11-01',
+  description:
+    'スクロールで下から上へ通り過ぎる箱が、緑から水色、青へと色を変える。',
+  tags: ['scroll'],
+  tech: ['js'],
 })

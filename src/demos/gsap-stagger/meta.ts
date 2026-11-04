@@ -15,4 +15,10 @@ export default defineDemo({
   ],
   webgl: false,
   interaction: 'none',
+  created: '2019-11-19',
+  added: '2026-11-01',
+  description:
+    '斜めに倒した 10×10 のマス目が、真ん中から順に浮き沈みして波紋のように広がる。',
+  tags: ['3d'],
+  tech: ['gsap', 'css'],
 })

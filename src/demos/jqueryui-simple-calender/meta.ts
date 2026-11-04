@@ -10,4 +10,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'click',
+  created: '2017-02-07',
+  added: '2026-11-02',
+  description:
+    '開始日と終了日を選ぶ欄と、押した日が下の欄に入るカレンダー。選べる日の範囲が互いに縛られる。',
+  tags: ['form', 'ui'],
+  tech: ['js'],
 })

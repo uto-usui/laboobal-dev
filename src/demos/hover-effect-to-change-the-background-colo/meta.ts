@@ -11,4 +11,10 @@ export default defineDemo({
   credits: [],
   webgl: false,
   interaction: 'hover',
+  created: '2017-01-31',
+  added: '2026-11-02',
+  description:
+    '四角にマウスを乗せると、2 色の板が順にせり上がり、「HOVER」の字が大きくなる。',
+  tags: ['hover', 'text'],
+  tech: ['css'],
 })
