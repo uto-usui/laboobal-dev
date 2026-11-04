@@ -38,7 +38,8 @@ const { title } = Astro.props
 
   h1 {
     margin: 0;
-    font-size: clamp(24px, 9cqh, 42px);
+    /* 縦長のスマホでは高さで決めると右上の「設定」の下まで伸びるので、幅でも抑える */
+    font-size: clamp(24px, min(9cqh, 9cqw), 42px);
     font-weight: bold;
     line-height: 1.1;
     color: #32355a;
