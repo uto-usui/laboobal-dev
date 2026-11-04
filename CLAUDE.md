@@ -8,10 +8,11 @@
 
 ## 文書とスキル
 
+- [docs/demo-guide.md](docs/demo-guide.md): デモの作り方の決まり（ファイル、meta、共有の部品、動きを減らす設定、タッチ、ページの UI、大きさ、E2E）
 - [docs/release.md](docs/release.md): デモを作ってから本番に出し、lab の記事からつなぐまでの順番
 - [docs/ideas.md](docs/ideas.md): デモをまたいだ考え方
 - [docs/history/](docs/history/): 作り直し（2026-11）の計画と、下げたデモの記録。今の決まりではない
-- スキル（`.claude/skills/`）: `capture-preview`（プレビューを 1 本撮り直す）、`link-lab-article`（デモと lab の記事をつなぐ）、`deps-update`（依存の更新）
+- スキル（`.claude/skills/`）: `new-demo`（デモを足す）、`check-demo`（デモを確かめる）、`capture-preview`（プレビューを 1 本撮り直す）、`link-lab-article`（デモと lab の記事をつなぐ）、`deps-update`（依存の更新）
 
 ## 守ること
 

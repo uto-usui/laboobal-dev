@@ -20,10 +20,10 @@
 
 コード:
 
-- [stegu/webgl-noise](https://github.com/stegu/webgl-noise)（Ashima Arts、Stefan Gustavson）: MIT License。`src/shared/glsl/simplex-noise.glsl` に取り込み、amoeba、three-typo、canvas-glitch-image、distortion-slider-a〜d で使う。particle-photo は WGSL に書き直したもの
+- [stegu/webgl-noise](https://github.com/stegu/webgl-noise)（Ashima Arts、Stefan Gustavson）: MIT License。`src/shared/glsl/simplex-noise.glsl` に取り込み、amoeba、three-typo、canvas-glitch-image、distortion-slider-a〜d で使う。particle-photo の 3D simplex noise は、これの `src/noise3D.glsl` を WGSL に書き直したもの（`src/demos/particle-photo/shaders.ts`。上流の LICENSE を写してある）
 - [josephg/noisejs](https://github.com/josephg/noisejs)（Joseph Gentle）: ISC License。もとの Stefan Gustavson のコードはパブリックドメインと書かれている。`src/shared/noise.ts` はこれをもとに書き直したもので、blob で使う
-- [codrops/TileScroll](https://github.com/codrops/TileScroll): MIT License。scrollmanager のタイルの並べ方
-- [CodePen mnmxmx/mEVxeg](https://codepen.io/mnmxmx/pen/mEVxeg)（Misaki Nakano）: CodePen の公開 Pen は MIT License（[CodePen の Licensing](https://blog.codepen.io/documentation/licensing/)）。nodeballs のもと
+- [codrops/TileScroll](https://github.com/codrops/TileScroll): MIT License。scrollmanager のタイルの並べ方の CSS は、これの `src/css/base.css` の `.tiles` をもとにしたもの（`src/demos/scrollmanager/Demo.astro`。上流の LICENSE を写してある）
+- [CodePen mnmxmx/mEVxeg](https://codepen.io/mnmxmx/pen/mEVxeg)（Misaki Nakano）: CodePen の公開 Pen は MIT License（[CodePen の Licensing](https://blog.codepen.io/documentation/licensing/)）。nodeballs のもと（旧デモのコードがこれをもとにしていた。`src/demos/nodeballs/README.md` のクレジットにもある）
 - [CodePen GreenSock/vYBRPbO](https://codepen.io/GreenSock/pen/vYBRPbO)（Advanced staggers in GSAP 3）: 同上。gsap-stagger の旧デモが参考に挙げていたもの
 - [ykob/sketch-threejs](https://github.com/ykob/sketch-threejs): MIT License。canvas-glitch-image のシェーダーは、これの glitch をもとにしている
 - [The Coding Train の Coding Challenge #50](https://thecodingtrain.com/challenges/50-animated-circle-packing): [CodingTrain/thecodingtrain.com](https://github.com/CodingTrain/thecodingtrain.com) のコードは MIT License（ロゴや画像は除く）。canvas-fill-text の、円を置いて膨らませる形がこれと同じ
@@ -53,26 +53,13 @@ pnpm verify       # lint、整形、型、ビルド、大きさ、E2E をまと�
 
 ## 文書
 
+- [docs/demo-guide.md](docs/demo-guide.md): デモの作り方（置くファイル、meta、メモ、共有の部品、動きを減らす設定、タッチ、ページの UI、大きさ、E2E）
 - [docs/release.md](docs/release.md): デモを出す流れ（ブランチ、確かめ方、プレビュー、PR、本番の確認、lab の記事とのつなぎ、SNS 用の動画）
 - [docs/context.md](docs/context.md): まわりのリポジトリとの関係、決まっていること、今の状態
 - [docs/ideas.md](docs/ideas.md): デモをまたいだ考え方
 - [docs/history/](docs/history/): 作り直しのときの計画と、下げたデモの記録
-- [.claude/skills/](.claude/skills/): コーディングエージェント向けの手順（プレビューの撮り直し、lab の記事とのつなぎ、依存の更新）
+- [.claude/skills/](.claude/skills/): コーディングエージェント向けの手順（デモを足す、デモを確かめる、プレビューの撮り直し、lab の記事とのつなぎ、依存の更新）
 
 ## デモを足す
 
-`src/demos/<slug>/` に `meta.ts`、`Demo.astro`、`README.md` を置き、`src/pages/<slug>.astro` にページを置くと、`/<slug>/` のページとトップの一覧に出ます。ページの中身は次の形で、`<slug>` のところだけを替えます。
-
-```astro
----
-import DemoLayout from '../layouts/DemoLayout.astro'
-import Demo from '../demos/<slug>/Demo.astro'
-import meta from '../demos/<slug>/meta'
----
-
-<DemoLayout demo={meta}>
-  <Demo />
-</DemoLayout>
-```
-
-ページを 1 つの動的ルート（`[slug].astro`）にまとめないのは、まとめると全デモの CSS がどのページにも付くためです。ページがない、別のデモを読んでいる、デモのないページがある、のどれかがあるとビルドが落ち、置くべき中身がエラーに出ます。そのほかの共有のファイルは書き換えません。決まりは [作り直しの計画](docs/history/rebuild-plan.md) の 5 章、見本は `src/demos/marquee/` と `src/pages/marquee.astro` です。
+`src/demos/<slug>/` に `meta.ts`、`Demo.astro`、`README.md` を置き、`src/pages/<slug>.astro` にページを置くと、`/<slug>/` のページとトップの一覧に出ます。meta の項目、共有の部品、動きを減らす設定やタッチの決まり、テストは [docs/demo-guide.md](docs/demo-guide.md) にあります。見本は `src/demos/marquee/` と `src/pages/marquee.astro` です。出すまでの流れは [docs/release.md](docs/release.md) です。

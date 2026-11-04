@@ -1,4 +1,4 @@
 import { getDemos } from '../lib/demos'
 
-// E2E が全デモを開くための一覧。Playwright は Vite を通らないので、ビルドの結果から読む
+// 全デモの一覧。webmanab の pnpm check:demos が読むので、項目は足すだけにし、名前を変えたり消したりしない
 export const GET = async () => Response.json(await getDemos())

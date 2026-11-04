@@ -418,7 +418,7 @@ try {
   alloc(P.count)
   bindInput()
   const gui = buildGui()
-  // 動きを減らす設定に切り替えたら、自動で次の写真へ送るのも止める（決まりは shared/motion.ts）
+  // 動きを減らす設定に切り替えたら、自動で次の写真へ送るのも止める（決まりは docs/demo-guide.md の 5 章）
   onReducedMotion((value) => {
     if (value === reduced) return
     reduced = value

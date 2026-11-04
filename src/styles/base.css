@@ -49,7 +49,7 @@ html[data-offscreen] * {
   animation-play-state: paused !important;
 }
 
-/* 動きを減らす設定のとき、ひとりでに動き続ける CSS の animation を止める（決まりは src/shared/motion.ts）。
+/* 動きを減らす設定のとき、ひとりでに動き続ける CSS の animation を止める（決まりは docs/demo-guide.md の 5 章）。
    読み込んだときから止めると最初のコマで止まる。スクロールに合わせて動く animation は止めないので、印を付けた要素だけにする */
 @media (prefers-reduced-motion: reduce) {
   [data-motion='auto'] {

@@ -58,7 +58,7 @@ export const trackPointer = (
 
 /**
  * マウスを重ねられない端末で、マウスの代わりにゆっくり 8 の字を描く位置（units: 'unit' のとき）。
- * マウスの端末と、動きを減らす設定のとき（motion.ts の決まりの 3）は pointer をそのまま返す
+ * マウスの端末と、動きを減らす設定のとき（docs/demo-guide.md の 5 章の 3）は pointer をそのまま返す
  */
 export const pointerOrWander = (
   pointer: Pointer,
