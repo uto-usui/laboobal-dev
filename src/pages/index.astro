@@ -473,9 +473,15 @@ const countOf = (key: string) =>
     const place = (x: number, y: number) => {
       pointer.x = x
       pointer.y = y
-      if (gl) gl.setTarget(x, y)
+      // 組の呼び名に触れている間は、動画を呼び名の行の上に出す（真ん中に重なると小さな字が読めない）。上に場所がなければ下に出す
+      let lift = 0
+      if (hovered?.classList.contains('variant-link')) {
+        const height = preview.offsetHeight
+        lift = (y > height + 24 ? -1 : 1) * (height / 2 + 24)
+      }
+      if (gl) gl.setTarget(x, y + lift)
       else
-        preview.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`
+        preview.style.transform = `translate3d(${x}px, ${y + lift}px, 0) translate(-50%, -50%)`
     }
     addEventListener('pointermove', (event) =>
       place(event.clientX, event.clientY),
@@ -484,6 +490,7 @@ const countOf = (key: string) =>
     links.forEach((link) => {
       const show = () => {
         hovered = link
+        place(pointer.x, pointer.y)
         clearTimeout(hideTimer)
         useGl()
         const slug = link.dataset.slug!
