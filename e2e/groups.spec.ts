@@ -278,6 +278,20 @@ for (const group of groups) {
           ).toBe(listenerBaseline.get(slug))
       }
     }
+    // 新しい slug を開いても、DemoLayout の CSS（どのページの <style> にも入っている）は重ねて足さない
+    expect(
+      await page.evaluate(
+        () =>
+          [...document.styleSheets]
+            .flatMap((sheet) => [...sheet.cssRules])
+            .filter(
+              (rule) =>
+                rule.cssText.startsWith('.info-close[') &&
+                rule.cssText.includes('align-self'),
+            ).length,
+      ),
+      'DemoLayout の CSS の重なり',
+    ).toBe(1)
     expect(errors).toEqual([])
   })
 

@@ -63,8 +63,9 @@ const loadPage = async (page: Page, slug: string): Promise<Loaded> => {
 }
 
 /**
- * 読んだページの head の CSS のうち、まだないものを足す。同じ部品の CSS は同じ中身なので、重なっても見た目は変わらない。
- * link は読み終えるまで待つ（読む前に mount すると、大きさを測り違える）
+ * 読んだページの head の CSS を足す。link はまだないものだけ足し、読み終えるまで待つ（読む前に mount すると、大きさを測り違える）。
+ * ページの <style> は DemoLayout の CSS とバリエーションの CSS がひとつになっているので、そのまま足すと切り替えるたびに
+ * DemoLayout の分が重なる。足したあと、同じ規則が前の <style> にあれば前のほうを外す。後ろの写しが効くので見え方は変わらない
  */
 const adoptStyles = async (doc: Document) => {
   const hrefs = new Set(
@@ -72,14 +73,21 @@ const adoptStyles = async (doc: Document) => {
       ...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]'),
     ].map((link) => link.href),
   )
-  const texts = new Set(
-    [...document.querySelectorAll('style')].map((style) => style.textContent),
-  )
   const waits: Promise<unknown>[] = []
   for (const el of doc.head.querySelectorAll('link[rel="stylesheet"], style')) {
     if (el.tagName === 'STYLE') {
-      if (texts.has(el.textContent)) continue
-      document.head.append(document.importNode(el, true))
+      const style = document.importNode(el, true) as HTMLStyleElement
+      document.head.append(style)
+      const fresh = new Set(
+        [...style.sheet!.cssRules].map((rule) => rule.cssText),
+      )
+      for (const old of document.querySelectorAll('style')) {
+        const sheet = old.sheet
+        if (old === style || !sheet) continue
+        for (let i = sheet.cssRules.length - 1; i >= 0; i--)
+          if (fresh.has(sheet.cssRules[i].cssText)) sheet.deleteRule(i)
+        if (sheet.cssRules.length === 0) old.remove()
+      }
       continue
     }
     const href = absolute(el.getAttribute('href')!)
