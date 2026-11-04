@@ -308,7 +308,7 @@ const toWorld = (cx: number, cy: number): [number, number] => {
 }
 
 const bindInput = () => {
-  // 記事を読む人の縦のスクロールを奪わない。タップするまでは pan-y（Demo.astro の none を上書きする）
+  // 記事を読む人の縦のスクロールを奪わない。タップするまでは pan-y
   touchGate(canvas)
   canvas.addEventListener('pointermove', (e) => {
     mouse = toWorld(e.clientX, e.clientY)
