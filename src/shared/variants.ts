@@ -1,5 +1,5 @@
 /**
- * 似たデモの組（#31）で、ページの中でバリエーションを切り替えるしくみ。見本は src/groups/random-color/。
+ * 似たデモの組（#31）で、ページの中でバリエーションを切り替えるしくみ。見本は src/groups/distortion-slider/。
  *
  * 置くもの
  * - src/groups/<group>/meta.ts  組の題、説明、並び順、トップから開くバリエーション（defineGroup）

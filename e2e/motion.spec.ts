@@ -38,7 +38,6 @@ const AUTOPLAY = [
   'rotate3d-xyz',
   'smooth-movement-using-sin-wave',
   'splitting',
-  'star-rotate-animation-createjs',
   'styling-input',
   'three-typo',
   'three-video',
@@ -68,7 +67,6 @@ const AUTOPLAY_WITHOUT_GL = [
   'rotate-elements-arranged-on-the-circumference',
   'smooth-movement-using-sin-wave',
   'splitting',
-  'star-rotate-animation-createjs',
   'trigonometry-random-floating',
 ]
 
