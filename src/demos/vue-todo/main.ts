@@ -1,6 +1,3 @@
-// import がないと、型の検査はこのファイルを全体で 1 つの script とみなし、ほかのデモの main.ts と名前がぶつかる
-export {}
-
 interface Todo {
   text: string
   done: boolean
