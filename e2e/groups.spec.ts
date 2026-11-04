@@ -483,4 +483,69 @@ test.describe('切り替えのしくみ', () => {
     expect(await loopsPerFrame(page)).toBeCloseTo(baseline, 0)
     expect(errors).toEqual([])
   })
+
+  // 新しいデプロイが出ると、開いたままのページが指す古いチャンクは 404 になる
+  const switcherChunk = '**/_astro/VariantSwitcher*'
+  const markOld = (page: Page) =>
+    page.evaluate(() => {
+      ;(window as unknown as { __old: boolean }).__old = true
+    })
+  const isOld = (page: Page) =>
+    page.evaluate(() => !!(window as unknown as { __old?: boolean }).__old)
+
+  test('「設定」のチャンクを読めないときは 1 回だけページを読み直し、フォーカスを落とさない', async ({
+    page,
+  }) => {
+    await page.route(switcherChunk, (route) =>
+      route.fulfill({ status: 404, body: 'not found' }),
+    )
+    await page.goto(`/${a}/`)
+    await markOld(page)
+    const toggle = page.locator('.variant-toggle')
+    await toggle.focus()
+    await page.keyboard.press('Enter')
+    await expect.poll(() => isOld(page)).toBe(false)
+    await expect(toggle).toBeVisible()
+
+    // 読み直しても読めないときは、もう読み直さない。ボタンにフォーカスが残り、また押せる
+    await markOld(page)
+    await toggle.focus()
+    await page.keyboard.press('Enter')
+    await page.waitForTimeout(1000)
+    expect(await isOld(page)).toBe(true)
+    await expect(toggle).toBeFocused()
+
+    // 読めるようになったら開き、印を消す（次のデプロイのときにまた 1 回読み直せるように）
+    await page.unroute(switcherChunk)
+    await page.reload()
+    await page.locator('.variant-toggle').click()
+    await expect(page.locator('.variant-gui select')).toBeVisible()
+    expect(await page.evaluate(() => sessionStorage.length)).toBe(0)
+  })
+
+  test('sessionStorage が使えなくても、チャンクを読めないときに読み直しを繰り返さない', async ({
+    page,
+  }) => {
+    const errors: string[] = []
+    page.on('pageerror', (error) => errors.push(error.message))
+    await page.addInitScript(() =>
+      Object.defineProperty(window, 'sessionStorage', {
+        get() {
+          throw new DOMException('denied', 'SecurityError')
+        },
+      }),
+    )
+    await page.route(switcherChunk, (route) =>
+      route.fulfill({ status: 404, body: 'not found' }),
+    )
+    await page.goto(`/${a}/`)
+    await markOld(page)
+    const toggle = page.locator('.variant-toggle')
+    await toggle.focus()
+    await page.keyboard.press('Enter')
+    await page.waitForTimeout(1000)
+    expect(await isOld(page)).toBe(true)
+    await expect(toggle).toBeFocused()
+    expect(errors).toEqual([])
+  })
 })
