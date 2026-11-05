@@ -1,3 +1,5 @@
+/* Montserrat（The Montserrat Project Authors）は SIL Open Font License 1.1。Fontsource のパッケージから入れている。
+   700 は src/layouts/Base.astro が @fontsource/montserrat から直に読む */
 /* 本文の Montserrat 400。@fontsource/montserrat/400.css の写しで、英数字だけを字を絞った版（scripts/subset-fonts.sh）に分けた。
    latin の版の範囲に英数字や制御文字（U+0000-001F）が残っていると、英数字だけのページでも latin の版まで読まれたので抜いてある */
 @font-face {
