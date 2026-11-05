@@ -395,6 +395,12 @@ const countOf = (key: string) =>
               playsInline: true,
               src: `/previews/${link.dataset.slug}.webm`,
             })
+            // 読み込み中の video は背景の色だけになるので、絵が出てからポスターと入れ替える
+            clip.addEventListener(
+              'playing',
+              () => clip!.setAttribute('data-ready', ''),
+              { once: true },
+            )
             link.querySelector('img')!.after(clip)
           }
           clip.play().catch(() => {})
@@ -817,7 +823,7 @@ const countOf = (key: string) =>
     opacity: 0;
   }
 
-  .pick-link:hover :global(video) {
+  .pick-link:hover :global(video[data-ready]) {
     opacity: 1;
   }
 
