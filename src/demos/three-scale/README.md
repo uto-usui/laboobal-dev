@@ -34,4 +34,4 @@ DOM の箱と WebGL の板を入れ替えて見せている。押した瞬間に
 
 ## クレジット
 
-- Codrops: https://tympanus.net/codrops/2019/05/22/creating-grid-to-fullscreen-animations-with-three-js/ （コードは Anemolo/GridToFullscreenAnimations。LICENSE のファイルはなく、README の License の節に Codrops の利用条件がある）
+- Codrops（Daniel Velasquez）: https://tympanus.net/codrops/2019/05/22/creating-grid-to-fullscreen-animations-with-three-js/ （コードは https://github.com/Anemolo/GridToFullscreenAnimations 。LICENSE のファイルはなく、README の License の節に Codrops の利用条件がある。作品に組み込むのは自由で、そのまま再配布や販売をするのは不可）

@@ -30,3 +30,7 @@ GSAP の `quickTo` で、x、y、skewX、skewY の 4 つを動かしている。
 - laboobal/docs/effects/mouse.md の「skew」
 - laboobal の部品 `effects/EffectsSkew.vue`、`effects/EffectsSkewScript.js`
 - 写真（Unsplash）: https://images.unsplash.com/photo-1545911975-b998991e17d1
+
+## クレジット
+
+- 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真の出どころは上の「もと」）

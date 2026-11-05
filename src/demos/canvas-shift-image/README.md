@@ -28,3 +28,7 @@ three の `ShaderMaterial` で、画面いっぱいの板を 1 枚描く。フ�
 ## もと
 
 - laboobal/docs/canvas/shiftImage.md（`Canvas/ShiftImage`、`ShiftImageEffect`）
+
+## クレジット
+
+- 写真 Unsplash: https://images.unsplash.com/photo-1548106755-5c6bf746ca84 （Unsplash License）

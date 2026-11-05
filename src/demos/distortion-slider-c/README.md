@@ -52,3 +52,7 @@ three の `ShaderMaterial` で、画面いっぱいの板を 1 枚だけ描い�
 - 写真（Unsplash）: https://images.unsplash.com/photo-1504808815740-fac4ff5aba5c
 - 写真（Unsplash）: https://images.unsplash.com/photo-1548621641-6aa2e973a768
 - 写真（Unsplash）: https://images.unsplash.com/photo-1547977609-5b451beb7b5e
+
+## クレジット
+
+- 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真の出どころは上の「もと」）

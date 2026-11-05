@@ -28,3 +28,7 @@ Canvas 2D。`fitCanvas` で解像度を上げ、座標は CSS の px で書く�
 ## もと
 
 - laboobal/docs/canvas/drawImage.md（`Canvas/DrawImage`）
+
+## クレジット
+
+- 写真 Unsplash: https://images.unsplash.com/photo-1608902918218-0f142aef5cfd （Unsplash License）

@@ -38,3 +38,7 @@ GSAP の `quickTo` で、rotationX、rotationY、x、y の 4 つを動かして�
 - laboobal/docs/effects/mouse.md の「tilt」
 - laboobal の部品 `effects/EffectsTilt.vue`、`effects/EffectsTiltScript.js`
 - 写真（Unsplash）: https://images.unsplash.com/photo-1542731242-435ab393d233
+
+## クレジット
+
+- 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真の出どころは上の「もと」）

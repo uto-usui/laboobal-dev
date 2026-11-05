@@ -36,4 +36,4 @@ Canvas 2D。毎フレーム全部の円を描き直す。ぶつかりの判定�
 
 ## クレジット
 
-- The Coding Train: https://thecodingtrain.com/challenges/50-animated-circle-packing （コードは MIT License。ロゴや画像は除く）
+- The Coding Train: https://thecodingtrain.com/challenges/50-animated-circle-packing （コードは https://github.com/CodingTrain/thecodingtrain.com にあり MIT License。ロゴや画像は除く）

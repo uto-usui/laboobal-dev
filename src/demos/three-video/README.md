@@ -38,4 +38,4 @@ three の最新版。地面は `MeshPhongMaterial`、20 面体は `MeshStandardM
 
 ## クレジット
 
-- learning-threejs: https://github.com/josdirksen/learning-threejs-third （ライセンスの表記がない）
+- learning-threejs: https://github.com/josdirksen/learning-threejs-third （ライセンスの表記がない。LICENSE のファイルはなく、README にも書かれていない。`package.json` の `license` 欄だけが `ISC`）
