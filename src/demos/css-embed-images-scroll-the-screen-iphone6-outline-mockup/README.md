@@ -40,3 +40,7 @@ CSS だけで、script はない。
 - https://jsfiddle.net/yutousui/656k72Lf/
 - 記事: https://webmanab.com/lab/css-embed-images-scroll-the-screen-iphone6-outline-mockup/
 - 写真: Unsplash（https://images.unsplash.com/photo-1467011582549-93cad47c167e 、https://images.unsplash.com/photo-1547962041-6d2d7c4bdf6e 、https://images.unsplash.com/photo-1494256997604-768d1f608cac 、https://images.unsplash.com/photo-1548112129-b5cf67e9558d 、https://images.unsplash.com/photo-1516125073169-9e3ecdee83e7 、https://images.unsplash.com/photo-1548106755-5c6bf746ca84 ）。写真のページは分からない
+
+## クレジット
+
+- 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真の出どころは上の「もと」）

@@ -32,3 +32,7 @@ CSS の `clip-path: inset(上 右 下 左)` を GSAP で動かしている。隠
 - laboobal/docs/effects/reveal.md の「clip」
 - laboobal の部品 `effects/RevealClip.vue`、`effects/RevealClipScript.js`
 - 写真（Unsplash）: https://images.unsplash.com/photo-1548621641-6aa2e973a768
+
+## クレジット
+
+- 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真の出どころは上の「もと」）

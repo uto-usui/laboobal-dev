@@ -37,3 +37,4 @@ three の `ShaderMaterial` で、画面いっぱいの板を 1 枚描く。ノ�
 ## クレジット
 
 - ykob/sketch-threejs: https://github.com/ykob/sketch-threejs （MIT License）
+- 写真 Unsplash: https://images.unsplash.com/photo-1547962041-6d2d7c4bdf6e （Unsplash License）

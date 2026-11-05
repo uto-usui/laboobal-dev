@@ -33,3 +33,7 @@ GSAP の `gsap.quickTo` で、要素ごとに `x`、`y`、`skewX`、`skewY` の 
 - https://jsfiddle.net/yutousui/vxmrkkyd/
 - 記事: https://webmanab.com/lab/parallax-distorts-by-following-mouse/
 - 写真: Unsplash（https://images.unsplash.com/photo-1548106755-5c6bf746ca84 ）。写真のページは分からない
+
+## クレジット
+
+- 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真の出どころは上の「もと」）

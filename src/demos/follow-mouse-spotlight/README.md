@@ -30,3 +30,7 @@ follow-mouse と同じく、requestAnimationFrame と `damp` で書いている�
 - laboobal/docs/basic/follow.md の「mouse spot light」
 - laboobal の部品 `basic/FollowMouseSpotLight.vue`、`basic/FollowMouseScript.js`
 - 写真（Unsplash）: https://images.unsplash.com/photo-1547962041-6d2d7c4bdf6e
+
+## クレジット
+
+- 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真の出どころは上の「もと」）

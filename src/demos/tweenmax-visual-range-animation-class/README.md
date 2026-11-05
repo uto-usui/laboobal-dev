@@ -36,3 +36,7 @@ CSS の scroll-driven animations でも、スクロールの量に合わせて�
 - https://jsfiddle.net/yutousui/j5tp2cw2/
 - 記事: https://webmanab.com/lab/tweenmax-visual-range-animation-class/
 - 写真: Unsplash（https://images.unsplash.com/photo-1547962041-6d2d7c4bdf6e 、https://images.unsplash.com/photo-1548112129-b5cf67e9558d 、https://images.unsplash.com/photo-1516125073169-9e3ecdee83e7 ）。写真のページは分からない
+
+## クレジット
+
+- 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真の出どころは上の「もと」）

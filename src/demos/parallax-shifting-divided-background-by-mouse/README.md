@@ -37,3 +37,7 @@ GSAP の `gsap.to` に `stagger` を関数で渡し、`Math.floor(i / 2) * 0.07`
 - https://jsfiddle.net/yutousui/xban07vu/
 - 記事: https://webmanab.com/lab/parallax-shifting-divided-background-by-mouse/
 - 写真: Unsplash（https://images.unsplash.com/photo-1494256997604-768d1f608cac ）。写真のページは分からない
+
+## クレジット
+
+- 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真の出どころは上の「もと」）

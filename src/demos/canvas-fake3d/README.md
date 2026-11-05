@@ -40,4 +40,4 @@ three の `ShaderMaterial` で、画面いっぱいの板を 1 枚描く。絵�
 
 ## クレジット
 
-- akella/fake3d: https://github.com/akella/fake3d （LICENSE のファイルはない。README の License の節に Codrops の利用条件がある）
+- akella/fake3d: https://github.com/akella/fake3d （LICENSE のファイルはない。README の License の節に Codrops の利用条件がある。作品に組み込むのは自由で、そのまま再配布や販売をするのは不可）

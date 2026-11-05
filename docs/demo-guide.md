@@ -113,7 +113,7 @@ export default defineDemo({
 - 「大事なところ」がいちばん大事な節です。一般論で済ませない
 - 文は平易な日本語で、です・ます にしなくてよい
 - 「クレジット」は、ほかの人のコードや素材を使ったときだけ置く。1 行に 1 つ、`- <名前>: <URL> （<ライセンス>）`。ライセンスは上流で確かめたものだけを書く。写真が何枚もあるときは、上に「写真」の節を作って 1 枚ずつ出どころを書き、クレジットからはそこを指す
-- ほかの人のコードを写したときは、写したファイルにも上流の LICENSE をそのまま写す（`src/demos/scrollmanager/Demo.astro`、`src/demos/particle-photo/shaders.ts` が例）。ルートの [README.md](../README.md) の「第三者のコードと素材」にも足す
+- ほかの人のコードを写したときは、写したファイルにも上流の LICENSE をそのまま写す（`src/demos/scrollmanager/Demo.astro`、`src/demos/particle-photo/shaders.ts` が例）
 - ほかのデモにも通じる考え方が出てきたら、[ideas.md](ideas.md) にも書き足す
 
 ## 4. Demo.astro と main.ts

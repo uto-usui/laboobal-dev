@@ -1,3 +1,6 @@
+/* Molle（Sorkin Type Co）は SIL Open Font License 1.1。@fontsource/molle から字を絞って作った。
+   scrollmanager、tweenmax-easing-of-scroll-parallax、css-embed-images-scroll-the-screen-iphone6-outline-mockup、
+   src/groups/processing-js/Sketch.astro は @fontsource/molle を直に読む */
 /* トップの背景の「labobal.dev」とピックアップの「pick!」専用。字を絞ってあるので、ほかの文字には使えない（scripts/subset-fonts.sh） */
 @font-face {
   font-family: "Molle Mark";

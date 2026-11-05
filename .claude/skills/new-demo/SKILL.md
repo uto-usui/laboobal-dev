@@ -41,7 +41,7 @@ git switch -c feat/<slug>
    - 大きさの変化は `onResize`、canvas は `fitCanvas`
 4. 素材は `src/demos/<slug>/assets/` に置いて import する。外のサーバーから読まない
 5. `src/pages/<slug>.astro`: demo-guide.md の 1 章の形をそのまま写し、slug だけ替える
-6. `src/demos/<slug>/README.md`: demo-guide.md の 3 章の節で書く。「大事なところ」は一般論にしない。ほかの人のコードや素材を使ったら「クレジット」の節、写したファイルへの LICENSE、ルートの README の「第三者のコードと素材」も
+6. `src/demos/<slug>/README.md`: demo-guide.md の 3 章の節で書く。「大事なところ」は一般論にしない。ほかの人のコードや素材を使ったら「クレジット」の節と、写したファイルへの LICENSE も
 
 ## 3. 動きを減らす設定とタッチ
 

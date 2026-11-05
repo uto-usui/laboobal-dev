@@ -40,3 +40,7 @@
 - laboobal/docs/effects/reveal.md の「curtain」
 - laboobal の部品 `effects/RevealCurtain.vue`、`effects/RevealCurtainScript.js`
 - 写真（Unsplash）: https://images.unsplash.com/photo-1542600030097-2669dc2a4223
+
+## クレジット
+
+- 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真の出どころは上の「もと」）
