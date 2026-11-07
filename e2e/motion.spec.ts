@@ -26,6 +26,8 @@ const AUTOPLAY = [
   'gsap-motion-path',
   'gsap-random-repeat',
   'gsap-stagger',
+  'html-emaki',
+  'html-takiage',
   'marquee',
   'move-a-node-with-springiness',
   'move-an-object-while-drawing-a-circle',
@@ -118,7 +120,13 @@ test.describe('指でのスクロールを奪わない', () => {
     'drag-pinch-friction',
     'drag-pinch-lines',
     'drag-pinch-word',
+    'html-cloth',
+    'html-emaki',
+    'html-takiage',
   ]
+  // HTML-in-Canvas（Chrome 157〜）のデモ。使えないブラウザではふつうの HTML を置くだけで touchGate を呼ばないので、
+  // タップしてからの所は、使えるブラウザでだけ見る（Playwright の Chromium 156 では飛ばす）
+  const HTML_IN_CANVAS = ['html-cloth', 'html-emaki', 'html-takiage']
 
   for (const slug of DRAG) {
     test(`${slug} を iframe に入れても、縦になぞると記事がスクロールする`, async ({
@@ -168,6 +176,12 @@ test.describe('指でのスクロールを奪わない', () => {
         return before === (await scrollY())
       }
       await expect.poll(settled).toBe(true)
+      const drawable = await page.evaluate(() => {
+        const canvas = document.createElement('canvas')
+        canvas.setAttribute('content', 'drawable')
+        return (canvas as { content?: string }).content === 'drawable'
+      })
+      if (HTML_IN_CANVAS.includes(slug) && !drawable) return
       await page.evaluate(() => scrollTo(0, 0))
       await touch('touchStart', 190, 300)
       await touch('touchEnd')
