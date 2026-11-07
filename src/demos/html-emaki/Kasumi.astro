@@ -1,0 +1,65 @@
+---
+// 絵巻の金の霞。紙の継ぎ目をまたぐときは、両方の紙に同じ形を置き（右の紙では x + 900）、はみ出した分を紙が切る
+interface Props {
+  x: number
+  y: number
+  shape?: 'a' | 'b' | 'c'
+  scale?: number
+}
+
+const { x, y, shape = 'a', scale = 1 } = Astro.props
+const SHAPES = {
+  a: [
+    [0, 0, 240, 20],
+    [50, -13, 140, 18],
+    [110, 15, 170, 17],
+  ],
+  b: [
+    [0, 0, 180, 18],
+    [30, 14, 230, 20],
+    [100, -12, 120, 16],
+  ],
+  c: [
+    [0, 0, 120, 18],
+    [-30, 22, 150, 19],
+    [10, 46, 110, 17],
+    [-20, 68, 140, 18],
+  ],
+}
+---
+
+<div
+  class="kasumi"
+  style={`left: ${x}px; top: ${y}px; transform: scale(${scale})`}
+  aria-hidden="true"
+>
+  {SHAPES[shape].map(([l, t, w, h]) => (
+    <span style={`left: ${l}px; top: ${t}px; width: ${w}px; height: ${h}px`} />
+  ))}
+</div>
+
+<style>
+  .kasumi {
+    position: absolute;
+    transform-origin: 0 0;
+    pointer-events: none;
+  }
+
+  span {
+    position: absolute;
+    border-radius: 999px;
+    /* 金砂子。大きさと間隔の違う粒を重ねて、並びを目立たなくする */
+    background:
+      radial-gradient(circle, rgb(255 246 214 / 0.9) 0.6px, transparent 1px) 0 0
+      / 7px 5px,
+      radial-gradient(circle, rgb(255 238 190 / 0.8) 0.9px, transparent 1.4px)
+      3px 2px / 13px 9px,
+      radial-gradient(circle, rgb(150 110 40 / 0.5) 0.8px, transparent 1.2px)
+      5px 1px / 11px 7px,
+      linear-gradient(#e2c477, #c8a24e 60%, #b8913f);
+    box-shadow:
+      inset 0 0 0 0.5px rgb(120 84 30 / 0.55),
+      inset 0 1px 1px rgb(255 240 200 / 0.6);
+    opacity: 0.94;
+  }
+</style>

@@ -1,0 +1,343 @@
+<div class="stage">
+  <!-- 夜の焚き上げ所。札掛けと篝籠は HTML で置き、火の明かりは canvas が加算で重ねる -->
+  <div class="scene">
+    <div class="board">
+      <div class="roof" aria-hidden="true"></div>
+      <p class="sign">書いて、ちぎって、くべる</p>
+      <div class="post" aria-hidden="true"></div>
+    </div>
+    <div class="pad washi" aria-hidden="true"><span class="seal">灯</span></div>
+    <svg class="brazier" viewBox="0 0 120 120" aria-hidden="true">
+      <ellipse
+        cx="60"
+        cy="118"
+        rx="44"
+        ry="4"
+        fill="#000"
+        opacity="0.35"
+      ></ellipse>
+      <g stroke="#120e0c" stroke-width="3.2" stroke-linecap="round">
+        <path d="M60 74 L60 116"></path>
+        <path d="M42 72 L28 117"></path>
+        <path d="M78 72 L92 117"></path>
+      </g>
+      <g fill="#2a1f1a">
+        <ellipse cx="44" cy="22" rx="9" ry="4"></ellipse>
+        <ellipse cx="62" cy="21" rx="11" ry="4.5"></ellipse>
+        <ellipse cx="78" cy="23" rx="8" ry="3.5"></ellipse>
+      </g>
+      <g fill="none" stroke="#15110f" stroke-width="2.4">
+        <path d="M8 22 Q60 34 112 22"></path>
+        <path d="M18 47 Q60 56 102 47"></path>
+        <path d="M30 70 Q60 76 90 70"></path>
+        <path
+          d="M8 22 L30 70 M22 26 L38 72 M38 29 L48 74 M54 30 L57 75 M70 30 L66 75 M86 29 L76 74 M100 26 L84 72 M112 22 L90 70"
+        ></path>
+      </g>
+      <path
+        d="M8 22 Q60 10 112 22"
+        fill="none"
+        stroke="#15110f"
+        stroke-width="2.4"
+      ></path>
+      <!-- 火に向いた所だけ、鉄が少し光る -->
+      <g fill="none" stroke="#7a3d1f" stroke-width="0.9" opacity="0.7">
+        <path d="M10 21 Q60 32 110 21"></path>
+        <path d="M20 46 Q60 54 100 46"></path>
+      </g>
+    </svg>
+  </div>
+
+  <canvas class="view" content="drawable">
+    <section class="slip washi" drawable>
+      <textarea
+        class="words"
+        maxlength="48"
+        placeholder="手放したいことを、ひとつ"
+        aria-label="短冊に書く。Ctrl か ⌘ を押しながら Enter で、ちぎってくべる"
+        autocomplete="off"
+        spellcheck="false"
+      ></textarea>
+      <span class="seal" aria-hidden="true">灯</span>
+    </section>
+  </canvas>
+
+  <!-- 綴じ具。canvas の上に重ねるが、ポインターの操作は下の canvas へ通す -->
+  <div class="clamp" aria-hidden="true"></div>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    color-scheme: dark;
+    background:
+      radial-gradient(
+        ellipse 38% 26% at var(--fire-x, 64%) var(--ground-y, 90%),
+        rgb(120 52 20 / 0.22),
+        transparent
+      ),
+      linear-gradient(
+        to bottom,
+        #1d2128 0,
+        #232931 calc(var(--ground-y, 90%) - 90px),
+        #2a2723 var(--ground-y, 90%),
+        #1c1917 100%
+      );
+    user-select: none;
+    /* 記事を読む人の縦のスクロールを奪わない。タップすると touchGate が none にする */
+    touch-action: pan-y;
+  }
+
+  .stage.is-grabbing,
+  .stage.is-grabbing * {
+    cursor: grabbing;
+  }
+
+  .scene,
+  .view {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .view {
+    display: block;
+  }
+
+  .washi {
+    background-color: #efe6d2;
+    background-image:
+      radial-gradient(circle at 22% 5%, #c9a85a 0 0.8px, transparent 1.4px),
+      radial-gradient(circle at 70% 9%, #c9a85a 0 1.1px, transparent 1.7px),
+      radial-gradient(circle at 48% 14%, #c9a85a 0 0.6px, transparent 1.2px),
+      radial-gradient(circle at 80% 88%, #c9a85a 0 0.9px, transparent 1.5px),
+      radial-gradient(circle at 18% 94%, #c9a85a 0 1px, transparent 1.6px),
+      radial-gradient(circle at 60% 97%, #c9a85a 0 0.7px, transparent 1.3px),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='160'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55 0.22' numOctaves='3' seed='5'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.38 0 0 0 0 0.28 0 0 0 0.4 -0.1'/%3E%3C/filter%3E%3Crect width='90' height='160' filter='url(%23f)'/%3E%3C/svg%3E");
+  }
+
+  /* 札掛け。白木の板に小さな屋根、地面まで柱 */
+  .board {
+    position: absolute;
+    top: calc(var(--slip-y) - 20px);
+    left: calc(var(--slip-x) - 26px);
+    width: calc(var(--slip-w) + 66px);
+    height: calc(var(--slip-h) + 40px);
+    background:
+      repeating-linear-gradient(
+        90deg,
+        transparent 0 9px,
+        rgb(0 0 0 / 0.05) 9px 10px,
+        transparent 10px 23px
+      ),
+      linear-gradient(90deg, #4b4033, #574a3a 60%, #615240);
+    border-radius: 1px;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 0.45);
+  }
+
+  .roof {
+    position: absolute;
+    top: -14px;
+    left: -12px;
+    right: -12px;
+    height: 16px;
+    background: linear-gradient(#3b4a45, #24302d);
+    clip-path: polygon(6% 0, 94% 0, 100% 100%, 0 100%);
+  }
+
+  .post {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 14px;
+    height: calc(var(--ground-y) - var(--slip-y) - var(--slip-h) - 20px);
+    background: linear-gradient(90deg, #4f4434, #6b5c46);
+    translate: -50% 0;
+  }
+
+  .sign {
+    position: absolute;
+    top: 28px;
+    right: 9px;
+    margin: 0;
+    color: #1c1511;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", YuMincho, serif;
+    font-size: 12px;
+    letter-spacing: 0.32em;
+    writing-mode: vertical-rl;
+  }
+
+  /* 束の残り。いちばん上の短冊の下に、紙の端が重なって見える */
+  .pad {
+    position: absolute;
+    top: var(--slip-y);
+    left: var(--slip-x);
+    width: var(--slip-w);
+    height: var(--slip-h);
+    filter: brightness(0.46) sepia(0.2);
+  }
+
+  .slip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    width: var(--slip-w);
+    height: var(--slip-h);
+    color: #2e2620;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", YuMincho, serif;
+    cursor: grab;
+  }
+
+  .words {
+    position: absolute;
+    top: 36px;
+    right: 5px;
+    bottom: 46px;
+    left: 5px;
+    box-sizing: border-box;
+    padding: 0;
+    overflow: hidden;
+    color: #2e2620;
+    font: inherit;
+    font-size: 20px;
+    line-height: 1.5;
+    letter-spacing: 0.12em;
+    background: transparent;
+    border: 0;
+    outline: none;
+    resize: none;
+    caret-color: #b8392a;
+    writing-mode: vertical-rl;
+    cursor: text;
+  }
+
+  .words::placeholder {
+    color: rgb(46 38 32 / 0.26);
+    font-size: 15px;
+  }
+
+  .seal {
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    display: grid;
+    place-items: center;
+    width: 19px;
+    height: 19px;
+    color: #b8392a;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", YuMincho, serif;
+    font-size: 12px;
+    line-height: 1;
+    border: 1.5px solid #b8392a;
+    border-radius: 2px;
+    opacity: 0.85;
+    translate: -50% 0;
+  }
+
+  .clamp {
+    position: absolute;
+    top: calc(var(--slip-y) - 5px);
+    left: calc(var(--slip-x) - 7px);
+    width: calc(var(--slip-w) + 14px);
+    height: 21px;
+    background: linear-gradient(#2d241e, #15110e);
+    border-radius: 2px;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 0.5);
+    pointer-events: none;
+  }
+
+  .clamp::before,
+  .clamp::after {
+    content: "";
+    position: absolute;
+    top: 7px;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(
+      circle at 35% 35%,
+      #e8d08a,
+      #c9a85a 50%,
+      #7d6430
+    );
+    border-radius: 50%;
+  }
+
+  .clamp::before {
+    left: 5px;
+  }
+
+  .clamp::after {
+    right: 5px;
+  }
+
+  .brazier {
+    position: absolute;
+    top: calc(var(--ground-y) - var(--basket-w));
+    left: calc(var(--fire-x) - var(--basket-w) / 2);
+    width: var(--basket-w);
+    height: var(--basket-w);
+    overflow: visible;
+  }
+
+  /* HTML-in-Canvas が使えないとき（main.ts の flat） */
+  .stage.is-flat .scene,
+  .stage.is-flat .clamp {
+    display: none;
+  }
+
+  .stage :global(.flat) {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 12px;
+  }
+
+  .stage.is-flat .slip {
+    position: relative;
+    width: 66px;
+    height: 290px;
+    transition:
+      opacity 0.6s,
+      filter 0.6s;
+  }
+
+  .stage.is-flat .slip:global(.is-burnt) {
+    opacity: 0;
+    filter: sepia(1) brightness(0.4);
+  }
+
+  .stage :global(.flat-burn) {
+    padding: 6px 18px;
+    color: #f0e6d2;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", YuMincho, serif;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    background: #b8392a;
+    border: 0;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  .stage :global(.flat-stubs) {
+    min-height: 1.5em;
+    margin: 0;
+    color: #c9a85a;
+    font-size: 12px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stage.is-flat .slip {
+      transition: none;
+    }
+  }
+</style>

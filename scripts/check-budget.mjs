@@ -37,6 +37,15 @@ const BUDGET = {
     'particle-photo': 27,
     // locomotive-scroll。15.1
     scrollmanager: 17,
+    // HTML-in-Canvas の作例。three を使わず、WebGL とシェーダーのコードをデモのチャンクにそのまま入れている（2026-11-07）
+    // 20.7（絵巻 8 枚の HTML と SVG が大きい）
+    'html-emaki': 25,
+    // 17.2
+    'html-mizu-mikuji': 21,
+    // 16.4
+    'html-takiage': 20,
+    // 8.7
+    'html-cloth': 11,
   },
   // 1 ファイルの最大。jpg 36.4、webm 324.1、webp 25.8
   previews: { jpg: 45, webm: 400, webp: 40 },
