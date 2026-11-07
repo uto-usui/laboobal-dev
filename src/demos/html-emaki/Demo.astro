@@ -1,0 +1,1360 @@
+---
+import Kasumi from './Kasumi.astro'
+
+// 市で選べる灯籠。選んだものが、渡し舟、灯籠流し、海の場面に描きこまれる
+const LANTERNS = [
+  { n: 1, name: 'あか', color: '#d4473a' },
+  { n: 2, name: 'あい', color: '#4a68b0' },
+  { n: 3, name: 'やまぶき', color: '#e2a52b' },
+  { n: 4, name: 'わかば', color: '#79ad45' },
+  { n: 5, name: 'しろ', color: '#f4efe0' },
+]
+// 灯籠流しで、それぞれの灯籠が浮かぶ x
+const FLOAT_X = [650, 540, 430, 320, 205]
+---
+
+<div class="stage">
+  <canvas class="view" content="drawable">
+    <!-- 〇 表紙、見返し、序 -->
+    <section class="sheet s0" drawable>
+      <!-- 岩絵具のにじみとざらつき。.art がみなこれを使う -->
+      <svg class="defs" width="0" height="0" aria-hidden="true">
+        <filter id="emaki-paint" x="-2%" y="-2%" width="104%" height="104%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.035"
+            numOctaves="3"
+            seed="4"
+            result="warp"
+          ></feTurbulence>
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="warp"
+            scale="4"
+            xChannelSelector="R"
+            yChannelSelector="G"
+            result="rough"
+          ></feDisplacementMap>
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.75"
+            numOctaves="2"
+            seed="9"
+            result="grain"
+          ></feTurbulence>
+          <feColorMatrix
+            in="grain"
+            type="saturate"
+            values="0"
+            result="grey"
+          ></feColorMatrix>
+          <feComposite
+            in="rough"
+            in2="grey"
+            operator="arithmetic"
+            k1="0.3"
+            k2="0.84"
+            k3="0"
+            k4="0"
+          ></feComposite>
+        </filter>
+      </svg>
+      <svg class="art" viewBox="0 0 900 360" aria-hidden="true">
+        <path
+          d="M24 214 Q60 150 110 176 Q160 120 220 168 Q270 140 330 180 L360 214 Z"
+          fill="#9fb0bf"
+          opacity="0.35"
+        ></path>
+        <path
+          d="M20 236 Q70 196 140 214 Q200 186 260 214 Q320 200 380 236 Z"
+          fill="#8fa89a"
+          opacity="0.35"
+        ></path>
+      </svg>
+      <div class="wash"></div>
+      <div class="cover">
+        <p class="slip">ともしび川絵巻</p>
+      </div>
+      <div class="endpaper"></div>
+      <div class="kotoba prologue">
+        <h2>序</h2>
+        <p>
+          山のおくで生まれたひとしずくが、里と市をとおり、夜の海へ出るまでの一日を、絵と詞でつづります。
+        </p>
+        <p>
+          左へ引いて、お読みください。読んだところは右に巻きとられ、まだ開いていない左の巻きには、この先の絵が裏から透けて見えます。
+        </p>
+      </div>
+      <Kasumi x={-120} y={318} shape="a" />
+      <Kasumi x={120} y={40} shape="b" scale={0.8} />
+    </section>
+
+    <!-- 一 みなもと（夜明け） -->
+    <section class="sheet s1" drawable>
+      <svg class="art" viewBox="0 0 900 360" aria-hidden="true">
+        <defs>
+          <linearGradient id="s1-river" x1="1" x2="0">
+            <stop offset="0" stop-color="#b5ccd3"></stop>
+            <stop offset="1" stop-color="#9dbac6"></stop>
+          </linearGradient>
+          <linearGradient id="s1-mt" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#4d6f86"></stop>
+            <stop offset="1" stop-color="#8fb39a"></stop>
+          </linearGradient>
+          <filter id="s1-blur" x="-20%" y="-200%" width="140%" height="500%">
+            <feGaussianBlur stdDeviation="7"></feGaussianBlur>
+          </filter>
+        </defs>
+        <circle cx="470" cy="122" r="30" fill="#eba37e" opacity="0.8"></circle>
+        <path
+          d="M24 250 Q60 150 120 150 Q170 88 232 140 Q300 58 372 130 Q420 100 462 150 Q522 92 592 160 Q640 140 694 196 L694 250 L0 250 Z"
+          fill="#8aa3b6"
+          opacity="0.6"
+        ></path>
+        <path
+          class="ridge"
+          d="M12 252 Q50 170 110 190 Q160 128 222 186 Q282 148 332 200 Q382 168 432 210 Q500 158 560 206 Q622 178 686 236 L700 252 L0 252 Z"
+          fill="url(#s1-mt)"
+        ></path>
+        <g class="mist" data-motion="auto" fill="#fff" filter="url(#s1-blur)">
+          <ellipse cx="160" cy="178" rx="150" ry="9" opacity="0.6"></ellipse>
+          <ellipse cx="470" cy="198" rx="170" ry="8" opacity="0.55"></ellipse>
+          <ellipse cx="250" cy="220" rx="130" ry="7" opacity="0.5"></ellipse>
+        </g>
+        <path d="M0 246 Q300 240 640 246 L700 252 L0 256 Z" class="far"></path>
+        <path
+          d="M640 258 Q600 256 520 257 Q300 254 0 255 L0 272 Q300 271 520 266 Q600 263 640 262 Z"
+          fill="url(#s1-river)"
+        ></path>
+        <path
+          class="flow"
+          d="M630 260 Q420 258 0 263"
+          fill="none"
+          stroke="#f2f7f7"
+          stroke-width="1.3"
+          stroke-dasharray="10 18"
+          data-motion="auto"
+        ></path>
+        <path
+          d="M652 232 Q646 246 641 259"
+          fill="none"
+          stroke="#dbe9ed"
+          stroke-width="2.4"
+        ></path>
+        <path
+          class="ink"
+          d="M612 252 Q618 222 652 218 Q688 220 694 248 Q680 262 642 263 Q620 261 612 252 Z"
+          fill="#6e7b6a"
+        ></path>
+        <circle cx="640" cy="226" r="4" fill="#5f8a6e"></circle>
+        <circle cx="664" cy="223" r="3.5" fill="#5f8a6e"></circle>
+        <circle cx="680" cy="236" r="3" fill="#5f8a6e"></circle>
+        <path
+          d="M0 272 Q300 271 520 266 Q600 263 720 268 L900 290 L900 360 L0 360 Z"
+          class="bank"
+        ></path>
+        <g class="ink">
+          <path d="M118 328 L122 268" stroke-width="3" stroke="#5b4636"></path>
+          <ellipse cx="120" cy="274" rx="30" ry="8" fill="#3f5a45"></ellipse>
+          <ellipse cx="114" cy="290" rx="36" ry="9" fill="#3f5a45"></ellipse>
+          <ellipse cx="124" cy="306" rx="28" ry="8" fill="#3f5a45"></ellipse>
+          <path d="M262 340 L258 292" stroke-width="3" stroke="#5b4636"></path>
+          <ellipse cx="258" cy="296" rx="24" ry="7" fill="#46624b"></ellipse>
+          <ellipse cx="264" cy="312" rx="30" ry="8" fill="#46624b"></ellipse>
+        </g>
+      </svg>
+      <div class="wash"></div>
+      <div class="kotoba">
+        <h2>一　みなもと</h2>
+        <p>
+          夜があけるころ、苔むした岩から、しずくが落ちる。しずくはほかのしずくと出会い、まだ名前のない細い流れになって、左へくだってゆく。
+        </p>
+      </div>
+      <Kasumi x={-110} y={318} shape="b" />
+      <Kasumi x={780} y={318} shape="a" />
+    </section>
+
+    <!-- 二 水車の里（朝） -->
+    <section class="sheet s2" drawable>
+      <svg class="art" viewBox="0 0 900 360" aria-hidden="true">
+        <defs>
+          <linearGradient id="s2-river" x1="1" x2="0">
+            <stop offset="0" stop-color="#9dbac6"></stop>
+            <stop offset="1" stop-color="#8fb2c2"></stop>
+          </linearGradient>
+        </defs>
+        <path
+          d="M0 214 Q120 206 260 212 Q420 202 640 214 L900 246 L900 256 L0 252 Z"
+          class="far"
+        ></path>
+        <path
+          d="M900 255 Q600 252 450 253 Q200 250 0 250 L0 280 Q200 279 450 274 Q650 272 900 272 Z"
+          fill="url(#s2-river)"
+        ></path>
+        <path
+          class="flow"
+          d="M900 262 Q600 260 300 262 Q120 263 0 265"
+          fill="none"
+          stroke="#f2f7f7"
+          stroke-width="1.3"
+          stroke-dasharray="12 20"
+          data-motion="auto"
+        ></path>
+        <path
+          d="M0 280 Q200 279 450 274 Q650 272 900 272 L900 360 L0 360 Z"
+          class="bank"
+        ></path>
+        <g class="ink paddy">
+          <path d="M70 300 L250 300 L230 330 L50 330 Z" fill="#a9c27f"></path>
+          <path d="M262 300 L440 300 L420 330 L242 330 Z" fill="#b8cd8e"></path>
+          <path d="M44 338 L224 338 L204 360 L24 360 Z" fill="#b8cd8e"></path>
+          <path d="M236 338 L414 338 L394 360 L216 360 Z" fill="#a9c27f"></path>
+          <path d="M452 300 L640 300 L620 330 L432 330 Z" fill="#a9c27f"></path>
+        </g>
+        <g class="ink house">
+          <rect x="300" y="196" width="62" height="34" fill="#e8dab6"></rect>
+          <path d="M292 198 L370 198 L356 174 L306 174 Z" fill="#8a6f4b"></path>
+          <rect x="324" y="210" width="14" height="20" fill="#5b4636"></rect>
+          <rect x="384" y="204" width="52" height="28" fill="#e8dab6"></rect>
+          <path d="M377 206 L443 206 L431 186 L389 186 Z" fill="#8a6f4b"></path>
+          <rect x="532" y="204" width="70" height="40" fill="#e8dab6"></rect>
+          <path d="M522 206 L612 206 L596 180 L538 180 Z" fill="#8a6f4b"></path>
+          <rect x="554" y="220" width="16" height="24" fill="#5b4636"></rect>
+        </g>
+        <g class="wheel" data-motion="auto">
+          <circle
+            cx="500"
+            cy="248"
+            r="32"
+            fill="none"
+            stroke="#5b4636"
+            stroke-width="3"
+          ></circle>
+          <circle cx="500" cy="248" r="6" fill="#5b4636"></circle>
+          <path
+            d="M500 216 L500 280 M468 248 L532 248 M477 225 L523 271 M523 225 L477 271"
+            stroke="#5b4636"
+            stroke-width="2"
+          ></path>
+          <path
+            d="M500 212 l-5 -6 h10 Z M536 248 l6 -5 v10 Z M500 284 l5 6 h-10 Z M464 248 l-6 5 v-10 Z"
+            fill="#5b4636"
+          ></path>
+        </g>
+        <g class="ink">
+          <path d="M180 240 L184 168" stroke="#5b4636" stroke-width="3"></path>
+          <path
+            d="M184 170 Q160 190 156 228 M184 170 Q170 196 172 236 M184 170 Q200 194 206 232 M184 170 Q214 186 222 222 M184 170 Q190 200 190 238"
+            fill="none"
+            stroke="#6f9a5c"
+            stroke-width="2"
+          ></path>
+        </g>
+      </svg>
+      <div class="wash"></div>
+      <div class="kotoba">
+        <h2>二　水車の里</h2>
+        <p>
+          朝。流れは里の水車をまわし、田に水を分ける。ここで川は、はじめて名前をもらう。ともしび川。夜に灯籠を流す川だから、そう呼ばれている。
+        </p>
+      </div>
+      <Kasumi x={-90} y={318} shape="a" />
+      <Kasumi x={790} y={318} shape="b" />
+    </section>
+
+    <!-- 三 市（昼まえ）。灯籠を選ぶ -->
+    <section class="sheet s3" drawable>
+      <svg class="art" viewBox="0 0 900 360" aria-hidden="true">
+        <defs>
+          <linearGradient id="s3-river" x1="1" x2="0">
+            <stop offset="0" stop-color="#8fb2c2"></stop>
+            <stop offset="1" stop-color="#86abbd"></stop>
+          </linearGradient>
+        </defs>
+        <path
+          d="M0 214 Q300 212 640 220 L900 214 L900 252 L0 250 Z"
+          class="far"
+        ></path>
+        <path
+          d="M900 250 Q640 248 420 250 Q200 248 0 248 L0 284 Q220 283 460 280 Q700 279 900 280 Z"
+          fill="url(#s3-river)"
+        ></path>
+        <path
+          class="flow"
+          d="M900 265 Q600 264 300 265 Q120 266 0 266"
+          fill="none"
+          stroke="#f2f7f7"
+          stroke-width="1.3"
+          stroke-dasharray="12 20"
+          data-motion="auto"
+        ></path>
+        <path
+          d="M0 284 Q220 283 460 280 Q700 279 900 280 L900 360 L0 360 Z"
+          class="bank"
+        ></path>
+        <g class="ink stall">
+          <path d="M430 96 L700 96 L684 70 L446 70 Z" fill="#7b5a3c"></path>
+          <rect x="440" y="96" width="6" height="128" fill="#b8452f"></rect>
+          <rect x="684" y="96" width="6" height="128" fill="#b8452f"></rect>
+          <path d="M436 200 L694 200 L686 226 L444 226 Z" fill="#c9a464"></path>
+          <path
+            d="M446 102 L684 102"
+            stroke="#5b4636"
+            stroke-width="1.5"
+          ></path>
+        </g>
+        <g class="ink">
+          <path d="M80 160 L240 160 L228 140 L92 140 Z" fill="#4a68b0"></path>
+          <rect x="88" y="160" width="4" height="66" fill="#5b4636"></rect>
+          <rect x="228" y="160" width="4" height="66" fill="#5b4636"></rect>
+          <path d="M84 206 L236 206 L230 224 L90 224 Z" fill="#c9a464"></path>
+          <ellipse cx="120" cy="202" rx="12" ry="4" fill="#9aa4ab"></ellipse>
+          <ellipse cx="146" cy="203" rx="12" ry="4" fill="#9aa4ab"></ellipse>
+          <ellipse cx="172" cy="202" rx="12" ry="4" fill="#9aa4ab"></ellipse>
+          <path d="M262 170 L382 170 L372 152 L272 152 Z" fill="#b8452f"></path>
+          <rect x="268" y="170" width="4" height="56" fill="#5b4636"></rect>
+          <rect x="372" y="170" width="4" height="56" fill="#5b4636"></rect>
+          <rect x="282" y="184" width="18" height="22" fill="#e2a52b"></rect>
+          <rect x="304" y="180" width="18" height="26" fill="#79ad45"></rect>
+          <rect x="326" y="186" width="18" height="20" fill="#d4473a"></rect>
+          <rect x="348" y="182" width="16" height="24" fill="#f4efe0"></rect>
+        </g>
+        <g class="ink people">
+          <circle cx="160" cy="232" r="5" fill="#f1e4cc"></circle>
+          <path d="M152 238 L168 238 L172 252 L148 252 Z" fill="#7d97b8"></path>
+          <circle cx="410" cy="230" r="5" fill="#f1e4cc"></circle>
+          <path d="M402 236 L418 236 L422 250 L398 250 Z" fill="#b8452f"></path>
+          <path d="M396 228 L424 228 L410 218 Z" fill="#c9a464"></path>
+          <circle cx="250" cy="312" r="5" fill="#f1e4cc"></circle>
+          <path d="M242 318 L258 318 L262 334 L238 334 Z" fill="#5f8a6e"></path>
+          <circle cx="272" cy="316" r="4" fill="#f1e4cc"></circle>
+          <path d="M266 321 L278 321 L281 333 L263 333 Z" fill="#e2a52b"></path>
+          <circle cx="600" cy="314" r="5" fill="#f1e4cc"></circle>
+          <path d="M592 320 L608 320 L612 336 L588 336 Z" fill="#6b6258"></path>
+          <path d="M586 312 L614 312 L600 302 Z" fill="#c9a464"></path>
+        </g>
+        <g class="ink">
+          <path
+            d="M700 292 Q760 300 820 292 L810 304 Q760 310 712 304 Z"
+            fill="#8a6f4b"
+          ></path>
+          <path
+            d="M760 292 L762 262"
+            stroke="#5b4636"
+            stroke-width="1.5"
+          ></path>
+        </g>
+      </svg>
+      <div class="wash"></div>
+      <div class="kotoba">
+        <h2>三　市</h2>
+        <p>
+          川ぞいに市が立つ。灯籠屋の軒に、五つの灯籠。今夜川に流す灯籠を、えらんでください。えらんだ灯籠は、この先の絵に描きこまれます。
+        </p>
+      </div>
+      <div class="lanterns">
+        {LANTERNS.map((l) => (
+          <label class="lantern" style={`--c: ${l.color}`}>
+            <span class="cord" />
+            <span class="body">
+              <span class="flame" />
+            </span>
+            <span class="name">{l.name}</span>
+            <input id={`lan-${l.n}`} type="checkbox" autocomplete="off" />
+          </label>
+        ))}
+      </div>
+      <Kasumi x={-100} y={-14} shape="b" />
+      <Kasumi x={810} y={318} shape="a" />
+    </section>
+
+    <!-- 四 渡し（昼）。岸を選ぶ -->
+    <section class="sheet s4" drawable>
+      <svg class="art" viewBox="0 0 900 360" aria-hidden="true">
+        <defs>
+          <linearGradient id="s4-river" x1="1" x2="0">
+            <stop offset="0" stop-color="#86abbd"></stop>
+            <stop offset="1" stop-color="#7c9fb0"></stop>
+          </linearGradient>
+        </defs>
+        <path
+          d="M0 214 Q260 204 600 214 L900 214 L900 252 L0 250 Z"
+          class="far"
+        ></path>
+        <path
+          d="M900 248 Q700 246 600 232 Q420 220 250 228 Q120 240 0 246 L0 290 Q120 296 250 304 Q420 312 600 300 Q720 286 900 284 Z"
+          fill="url(#s4-river)"
+        ></path>
+        <path
+          class="flow"
+          d="M900 266 Q700 264 560 262 Q400 258 240 266 Q100 268 0 268"
+          fill="none"
+          stroke="#f2f7f7"
+          stroke-width="1.3"
+          stroke-dasharray="12 22"
+          data-motion="auto"
+        ></path>
+        <path
+          d="M0 290 Q120 296 250 304 Q420 312 600 300 Q720 286 900 284 L900 360 L0 360 Z"
+          class="bank"
+        ></path>
+        <g class="ink temple">
+          <path d="M60 128 L230 128 L212 102 L78 102 Z" fill="#4a4038"></path>
+          <rect x="84" y="128" width="7" height="50" fill="#b8452f"></rect>
+          <rect x="198" y="128" width="7" height="50" fill="#b8452f"></rect>
+          <path
+            d="M100 182 L190 182 M96 192 L194 192 M92 202 L198 202 M88 212 L202 212 M84 222 L206 222"
+            stroke="#8d8273"
+            stroke-width="5"
+          ></path>
+          <path d="M268 220 L272 150" stroke="#5b4636" stroke-width="3"></path>
+          <ellipse cx="272" cy="154" rx="30" ry="8" fill="#3f5a45"></ellipse>
+          <ellipse cx="266" cy="170" rx="36" ry="9" fill="#3f5a45"></ellipse>
+        </g>
+        <g class="ink teahouse">
+          <path d="M70 312 L240 312 L226 292 L84 292 Z" fill="#8a6f4b"></path>
+          <rect x="82" y="312" width="5" height="44" fill="#5b4636"></rect>
+          <rect x="224" y="312" width="5" height="44" fill="#5b4636"></rect>
+          <rect x="104" y="334" width="100" height="8" fill="#b8452f"></rect>
+          <path d="M296 300 Q326 280 356 300 Z" fill="#c2452d"></path>
+          <path d="M326 300 L326 346" stroke="#5b4636" stroke-width="2"></path>
+        </g>
+      </svg>
+      <div class="wash"></div>
+      <div class="boat">
+        <svg viewBox="0 0 130 60" aria-hidden="true">
+          <path
+            class="ink"
+            d="M4 40 L120 40 Q112 54 92 56 L26 56 Q10 52 4 40 Z"
+            fill="#7b5a3c"
+          ></path>
+          <circle cx="94" cy="14" r="5" fill="#f1e4cc"></circle>
+          <path d="M86 20 L102 20 L106 40 L84 40 Z" fill="#6b6258"></path>
+          <path d="M80 12 L108 12 L94 2 Z" fill="#c9a464"></path>
+          <path d="M112 0 L76 58" stroke="#5b4636" stroke-width="2"></path>
+        </svg>
+        <div class="cargo">
+          {LANTERNS.map((l) => (
+            <span class={`mini lan-${l.n}`} style={`--c: ${l.color}`} />
+          ))}
+        </div>
+      </div>
+      <div class="kotoba">
+        <h2>四　渡し</h2>
+        <p>
+          昼。渡し舟が、岸と岸を行き来している。灯籠をつんで、どちらの岸で夜を待ちますか。
+        </p>
+      </div>
+      <fieldset class="banks">
+        <legend>岸</legend>
+        <label
+          ><input
+            id="bank-near"
+            type="radio"
+            name="bank"
+            checked
+            autocomplete="off"
+          >
+          <span>こちらの岸、茶屋で待つ</span></label
+        >
+        <label
+          ><input id="bank-far" type="radio" name="bank" autocomplete="off">
+          <span>むこう岸、お寺で待つ</span></label
+        >
+      </fieldset>
+      <Kasumi x={-80} y={322} shape="a" />
+      <Kasumi x={800} y={-14} shape="b" />
+    </section>
+
+    <!-- 五 夕立（午後から夕方） -->
+    <section class="sheet s5" drawable>
+      <svg class="art" viewBox="0 0 900 360" aria-hidden="true">
+        <defs>
+          <linearGradient id="s5-river" x1="1" x2="0">
+            <stop offset="0" stop-color="#7c9fb0"></stop>
+            <stop offset="1" stop-color="#6c7f8a"></stop>
+          </linearGradient>
+          <filter id="s5-blur">
+            <feGaussianBlur stdDeviation="9"></feGaussianBlur>
+          </filter>
+          <pattern
+            id="s5-rain"
+            width="72"
+            height="80"
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d="M44.4 59.3 l-3.3 19.5 M66.1 59.2 l-3.6 21.1 M4.0 37.2 l-3.6 21.3 M46.1 72.1 l-1.9 11.4 M33.9 19.7 l-2.8 16.5 M41.0 1.0 l-2.1 12.6 M21.0 73.3 l-3.3 19.2 M12.9 63.8 l-2.0 11.7 M44.0 10.1 l-1.7 10.0 M61.3 16.8 l-2.1 12.6 M68.8 69.8 l-2.3 13.5 M67.4 43.1 l-3.1 18.1 M15.9 75.3 l-3.1 18.3 M67.7 71.5 l-2.3 13.6"
+              stroke="#56636e"
+              stroke-width="0.9"
+              opacity="0.5"
+            ></path>
+          </pattern>
+          <linearGradient id="s5-fade" x1="0" x2="1">
+            <stop offset="0" stop-color="#fff" stop-opacity="0"></stop>
+            <stop offset="0.3" stop-color="#fff"></stop>
+            <stop offset="0.8" stop-color="#fff"></stop>
+            <stop offset="1" stop-color="#fff" stop-opacity="0"></stop>
+          </linearGradient>
+          <mask id="s5-rain-mask">
+            <rect
+              x="300"
+              y="0"
+              width="560"
+              height="310"
+              fill="url(#s5-fade)"
+            ></rect>
+          </mask>
+        </defs>
+        <circle cx="150" cy="196" r="24" fill="#e2784a"></circle>
+        <path
+          d="M0 214 Q80 170 160 196 Q240 160 340 206 L340 252 L0 252 Z"
+          fill="#6d5a6e"
+          opacity="0.8"
+        ></path>
+        <path
+          d="M0 214 Q300 224 600 214 L900 214 L900 252 L0 252 Z"
+          class="far"
+        ></path>
+        <path
+          d="M900 246 Q700 245 500 247 Q240 244 0 244 L0 294 Q240 293 500 290 Q700 290 900 290 Z"
+          fill="url(#s5-river)"
+        ></path>
+        <g
+          class="ripples"
+          fill="none"
+          stroke="#e8eef0"
+          stroke-width="1"
+          opacity="0.7"
+        >
+          <ellipse cx="780" cy="262" rx="10" ry="3"></ellipse>
+          <ellipse cx="700" cy="276" rx="8" ry="2.5"></ellipse>
+          <ellipse cx="610" cy="258" rx="12" ry="3"></ellipse>
+          <ellipse cx="540" cy="280" rx="9" ry="2.5"></ellipse>
+          <ellipse cx="460" cy="266" rx="11" ry="3"></ellipse>
+        </g>
+        <path
+          d="M0 294 Q240 293 500 290 Q700 290 900 290 L900 360 L0 360 Z"
+          class="bank"
+        ></path>
+        <g filter="url(#s5-blur)" fill="#5f6870" opacity="0.65">
+          <ellipse cx="640" cy="26" rx="190" ry="38"></ellipse>
+          <ellipse cx="470" cy="16" rx="150" ry="28"></ellipse>
+        </g>
+        <g class="near-only ink">
+          <path d="M500 300 L660 300 L646 280 L514 280 Z" fill="#8a6f4b"></path>
+          <rect x="512" y="300" width="5" height="54" fill="#5b4636"></rect>
+          <rect x="642" y="300" width="5" height="54" fill="#5b4636"></rect>
+          <circle cx="584" cy="318" r="5" fill="#f1e4cc"></circle>
+          <path d="M576 324 L592 324 L596 342 L572 342 Z" fill="#7d97b8"></path>
+        </g>
+        <g class="far-only ink">
+          <path d="M490 168 L670 168 L650 142 L510 142 Z" fill="#4a4038"></path>
+          <rect x="514" y="168" width="7" height="58" fill="#b8452f"></rect>
+          <rect x="640" y="168" width="7" height="58" fill="#b8452f"></rect>
+          <circle cx="580" cy="206" r="5" fill="#f1e4cc"></circle>
+          <path d="M572 212 L588 212 L592 230 L568 230 Z" fill="#7d97b8"></path>
+        </g>
+        <path
+          d="M232 110 l8 6 l8 -6 M262 96 l7 5 l7 -5 M206 124 l6 4 l6 -4"
+          fill="none"
+          stroke="#3b3027"
+          stroke-width="1.6"
+        ></path>
+        <g mask="url(#s5-rain-mask)">
+          <g class="rainfall" data-motion="auto">
+            <rect
+              x="300"
+              y="-80"
+              width="560"
+              height="400"
+              fill="url(#s5-rain)"
+            ></rect>
+          </g>
+        </g>
+      </svg>
+      <div class="wash"></div>
+      <div class="kotoba">
+        <h2>五　夕立</h2>
+        <p>
+          にわか雨が川面をたたく。<span class="near-only">茶屋の軒下</span
+          ><span class="far-only">お寺の山門の下</span
+          >で雨やどり。灯籠は、ぬらさないようにふところに。雨があがると、空があかね色にそまる。
+        </p>
+      </div>
+      <Kasumi x={-60} y={300} shape="b" />
+      <Kasumi x={820} y={322} shape="a" />
+    </section>
+
+    <!-- 六 灯籠流し（夜） -->
+    <section class="sheet s6 night" drawable>
+      <svg class="art" viewBox="0 0 900 360" aria-hidden="true">
+        <defs>
+          <linearGradient id="s6-river" x1="1" x2="0">
+            <stop offset="0" stop-color="#6c7f8a"></stop>
+            <stop offset="0.6" stop-color="#2c3a56"></stop>
+            <stop offset="1" stop-color="#24324e"></stop>
+          </linearGradient>
+        </defs>
+        <path
+          d="M0 214 Q300 222 600 226 L900 214 L900 250 L0 248 Z"
+          class="far"
+        ></path>
+        <path
+          d="M900 244 Q640 243 420 244 Q200 241 0 240 L0 300 Q220 298 460 296 Q700 294 900 294 Z"
+          fill="url(#s6-river)"
+        ></path>
+        <path
+          d="M0 300 Q220 298 460 296 Q700 294 900 294 L900 360 L0 360 Z"
+          class="bank"
+        ></path>
+        <g class="ink">
+          <rect x="60" y="200" width="54" height="30" fill="#c9b98a"></rect>
+          <path d="M52 202 L122 202 L110 182 L64 182 Z" fill="#6b5a44"></path>
+          <rect x="150" y="206" width="44" height="26" fill="#c9b98a"></rect>
+          <path d="M144 208 L200 208 L190 190 L154 190 Z" fill="#6b5a44"></path>
+        </g>
+      </svg>
+      <div class="wash"></div>
+      <svg class="glow" viewBox="0 0 900 360" aria-hidden="true">
+        <defs>
+          <filter id="s6-soft">
+            <feGaussianBlur stdDeviation="0.8"></feGaussianBlur>
+          </filter>
+          <radialGradient id="s6-moon">
+            <stop offset="0.45" stop-color="#f6ecd0"></stop>
+            <stop offset="0.5" stop-color="#f6ecd0" stop-opacity="0.35"></stop>
+            <stop offset="1" stop-color="#f6ecd0" stop-opacity="0"></stop>
+          </radialGradient>
+        </defs>
+        <circle cx="330" cy="72" r="46" fill="url(#s6-moon)"></circle>
+        <g fill="#f6ecd0">
+          <circle cx="90" cy="40" r="1.4"></circle>
+          <circle cx="180" cy="90" r="1"></circle>
+          <circle cx="240" cy="30" r="1.3"></circle>
+          <circle cx="420" cy="50" r="1"></circle>
+          <circle cx="480" cy="110" r="1.2"></circle>
+          <circle cx="560" cy="36" r="1"></circle>
+          <circle cx="40" cy="130" r="1"></circle>
+        </g>
+        <path
+          d="M320 254 h18 M312 262 h34 M324 270 h12 M316 279 h26 M326 288 h8"
+          stroke="#f6ecd0"
+          stroke-width="1.4"
+          opacity="0.35"
+          filter="url(#s6-soft)"
+        ></path>
+        <rect x="76" y="210" width="6" height="7" fill="#f2c45a"></rect>
+        <rect x="166" y="214" width="5" height="6" fill="#f2c45a"></rect>
+      </svg>
+      <div class="floats">
+        {LANTERNS.map((l, i) => (
+          <span
+            class={`float lan-${l.n}`}
+            style={`--c: ${l.color}; left: ${FLOAT_X[i]}px; --d: ${i * 0.37}s`}
+            data-motion="auto"
+          />
+        ))}
+      </div>
+      {['near-only', 'far-only'].map((bank) => (
+        <svg class={`crowd ${bank}`} viewBox="0 0 160 24" aria-hidden="true">
+          {[8, 26, 40, 62, 80, 96, 118, 140].map((x, i) => (
+            <g fill="#14110f">
+              <circle cx={x} cy={i % 2 ? 7 : 5} r="3.6" />
+              <path
+                d={`M${x - 6} 24 L${x - 4} ${i % 2 ? 11 : 9} L${x + 4} ${i % 2 ? 11 : 9} L${x + 6} 24 Z`}
+              />
+            </g>
+          ))}
+        </svg>
+      ))}
+      <div class="kotoba">
+        <h2>六　灯籠流し</h2>
+        <p class="some-only">
+          夜。えらんだ灯籠に火を入れて、川に流す。灯りはゆっくりと左へ、海のほうへくだってゆく。
+        </p>
+        <p class="none-only">
+          夜。灯籠をえらばなかったので、川はくらいまま。右へ巻きもどして、市でえらぶこともできます。
+        </p>
+      </div>
+      <Kasumi x={-110} y={318} shape="a" />
+      <Kasumi x={840} y={300} shape="b" />
+    </section>
+
+    <!-- 七 海へ。奥書 -->
+    <section class="sheet s7 night" drawable>
+      <svg class="art" viewBox="0 0 900 360" aria-hidden="true">
+        <defs>
+          <linearGradient id="s7-sea" x1="0" x2="1">
+            <stop offset="0" stop-color="#24324e" stop-opacity="0"></stop>
+            <stop offset="0.25" stop-color="#24324e"></stop>
+            <stop offset="1" stop-color="#2a3956"></stop>
+          </linearGradient>
+        </defs>
+        <rect
+          x="380"
+          y="206"
+          width="520"
+          height="154"
+          fill="url(#s7-sea)"
+        ></rect>
+        <path d="M900 214 L900 240 Q780 236 640 210 Z" class="far"></path>
+        <path
+          d="M900 300 L900 360 L600 360 Q760 334 900 300 Z"
+          class="bank"
+        ></path>
+        <path
+          class="flow"
+          d="M900 268 Q760 262 640 236 Q560 222 440 222"
+          fill="none"
+          stroke="#8fa3c0"
+          stroke-width="1.2"
+          stroke-dasharray="12 22"
+          data-motion="auto"
+        ></path>
+      </svg>
+      <div class="wash"></div>
+      <svg class="glow" viewBox="0 0 900 360" aria-hidden="true">
+        <g fill="#f6ecd0">
+          <circle cx="840" cy="40" r="1.3"></circle>
+          <circle cx="760" cy="90" r="1"></circle>
+          <circle cx="690" cy="34" r="1.4"></circle>
+          <circle cx="600" cy="120" r="1"></circle>
+          <circle cx="520" cy="60" r="1.2"></circle>
+          <circle cx="450" cy="150" r="1"></circle>
+          <circle cx="430" cy="40" r="1.3"></circle>
+        </g>
+        <path
+          d="M440 206 L640 206"
+          stroke="#f6ecd0"
+          stroke-width="0.8"
+          opacity="0.35"
+        ></path>
+      </svg>
+      <div class="sea-lights">
+        {LANTERNS.map((l, i) => (
+          <span
+            class={`dot lan-${l.n}`}
+            style={`--c: ${l.color}; left: ${430 + i * 34}px; top: ${222 + (i % 2) * 9}px`}
+          />
+        ))}
+      </div>
+      <div class="kotoba sea">
+        <h2>七　海へ</h2>
+        <p>
+          夜ふけ、川は海に出る。灯りは小さくなり、やがて見えなくなる。しずくは、もう川ではない。
+        </p>
+      </div>
+      <Kasumi x={790} y={318} shape="a" />
+      <Kasumi x={372} y={40} shape="c" />
+      <Kasumi x={360} y={206} shape="c" scale={0.9} />
+      <div class="kotoba colophon">
+        <p class="title">ともしび川絵巻　一巻</p>
+        <p>灯籠を<span data-count>ひとつも</span>流す</p>
+        <p><span data-date></span>しるす</p>
+        <p class="sign">labobal.dev</p>
+        <span class="seal">灯</span>
+      </div>
+    </section>
+  </canvas>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    cursor: grab;
+    /* 緋毛氈を敷いた机 */
+    background:
+      radial-gradient(
+        ellipse at 50% 40%,
+        rgb(255 255 255 / 0.06),
+        transparent 70%
+      ),
+      #4f2120;
+    /* 記事を読む人の縦のスクロールを奪わない。タップすると touchGate が none にする */
+    touch-action: pan-y;
+  }
+
+  .stage.is-grabbing {
+    cursor: grabbing;
+  }
+
+  .view {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .sheet {
+    --paper: #efe6d2;
+    --ink: #2e2620;
+    position: relative;
+    box-sizing: border-box;
+    width: 900px;
+    height: 360px;
+    overflow: hidden;
+    color: var(--ink);
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", YuMincho, serif;
+    color-scheme: light;
+    background: var(--paper);
+    user-select: none;
+  }
+
+  /* 巻きの奥に入った紙は動かさない（main.ts） */
+  .sheet.is-rolled,
+  .sheet.is-rolled * {
+    animation-play-state: paused !important;
+  }
+
+  .defs {
+    position: absolute;
+  }
+
+  .art {
+    filter: url(#emaki-paint);
+  }
+
+  .art,
+  .glow {
+    position: absolute;
+    inset: 0;
+    width: 900px;
+    height: 360px;
+    max-width: none;
+  }
+
+  .ink {
+    stroke: #3b3027;
+    stroke-width: 1.2;
+    stroke-linejoin: round;
+  }
+
+  .ink :is(path, rect, ellipse, circle):not([stroke]) {
+    stroke: #3b3027;
+    stroke-width: 1.2;
+  }
+
+  .bank {
+    fill: #c6cd9f;
+    opacity: 0.85;
+  }
+
+  .far {
+    fill: #d3c495;
+  }
+
+  .wash {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  /* 時刻の色。隣の紙と継ぎ目で同じ色になるように、右の端と左の端の色を合わせる */
+  .s0 .wash {
+    background: linear-gradient(
+      to left,
+      transparent 30%,
+      rgb(232 190 182 / 0.3)
+    );
+  }
+
+  .s1 .wash {
+    background: linear-gradient(
+      to left,
+      rgb(232 190 182 / 0.3),
+      rgb(200 215 225 / 0.22)
+    );
+  }
+
+  .s2 .wash {
+    background: linear-gradient(
+      to left,
+      rgb(200 215 225 / 0.22),
+      rgb(240 230 200 / 0.08)
+    );
+  }
+
+  .s3 .wash {
+    background: linear-gradient(
+      to left,
+      rgb(240 230 200 / 0.08),
+      rgb(240 220 170 / 0.15)
+    );
+  }
+
+  .s4 .wash {
+    background: linear-gradient(
+      to left,
+      rgb(240 220 170 / 0.15),
+      rgb(150 160 165 / 0.32)
+    );
+  }
+
+  .s5 .wash {
+    background: linear-gradient(
+      to left,
+      rgb(150 160 165 / 0.32),
+      rgb(150 150 160 / 0.3) 35%,
+      rgb(205 120 90 / 0.42)
+    );
+  }
+
+  .s6 .wash {
+    background: linear-gradient(
+      to left,
+      rgb(205 120 90 / 0.42),
+      rgb(28 34 62 / 0.9) 45%,
+      rgb(22 27 50 / 0.94)
+    );
+  }
+
+  .s7 .wash {
+    background: linear-gradient(
+      to left,
+      rgb(22 27 50 / 0.94),
+      rgb(22 27 50 / 0.94) 45%,
+      rgb(22 27 50 / 0) 60%
+    );
+  }
+
+  .kotoba {
+    position: absolute;
+    top: 24px;
+    right: 26px;
+    height: 206px;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.95;
+    letter-spacing: 0.06em;
+    writing-mode: vertical-rl;
+  }
+
+  .kotoba h2 {
+    margin: 0 0 0 10px;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+  }
+
+  .kotoba p {
+    margin: 0 0 0 4px;
+  }
+
+  .night .kotoba {
+    color: #e6cd86;
+  }
+
+  /* 表紙と見返し */
+  .cover {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 172px;
+    background:
+      radial-gradient(circle, #c9a85a 1.1px, transparent 1.6px) 0 0 / 14px 14px,
+      radial-gradient(circle, #a8893f 0.9px, transparent 1.3px) 7px 7px / 14px
+      14px,
+      linear-gradient(90deg, #1d2541, #2a3557 50%, #1d2541);
+    box-shadow: inset 6px 0 10px rgb(0 0 0 / 0.35);
+  }
+
+  .slip {
+    position: absolute;
+    top: 22px;
+    left: 18px;
+    margin: 0;
+    padding: 12px 6px;
+    color: #2e2620;
+    font-size: 17px;
+    letter-spacing: 0.3em;
+    writing-mode: vertical-rl;
+    background:
+      radial-gradient(circle, #d8b860 0.8px, transparent 1.2px) 0 0 / 7px 9px,
+      #f3ecd8;
+    border: 1px solid #b89a52;
+  }
+
+  .endpaper {
+    position: absolute;
+    top: 0;
+    right: 172px;
+    bottom: 0;
+    width: 100px;
+    background:
+      radial-gradient(circle, #d6b45a 0.9px, transparent 1.4px) 0 0 / 9px 11px,
+      radial-gradient(circle, #e3c776 1.2px, transparent 1.8px) 4px 5px / 23px
+      19px,
+      #e9dcc0;
+  }
+
+  .prologue {
+    right: 300px;
+    height: 296px;
+  }
+
+  /* 市の灯籠 */
+  .lanterns {
+    position: absolute;
+    top: 104px;
+    left: 458px;
+    display: flex;
+    gap: 14px;
+  }
+
+  .lantern {
+    display: grid;
+    justify-items: center;
+    gap: 3px;
+    width: 34px;
+    cursor: pointer;
+  }
+
+  .lantern .cord {
+    width: 1px;
+    height: 8px;
+    background: #3b3027;
+  }
+
+  .lantern .body {
+    position: relative;
+    width: 28px;
+    height: 36px;
+    background: color-mix(in srgb, var(--c) 55%, #8d8273);
+    border-top: 4px solid #3b3027;
+    border-bottom: 4px solid #3b3027;
+    border-radius: 10px / 13px;
+  }
+
+  .lantern .flame {
+    position: absolute;
+    inset: 9px 9px;
+    border-radius: 50%;
+    opacity: 0;
+    background: radial-gradient(#fff8d0, transparent 70%);
+  }
+
+  .lantern:has(input:checked) .body {
+    background: radial-gradient(circle at 50% 55%, #fff6c8, var(--c) 70%);
+    box-shadow: 0 0 16px 4px color-mix(in srgb, var(--c) 70%, transparent);
+  }
+
+  .lantern:has(input:checked) .flame {
+    opacity: 1;
+  }
+
+  .lantern .name {
+    font-size: 11px;
+    line-height: 1.2;
+    writing-mode: vertical-rl;
+    min-height: 3.6em;
+  }
+
+  .lantern input {
+    margin: 0;
+    accent-color: #8a3b2b;
+  }
+
+  .lantern:focus-within .body {
+    outline: 2px solid #8a3b2b;
+    outline-offset: 2px;
+  }
+
+  /* 渡し */
+  .boat {
+    position: absolute;
+    top: 240px;
+    left: 370px;
+    width: 130px;
+    transition: transform 1.2s cubic-bezier(0.45, 0, 0.3, 1);
+  }
+
+  .boat svg {
+    width: 130px;
+    height: 60px;
+  }
+
+  .cargo {
+    position: absolute;
+    top: 28px;
+    left: 14px;
+    display: flex;
+    gap: 4px;
+  }
+
+  .mini {
+    display: none;
+    width: 9px;
+    height: 12px;
+    background: radial-gradient(circle at 50% 55%, #fff6c8, var(--c) 75%);
+    border-top: 2px solid #3b3027;
+    border-radius: 4px / 5px;
+    box-shadow: 0 0 8px 2px color-mix(in srgb, var(--c) 60%, transparent);
+  }
+
+  .view:has(#bank-far:checked) .boat {
+    transform: translate(10px, -50px) scale(0.92);
+  }
+
+  .banks {
+    position: absolute;
+    top: 30px;
+    right: 262px;
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 8px;
+    margin: 0;
+    padding: 10px 8px;
+    font-size: 13px;
+    background: rgb(250 245 232 / 0.7);
+    border: 1px solid #b89a52;
+  }
+
+  .banks legend {
+    padding: 0 4px;
+    color: #8a3b2b;
+    font-size: 11px;
+  }
+
+  .banks label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .banks span {
+    writing-mode: vertical-rl;
+    letter-spacing: 0.08em;
+  }
+
+  .banks input {
+    margin: 0;
+    accent-color: #8a3b2b;
+  }
+
+  .far-only {
+    display: none;
+  }
+
+  .view:has(#bank-far:checked) .near-only {
+    display: none;
+  }
+
+  .view:has(#bank-far:checked) .far-only {
+    display: inline;
+  }
+
+  .view:has(#lan-1:checked) .lan-1,
+  .view:has(#lan-2:checked) .lan-2,
+  .view:has(#lan-3:checked) .lan-3,
+  .view:has(#lan-4:checked) .lan-4,
+  .view:has(#lan-5:checked) .lan-5 {
+    display: block;
+  }
+
+  /* 夕立。模様の 1 つぶん（80px）下げてくり返す */
+  .rainfall {
+    animation: emaki-rain 0.6s linear infinite;
+  }
+
+  @keyframes emaki-rain {
+    to {
+      translate: 0 80px;
+    }
+  }
+
+  /* 灯籠流し */
+  .floats {
+    position: absolute;
+    inset: 0;
+  }
+
+  .float {
+    position: absolute;
+    top: 276px;
+    display: none;
+    width: 14px;
+    height: 14px;
+    background: radial-gradient(circle at 50% 55%, #fffbe0, var(--c) 70%);
+    border-top: 2px solid #1a1410;
+    border-radius: 3px;
+    box-shadow:
+      0 0 14px 5px color-mix(in srgb, var(--c) 65%, transparent),
+      0 0 40px 10px color-mix(in srgb, var(--c) 30%, transparent);
+    animation: emaki-bob 3.2s ease-in-out var(--d) infinite alternate;
+  }
+
+  /* 水に映る灯り */
+  .float::after {
+    position: absolute;
+    top: 16px;
+    left: 2px;
+    width: 10px;
+    height: 26px;
+    content: "";
+    background: linear-gradient(
+      color-mix(in srgb, var(--c) 80%, transparent),
+      transparent
+    );
+    filter: blur(2px);
+    opacity: 0.7;
+  }
+
+  .view:has(#bank-far:checked) .float {
+    top: 252px;
+  }
+
+  @keyframes emaki-bob {
+    to {
+      translate: -6px 2px;
+    }
+  }
+
+  .crowd {
+    position: absolute;
+    left: 110px;
+    width: 160px;
+    height: 24px;
+  }
+
+  .crowd.near-only {
+    top: 302px;
+  }
+
+  .crowd.far-only {
+    top: 218px;
+  }
+
+  .view:has(#bank-far:checked) .crowd.far-only {
+    display: block;
+  }
+
+  .some-only {
+    display: none;
+  }
+
+  .view:has(.lantern input:checked) .some-only {
+    display: block;
+  }
+
+  .view:has(.lantern input:checked) .none-only {
+    display: none;
+  }
+
+  /* 海と奥書 */
+  .dot {
+    position: absolute;
+    display: none;
+    width: 4px;
+    height: 4px;
+    background: var(--c);
+    border-radius: 50%;
+    box-shadow: 0 0 8px 3px color-mix(in srgb, var(--c) 60%, transparent);
+  }
+
+  .kotoba.sea {
+    right: 40px;
+    height: 180px;
+  }
+
+  .colophon {
+    top: 34px;
+    right: 600px;
+    height: 280px;
+    color: var(--ink);
+    font-size: 14px;
+  }
+
+  .night .colophon {
+    color: var(--ink);
+  }
+
+  .colophon .title {
+    font-size: 17px;
+    letter-spacing: 0.2em;
+  }
+
+  .colophon .sign {
+    margin-top: 120px;
+    font-family: Georgia, serif;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+  }
+
+  .seal {
+    display: block;
+    width: 30px;
+    height: 30px;
+    margin-top: 10px;
+    color: #f6e9e0;
+    font-size: 19px;
+    line-height: 30px;
+    text-align: center;
+    background: #b8392a;
+    border-radius: 3px;
+    writing-mode: horizontal-tb;
+  }
+
+  /* 水と水車と霧 */
+  .flow {
+    stroke-width: 0.9;
+    stroke-opacity: 0.55;
+    stroke-dasharray: 3 9 16 12;
+    animation: emaki-flow 2.6s linear infinite;
+  }
+
+  @keyframes emaki-flow {
+    to {
+      stroke-dashoffset: -60;
+    }
+  }
+
+  .wheel {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: emaki-spin 9s linear infinite reverse;
+  }
+
+  @keyframes emaki-spin {
+    to {
+      rotate: 360deg;
+    }
+  }
+
+  .mist {
+    animation: emaki-mist 9s ease-in-out infinite alternate;
+  }
+
+  @keyframes emaki-mist {
+    to {
+      translate: -26px 0;
+    }
+  }
+
+  /* HTML-in-Canvas が使えないときは、紙を右から左へ並べて横にスクロールする（main.ts） */
+  .stage.is-flat {
+    display: grid;
+    align-content: center;
+    gap: 12px;
+    cursor: auto;
+  }
+
+  .stage :global(.flat-row) {
+    display: flex;
+    overflow-x: auto;
+    direction: rtl;
+  }
+
+  .stage.is-flat .sheet {
+    flex: none;
+    direction: ltr;
+  }
+</style>
