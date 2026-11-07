@@ -632,7 +632,7 @@ function start(gl: WebGL2RenderingContext) {
     }
   }
 
-  /** 火のついた所があるか、炎の中に入っている所がある */
+  /** 火のついた所か、炎の中に入っている所があるか */
   const inFire = (s: Slip) => {
     const f = fire()
     const { pos, heat, gone } = s.sheet

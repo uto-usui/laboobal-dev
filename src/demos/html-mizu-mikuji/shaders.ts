@@ -146,7 +146,7 @@ export const SLIP_FS = /* glsl */ `#version 300 es
   ${NOISE}
   out vec4 outColor;
   const vec3 PAPER = vec3(0.961, 0.937, 0.875);
-  // 紙の色からのずれが、どの色にも同じだけ暗い（灰色の向き）なら墨。朱は赤だけが残るので外れる。
+  // 紙の色からのずれが、R、G、B のどれも同じだけ暗い（灰色の向き）なら墨。朱は赤だけが残るので外れる。
   // ずれの向きで見るので、文字のふちの紙と混ざった薄い画素も、墨か朱かを取り違えない
   float inkOf(vec3 c) {
     vec3 d = max(PAPER - c, 0.0);

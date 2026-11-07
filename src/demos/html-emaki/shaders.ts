@@ -1,4 +1,4 @@
-// 座標は紙の設計の px。x は横、y は紙の天（0）から地（PAPER_H）、z は机から上。
+// 座標は紙の縮める前の px。x は横、y は紙の天（0）から地（PAPER_H）、z は机から上。
 // 画面へは斜投影（z の分だけ上へずらす）で写す。平らな紙は z = 0 なので、写し方が平行移動と拡大だけになり、当たり判定がずれない
 
 const COMMON = /* glsl */ `
@@ -9,7 +9,7 @@ const COMMON = /* glsl */ `
   vec4 toClip(vec3 p) {
     vec2 sc = uOrigin + uK * vec2(p.x, p.y - uKy * p.z);
     vec2 c = sc / uView * 2.0 - 1.0;
-    // 見る向きは (0, uKy, 1)。その向きに進んだ点ほど手前
+    // 目の向きは (0, uKy, 1)。この向きに進んだ点ほど手前にある
     return vec4(c.x, -c.y, -(uKy * p.y + p.z) / 3000.0, 1.0);
   }
 `
@@ -283,7 +283,7 @@ export const ROD_FS = /* glsl */ `#version 300 es
   in vec3 vN;
   in float vT;
   uniform vec3 uColor;
-  // 金の帯を巻く位置（0〜1）。使わないときは負
+  // 金の帯を巻く位置（0〜1）。使わないときは負の値
   uniform float uBand;
   uniform float uKy;
   out vec4 outColor;
@@ -298,7 +298,7 @@ export const ROD_FS = /* glsl */ `#version 300 es
     outColor = vec4(base * (0.32 + 0.75 * diff) + spec * 0.45, 1.0);
   }`
 
-// 机に落ちる紙と巻きの影。画面いっぱいの四角で、紙の座標に戻して測る
+// 机に落ちる紙と巻きの影。画面いっぱいの四角を描き、画素ごとに紙の座標へ戻して影の濃さを求める
 export const SHADOW_VS = /* glsl */ `#version 300 es
   layout(location = 0) in vec2 aC;
   void main() {

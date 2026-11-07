@@ -63,7 +63,7 @@ export class Water {
     return Math.sqrt(e / this.n)
   }
 
-  /** 波が 1 回で列を飛び越えない時間の幅（CFL 条件） */
+  /** 1 ステップの間に波が列を飛び越えないための、時間の刻みの上限（CFL 条件） */
   get maxStep() {
     let deepest = 1
     for (let i = 0; i < this.n; i++) deepest = Math.max(deepest, this.h[i])

@@ -10,7 +10,7 @@ import {
   SHADOW_VS,
 } from './shaders'
 
-/** 紙 1 枚の大きさ（設計の px）。Demo.astro の .sheet と同じ */
+/** 紙 1 枚の大きさ（縮める前の px）。Demo.astro の .sheet と同じ */
 export const SHEET_W = 900
 export const PAPER_H = 360
 /** 紙の厚み。1 巻きで半径がこれだけ増える。本物より厚くして、木口の渦が見えるようにしている */
@@ -59,7 +59,7 @@ export const createScene = (gl: WebGL2RenderingContext, sheetCount: number) => {
     return v
   }
 
-  // 紙は s の向きに 2px ごとの帯。天と地の 2 点ずつ。巻きの形は頂点シェーダーが決めるので、中身は変えない
+  // 紙を s の向きに 2px ごとの帯に分け、帯ごとに天と地の 2 点を置く。巻きの形は頂点シェーダーで決めるので、この中身は作ったあと変えない
   const STEP = 2
   const columns = Math.ceil(LEN / STEP) + 1
   const strip = new Float32Array(columns * 4)

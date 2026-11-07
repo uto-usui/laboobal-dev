@@ -618,7 +618,7 @@ function start(gl: WebGL2RenderingContext) {
       }
       const [a, b] = dryRun(s)
       const width = ((b - a) / SC) * slipW
-      // 出入りの境目で行ったり来たりしないよう、出るときだけ少し余分に出ているのを待つ
+      // 境目で押せる・押せないが行ったり来たりしないよう、水から出たとみなすのは、少し余分に出てからにする
       const dry = width >= MIN_DRY + (s.dry ? 0 : 10)
       if (dry !== s.dry) {
         s.dry = dry

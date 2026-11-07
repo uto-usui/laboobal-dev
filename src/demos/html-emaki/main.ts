@@ -63,9 +63,9 @@ function start(gl: WebGL2RenderingContext) {
   const CONTENT_H = PAPER_H + KNOB * 2 + KY * 2 * R_MAX
 
   const view: View = { width: 0, height: 0, dpr: 1, k: 1, ox: 0, oy: 0 }
-  // 平らに開く幅（設計の px）
+  // 平らに開く幅（縮める前の px）
   let flatW = 0
-  // 右の端に来ている紙の位置。読んだ長さ
+  // 読んだ長さ。右の端に来ている紙の位置で数える
   let read = 0
   let velocity = 0
   let target: number | undefined
@@ -96,7 +96,7 @@ function start(gl: WebGL2RenderingContext) {
     const th = Math.ceil(size.height)
     if (!tw || !th) return
     const all = scene.allocate(tw, th) || !ready
-    // Chrome 157 では変わった子だけが入る。型にはまだない
+    // changedElements には、変わった子だけが入る（Chrome 157）。TypeScript の型にはまだない
     const list = (e as Event & { changedElements?: Iterable<Element> })
       .changedElements
     const changed = list ? new Set(list) : undefined
@@ -136,7 +136,7 @@ function start(gl: WebGL2RenderingContext) {
     }
   }
 
-  // 巻きの奥に入った紙は、CSS の動きを止める。描き直し（paint）が出続けないように
+  // 巻きの奥に入った紙は、CSS のアニメーションを止める。止めないと paint が出続ける
   const awake: boolean[] = []
   const pauseHidden = (r: Rolls) => {
     const from = r.right[3] - 2 * Math.PI * r.right[1] * 2
@@ -272,7 +272,7 @@ function start(gl: WebGL2RenderingContext) {
     goTo((target ?? read) + step)
   })
 
-  // 巻かれた所の部品に Tab で来たら、平らな所の真ん中まで開く。押して入ったフォーカスでは動かさない
+  // 巻かれた所の部品に Tab で来たら、平らな所の真ん中まで開く。クリックでフォーカスが移ったときは動かさない
   canvas.addEventListener('focusin', (e) => {
     const el = e.target as HTMLElement
     const sheet = el.closest<HTMLElement>('.sheet')

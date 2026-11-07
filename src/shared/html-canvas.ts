@@ -1,6 +1,6 @@
 /**
- * HTML-in-Canvas（Chrome 157〜）で、生きた HTML を WebGL のテクスチャにするデモの共通の部品。
- * 型は html-in-canvas.d.ts。使い方は src/demos/html-cloth/ が見本
+ * HTML-in-Canvas（Chrome 157〜）で、入力やホバーがそのまま効く HTML を WebGL のテクスチャにして描くデモの、共通の部品。
+ * 型は html-in-canvas.d.ts にある。使い方は src/demos/html-takiage/ を見る
  */
 
 /** content="drawable" の canvas と WebGL2 の texElementSubImage2D が使えるか */
@@ -20,7 +20,7 @@ export const htmlCanvasGl = (
 
 /**
  * 使えないブラウザでは、canvas の子は描かれない。要素を canvas の外（into）に出してふつうの HTML として置き、下に一行添える。
- * showFallback は画面を覆うので使わない。drawable を外すのは、対応している版で canvas を通さないと描かれないため
+ * showFallback は画面を覆ってしまうので使わない。drawable を付けたままだと、対応しているブラウザでは canvas を通さないかぎり描かれないので外す
  */
 export const showFlatFallback = (
   canvas: HTMLCanvasElement,
@@ -86,7 +86,7 @@ export const elementTexture = (
     texture,
     width: 0,
     height: 0,
-    /** 写し終えたか。最初の paint の前は空 */
+    /** 一度でも写したか。最初の paint までは中身が空 */
     ready: false,
     upload() {
       const size = canvas.getElementImageDefaultSize(el)
@@ -119,7 +119,7 @@ export const elementTexture = (
 
 /**
  * canvas の CSS px の座標を WebGL のクリップ座標へ写す行列。M（要素の px → canvas の px）の前に掛ける。
- * 奥行きは手前（z が大きい）ほど小さくし、depth test で手前が勝つようにする
+ * depth test で手前のものが前に描かれるよう、手前（z が大きい）ほど奥行きの値を小さくする
  */
 export const clipMatrix = (width: number, height: number) =>
   new DOMMatrix([
@@ -141,6 +141,6 @@ export const clipMatrix = (width: number, height: number) =>
     1,
   ])
 
-/** 透視（目から画面までの距離 d px）。css の perspective と同じ */
+/** 透視（目から画面までの距離 d px）。CSS の perspective と同じ */
 export const perspective = (d: number) =>
   new DOMMatrix([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, -1 / d, 0, 0, 0, 1])

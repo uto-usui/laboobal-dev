@@ -113,7 +113,7 @@ function start(gl: WebGL2RenderingContext) {
           link(id(i, j), id(i + 1, j + 1), 1)
           link(id(i + 1, j), id(i, j + 1), 1)
         }
-        // 1 つ飛ばしのつなぎが折れにくさ。k は毎フレーム布の重さで替える
+        // 1 つ飛ばしの点どうしのつなぎで、折れにくさを出す。k は毎フレーム、布の重さに合わせて替える
         if (i < COLS - 1) link(id(i, j), id(i + 2, j), -1)
         if (j < rows - 1) link(id(i, j), id(i, j + 2), -1)
         if (i < COLS - 1 && j < rows - 1) {
@@ -399,7 +399,7 @@ function start(gl: WebGL2RenderingContext) {
     gl.uniform2f(gl.getUniformLocation(shadowProgram, 'uSize'), W, H)
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
     gl.bufferData(gl.ARRAY_BUFFER, shadowVbo, gl.DYNAMIC_DRAW)
-    // 影は premultiplied で出したいので、色 0 のまま alpha だけを効かせる
+    // 影は premultiplied で出すので、色は 0 のまま alpha だけを効かせる
     gl.drawElements(gl.TRIANGLES, index.length, gl.UNSIGNED_SHORT, 0)
 
     gl.enable(gl.DEPTH_TEST)
