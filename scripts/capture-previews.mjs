@@ -36,6 +36,26 @@ const TUNE = {
   'processing-js-random-walk': { poster: 'late' },
   // スクロールで箱の色が緑から青へ変わる。始めのコマは緑のままなので、少し進んで色が変わりかけたところにする
   'scroll-reveal-color': { poster: 0.8 },
+  // HTML-in-Canvas（Chrome 157〜）のデモ。Playwright の Chromium にはまだないので、手元の Google Chrome で撮る（chrome: true）
+  'html-cloth': { chrome: true },
+  // 開くときの再生が終わってから撮る
+  'html-emaki': { chrome: true, warmup: 4200 },
+  'html-mizu-mikuji': { chrome: true, warmup: 1800 },
+  // 短冊に書いて、キーボードでくべる。燃えているところをポスターにする
+  'html-takiage': {
+    chrome: true,
+    poster: 2.6,
+    act: async (page) => {
+      await page.evaluate(() =>
+        [...document.querySelectorAll('canvas textarea')]
+          .find((t) => !t.readOnly)
+          ?.focus(),
+      )
+      await page.keyboard.type('夜ふかしの癖', { delay: 70 })
+      await page.keyboard.press('Control+Enter')
+      await wait(page, LENGTH - 500)
+    },
+  },
 }
 
 const demos = readdirSync('src/demos')
@@ -138,14 +158,21 @@ if (webpOnly) {
 
 mkdirSync(OUT, { recursive: true })
 mkdirSync(TMP, { recursive: true })
-const browser = await chromium.launch({
-  args: ['--enable-gpu', '--use-angle=metal'],
-})
+const args = ['--enable-gpu', '--use-angle=metal']
+const browser = await chromium.launch({ args })
+let chrome
 
 for (const demo of targets) {
   const dir = join(TMP, demo.slug)
   rmSync(dir, { recursive: true, force: true })
-  const context = await browser.newContext({
+  const tune = TUNE[demo.slug] ?? {}
+  if (tune.chrome)
+    chrome ??= await chromium.launch({
+      channel: 'chrome',
+      headless: false,
+      args,
+    })
+  const context = await (tune.chrome ? chrome : browser).newContext({
     viewport: VIEW,
     recordVideo: { dir, size: VIEW },
   })
@@ -157,10 +184,9 @@ for (const demo of targets) {
     content:
       '.links, .info, .variant-toggle, .lil-gui { display: none !important }',
   })
-  const tune = TUNE[demo.slug] ?? {}
   await wait(page, tune.warmup ?? WARMUP)
   const offset = (Date.now() - started) / 1000
-  await act(page, demo.interaction)
+  await (tune.act ? tune.act(page) : act(page, demo.interaction))
   await context.close()
   const raw = join(
     dir,
@@ -230,3 +256,4 @@ for (const demo of targets) {
 }
 
 await browser.close()
+await chrome?.close()
