@@ -1,0 +1,395 @@
+---
+import { FORTUNES } from './fortunes'
+
+// JS が動けば引き直す。ここは JS がないときと、HTML-in-Canvas が使えないときに出る札
+const first = [FORTUNES[0], FORTUNES[3], FORTUNES[5]]
+---
+
+<div class="stage">
+  <canvas class="view" content="drawable">
+    <div class="rope" drawable aria-hidden="true">
+      <span class="straw"></span>
+      {[18, 50, 82].map((x) => (
+        <svg
+          class="shide"
+          style={`left: ${x}%`}
+          viewBox="0 0 22 46"
+          role="presentation"
+        >
+          <path d="M4 0h10v11H4z" fill="#f8f4ea" />
+          <path d="M9 11h11v12H9z" fill="#e9e2cf" />
+          <path d="M3 23h11v12H3z" fill="#f8f4ea" />
+          <path d="M8 35h10v11H8z" fill="#e9e2cf" />
+        </svg>
+      ))}
+    </div>
+    {first.map((f) => (
+      <article class="slip" drawable>
+        <header class="head">
+          <span class="title">水占みくじ</span>
+          <span class="no">{f.no}</span>
+        </header>
+        <p class="luck">{f.luck}</p>
+        <p class="uta">
+          <span>{f.uta[0]}</span>
+          <span>{f.uta[1]}</span>
+        </p>
+        <dl class="items">
+          {f.items.map(([k, v]) => (
+            <div class="item">
+              <dt>{k}</dt>
+              <dd>{v}</dd>
+            </div>
+          ))}
+        </dl>
+        <div class="tabs">
+          <button type="button" class="tab tie">
+            結ぶ
+          </button>
+          <button type="button" class="tab keep">
+            持ち帰る
+          </button>
+        </div>
+      </article>
+    ))}
+    <p class="sign" drawable>水にひたすと、文字があらわれます</p>
+    <button type="button" class="box" drawable>
+      <span class="seal">御籤</span>引く
+    </button>
+    {[0, 1].map((n) => (
+      <div class="camellia" drawable aria-hidden="true">
+        <svg viewBox="0 0 100 100" role="presentation">
+          <defs>
+            <radialGradient id={`petal-${n}`} cx="0.5" cy="0.5" r="0.5">
+              <stop offset="0.35" stop-color="#c8343a" />
+              <stop offset="1" stop-color="#8e1f2a" />
+            </radialGradient>
+          </defs>
+          <g fill={`url(#petal-${n})`}>
+            {[0, 72, 144, 216, 288].map((a) => (
+              <ellipse
+                cx="50"
+                cy="27"
+                rx="21"
+                ry="24"
+                transform={`rotate(${a} 50 50)`}
+              />
+            ))}
+          </g>
+          <g fill="#b72c34" opacity="0.9">
+            {[36, 108, 180, 252, 324].map((a) => (
+              <ellipse
+                cx="50"
+                cy="36"
+                rx="13"
+                ry="15"
+                transform={`rotate(${a} 50 50)`}
+              />
+            ))}
+          </g>
+          <circle cx="50" cy="50" r="11" fill="#f1e6c4" />
+          <g fill="#e2b13c">
+            {Array.from({ length: 12 }, (_, i) => (
+              <circle
+                cx={50 + 8 * Math.cos((i / 12) * Math.PI * 2)}
+                cy={50 + 8 * Math.sin((i / 12) * Math.PI * 2)}
+                r="2.6"
+              />
+            ))}
+          </g>
+        </svg>
+      </div>
+    ))}
+  </canvas>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    container-type: size;
+    /* 指で横になぞると傾く。縦は記事のスクロールに渡す */
+    touch-action: pan-y;
+  }
+
+  .view {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* HTML-in-Canvas が使えず、札をふつうに並べたとき（main.ts の showFlatFallback） */
+  .stage:not(:has(canvas)) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-content: center;
+    justify-content: center;
+    padding: 16px;
+    overflow: auto;
+  }
+
+  /* 注連縄。縄は斜めの撚りの縞、紙垂は段に折った白い紙 */
+  .rope {
+    position: relative;
+    width: 600px;
+    height: 66px;
+  }
+
+  .straw {
+    position: absolute;
+    top: 6px;
+    right: 0;
+    left: 0;
+    height: 15px;
+    background:
+      linear-gradient(
+        to bottom,
+        rgb(255 255 255 / 0.35),
+        transparent 40%,
+        rgb(60 40 10 / 0.35)
+      ),
+      repeating-linear-gradient(
+        118deg,
+        #e6d39a 0 6px,
+        #c9a85a 6px 10px,
+        #9c7c3c 10px 12px,
+        #e6d39a 12px 17px
+      );
+    border-radius: 8px;
+  }
+
+  .shide {
+    position: absolute;
+    top: 18px;
+    width: 22px;
+    height: 46px;
+    translate: -50% 0;
+  }
+
+  /* おみくじ。朱は刷り（いつも見える）、墨は水にひたすと出る文字（シェーダーが墨の色だけを隠す） */
+  /* 縦書きなので、flex の column は右から左へ並ぶ。結ぶ・持ち帰るはいちばん左（読み終わり）に寄せる */
+  .slip {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 200px;
+    height: 252px;
+    margin: 0;
+    padding: 14px;
+    color: #2e2620;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", YuMincho, serif;
+    font-size: 12px;
+    line-height: 1.45;
+    letter-spacing: 0.04em;
+    writing-mode: vertical-rl;
+    background: #f5efdf;
+    outline: 3px double #b8392a;
+    outline-offset: -7px;
+  }
+
+  .slip[hidden] {
+    display: none;
+  }
+
+  .head {
+    display: flex;
+    justify-content: space-between;
+    color: #b8392a;
+  }
+
+  .title {
+    letter-spacing: 0.2em;
+  }
+
+  .no {
+    font-size: 11px;
+  }
+
+  .luck {
+    margin: 0;
+    padding: 6px 0;
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0.3em;
+  }
+
+  /* 歌の上の句は 18 字まであるので、少し小さくして 1 行に収める */
+  .uta {
+    margin: 0;
+    font-size: 11.5px;
+    letter-spacing: 0.02em;
+  }
+
+  .uta span {
+    display: block;
+  }
+
+  .uta span:last-child {
+    padding-top: 2em;
+  }
+
+  .items {
+    margin: 0;
+  }
+
+  .item {
+    display: block;
+  }
+
+  .item dt,
+  .item dd {
+    display: inline;
+    margin: 0;
+  }
+
+  .item dt {
+    color: #b8392a;
+  }
+
+  .item dt::after {
+    content: "　";
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-block-start: auto;
+  }
+
+  /*
+   * 水盤の右半分の札は、結ぶ・持ち帰るを右の端（外側）に置く。真ん中は水が溜まる所なので、
+   * 内側に置くと、押そうと手を寄せても傾きが足りず、いつまでも水の中になる
+   */
+  .slip.tabs-right .tabs {
+    order: -1;
+    margin-block: 0 auto;
+  }
+
+  .tab {
+    padding: 8px 3px;
+    color: #b8392a;
+    font: inherit;
+    letter-spacing: 0.2em;
+    background: transparent;
+    border: 1px solid #b8392a;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  .tab:hover {
+    background: rgb(184 57 42 / 0.1);
+  }
+
+  .tab:focus-visible {
+    outline: 2px solid #b8392a;
+    outline-offset: 1px;
+  }
+
+  /* 狭い画面の札は縦に長いので、短い項目は 1 列に 2 つ入れる */
+  @container (max-width: 560px) {
+    .item {
+      display: inline-block;
+      margin-inline-end: 0.8em;
+    }
+
+    .slip {
+      gap: 0;
+      padding: 12px 9px;
+      font-size: 11px;
+      line-height: 1.42;
+      outline-offset: -5px;
+    }
+
+    .luck {
+      font-size: 17px;
+    }
+  }
+
+  /* 立て札。板に白で書いてある */
+  .sign {
+    box-sizing: border-box;
+    width: 300px;
+    margin: 0;
+    padding: 5px 12px;
+    color: #f2ead4;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", YuMincho, serif;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    background:
+      repeating-linear-gradient(
+        178deg,
+        rgb(0 0 0 / 0.08) 0 1px,
+        transparent 1px 5px
+      ),
+      linear-gradient(to bottom, #8a6a48, #6e5034);
+    border-radius: 2px;
+  }
+
+  /* 御籤箱。木の箱の上に朱の印 */
+  .box {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 5px 12px 5px 6px;
+    color: #f2ead4;
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", YuMincho, serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    background:
+      repeating-linear-gradient(
+        92deg,
+        rgb(0 0 0 / 0.07) 0 1px,
+        transparent 1px 6px
+      ),
+      linear-gradient(to bottom, #6f4c30, #553821);
+    border: 0;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .box:hover {
+    background:
+      repeating-linear-gradient(
+        92deg,
+        rgb(0 0 0 / 0.07) 0 1px,
+        transparent 1px 6px
+      ),
+      linear-gradient(to bottom, #7d5838, #5f4027);
+  }
+
+  .box:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  .seal {
+    padding: 2px 3px;
+    color: #f5efdf;
+    font-size: 10px;
+    letter-spacing: 0;
+    background: #b8392a;
+    border-radius: 2px;
+  }
+
+  .camellia {
+    width: 56px;
+    height: 56px;
+  }
+
+  .camellia svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>
