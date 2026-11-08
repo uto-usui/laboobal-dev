@@ -115,7 +115,8 @@ const SHEET_FS = /* glsl */ `#version 300 es
     float near = smoothstep(0.4, 0.62, h) * (1.0 - charred);
     color += vec3(1.0, 0.3, 0.06) * ink * near * 1.2 * flick;
     float a = tex.a * (1.0 - charred * 0.25);
-    outColor = vec4(color * a, a);
+    // 燃え際の光で色が 1 を超える。焦げてアルファが下がった所でアルファを上回らないよう 1 で抑える
+    outColor = vec4(min(color, vec3(1.0)) * a, a);
   }`
 
 const FLAT_VS = /* glsl */ `#version 300 es
@@ -157,8 +158,13 @@ const POINT_FS = /* glsl */ `#version 300 es
   void main() {
     float d = length(gl_PointCoord - 0.5) * 2.0;
     float a = pow(max(1.0 - d, 0.0), uSoft);
-    outColor = vColor * a;
+    vec4 c = vColor * a;
+    // 加算の粒は色だけ渡してくるので、アルファを色の最大値にそろえる（PREMULTIPLIED の説明を参照）
+    outColor = vec4(c.rgb, max(c.a, max(c.r, max(c.g, c.b))));
   }`
+
+// PREMULTIPLIED: canvas は premultiplied alpha なので、色はアルファ以下でないといけない。
+// 加算の光を「色だけ、アルファ 0」で出すと、ページに重ねるときに環境によっては消える。光はアルファを色の最大値にして出す
 
 // 炎。下から上へ流れるノイズを、上ほど細くなる形で切り抜く
 const FLAME_VS = /* glsl */ `#version 300 es
@@ -197,7 +203,8 @@ const FLAME_FS = /* glsl */ `#version 300 es
     float coal = exp(-pow((vUv.y - 0.93) * 9.0, 2.0)) * (1.0 - smoothstep(0.55, 1.0, abs(vUv.x - 0.5) * 2.0));
     coal *= 0.6 + 0.4 * noise(vec2(vUv.x * 14.0, uTime * 1.5));
     vec3 glow = vec3(1.0, 0.3, 0.06) * coal * 0.9;
-    outColor = vec4((color * v * 1.1 + glow) * uGain, 0.0);
+    vec3 rgb = (color * v * 1.1 + glow) * uGain;
+    outColor = vec4(rgb, max(rgb.r, max(rgb.g, rgb.b)));
   }`
 
 // 火の明かり。canvas の下の HTML（札掛けや地面）を、加算で照らす
@@ -212,7 +219,8 @@ const GLOW_FS = /* glsl */ `#version 300 es
     vec2 p = vUv * uSize;
     float d = length((p - uCenter) * vec2(1.0, 1.25));
     float a = uPower / (1.0 + pow(d / 210.0, 2.0)) - 0.04;
-    outColor = vec4(vec3(1.0, 0.5, 0.2) * max(a, 0.0) * 0.2, 0.0);
+    vec3 rgb = vec3(1.0, 0.5, 0.2) * max(a, 0.0) * 0.2;
+    outColor = vec4(rgb, max(rgb.r, max(rgb.g, rgb.b)));
   }`
 
 export interface SheetMesh {
