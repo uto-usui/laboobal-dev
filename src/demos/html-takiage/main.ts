@@ -831,17 +831,22 @@ function start(gl: WebGL2RenderingContext) {
 
   const layout = () => {
     const narrow = W < 560
-    L.slipH = Math.round(Math.min(300, Math.max(200, H * 0.6)))
-    L.slipW = Math.round(L.slipH * 0.23)
-    L.slipX = Math.round((narrow ? W * 0.3 : W * 0.37) - L.slipW / 2)
-    L.slipY = Math.round(Math.max(26, H * 0.11))
+    // 短冊と篝火の大きさには上限がある。大きい画面でも位置だけ広がらないよう、
+    // 置く範囲を幅 1100px・高さ 760px までに絞り、地面の上に寄せる
+    const cw = narrow ? W : Math.min(W, Math.max(H * 1.4, 720), 1100)
+    const ch = Math.min(H, 760)
+    const ox = (W - cw) / 2
     L.groundY = Math.round(H - Math.max(16, H * 0.05))
-    L.fireX = Math.round(narrow ? W * 0.74 : W * 0.64)
-    L.basketW = Math.round(Math.min(150, Math.max(92, W * 0.17)))
+    L.slipH = Math.round(Math.min(300, Math.max(200, ch * 0.6)))
+    L.slipW = Math.round(L.slipH * 0.23)
+    L.slipX = Math.round(ox + (narrow ? cw * 0.3 : cw * 0.37) - L.slipW / 2)
+    L.slipY = Math.round(Math.max(26, L.groundY - ch * 0.84))
+    L.fireX = Math.round(ox + (narrow ? cw * 0.74 : cw * 0.64))
+    L.basketW = Math.round(Math.min(150, Math.max(92, cw * 0.17)))
     const scale = L.basketW / 120
     L.coalY = Math.round(L.groundY - 120 * scale + 24 * scale)
     L.flameW = L.basketW * 0.86
-    L.flameH = Math.min(150, H * 0.3, L.basketW * 1.25)
+    L.flameH = Math.min(150, ch * 0.3, L.basketW * 1.25)
     const set = (name: string, v: number) =>
       stage.style.setProperty(name, `${v}px`)
     set('--slip-x', L.slipX)
