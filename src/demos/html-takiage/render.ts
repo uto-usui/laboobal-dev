@@ -182,17 +182,19 @@ const FLAME_FS = /* glsl */ `#version 300 es
   ${NOISE}
   void main() {
     // vUv.y は上が 0、下が 1。up は根もとから先へ 0〜1
-    float up = 1.0 - vUv.y;
+    // 下の端では補間で少し負になる。負のまま pow に渡すと NaN になる
+    float up = clamp(1.0 - vUv.y, 0.0, 1.0);
     vec2 q = vec2(vUv.x * 3.2, up * 2.2 - uTime * 1.7);
     float n = fbm(q + vec2(0.0, fbm(q * 1.7 + uTime * 0.4)));
     float x = abs(vUv.x - 0.5) * 2.0 + (n - 0.5) * 0.9 * up;
     float width = mix(0.95, 0.05, pow(up / uPower, 0.8));
-    float body = smoothstep(width, width * 0.25, x) * smoothstep(1.05, 0.2, up / uPower);
+    // smoothstep の端を逆に渡すと結果が決まっていない（GPU によっては 0 になって炎が消える）。1.0 - で向きを変える
+    float body = (1.0 - smoothstep(width * 0.25, width, x)) * (1.0 - smoothstep(0.2, 1.05, up / uPower));
     float v = body * (0.55 + n * 0.9);
     vec3 color = mix(vec3(0.55, 0.08, 0.02), vec3(1.0, 0.45, 0.08), smoothstep(0.15, 0.6, v));
     color = mix(color, vec3(1.0, 0.86, 0.55), smoothstep(0.75, 1.2, v));
     // 根もとの熾火
-    float coal = exp(-pow((vUv.y - 0.93) * 9.0, 2.0)) * smoothstep(1.0, 0.55, abs(vUv.x - 0.5) * 2.0);
+    float coal = exp(-pow((vUv.y - 0.93) * 9.0, 2.0)) * (1.0 - smoothstep(0.55, 1.0, abs(vUv.x - 0.5) * 2.0));
     coal *= 0.6 + 0.4 * noise(vec2(vUv.x * 14.0, uTime * 1.5));
     vec3 glow = vec3(1.0, 0.3, 0.06) * coal * 0.9;
     outColor = vec4((color * v * 1.1 + glow) * uGain, 0.0);
