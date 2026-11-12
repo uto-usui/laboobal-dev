@@ -54,6 +54,7 @@ GSAP で同じことをするなら、マウスが動くたびに「n 秒かけ�
 - 遅れが要らないなら、CSS の `animation-timeline: view()` と `animation-range` でブラウザに進み具合を計算させ、`@property` で登録した数 1 つだけを動かす（[scroll-reveal-color](../src/demos/scroll-reveal-color/README.md)）
 - 進み具合を 1 つの値にまとめておくと、子は CSS だけでずらせる。locomotive-scroll 5 の `--progress` は子に受け継がれる（[scrollmanager](../src/demos/scrollmanager/README.md)）
 - 崩れ方の強さを 1 つの値にまとめ、すべてのノイズがそれを見るようにすると、緩急を 1 か所で決められる（[canvas-glitch-image](../src/demos/canvas-glitch-image/README.md)）
+- スクロールを縦の移動ではなく時間として使う。画面は止め、進み具合で場面を選び、場面の中の動き（カメラの寄りなど）に写す。写真を縦に並べて流すだけだと、下へ進む理由が生まれない（[vhs-rewind](../src/demos/vhs-rewind/README.md)）
 
 ## 乱数は行き先にする
 
@@ -97,6 +98,8 @@ GSAP で同じことをするなら、マウスが動くたびに「n 秒かけ�
 - 崩れる場所をしぼる。ノイズを 8 乗すると山のところだけが残り、文字の大部分は動かない（[three-typo](../src/demos/three-typo/README.md)）
 - 覆いきってから 0.5 秒止めると、「何かが隠れている」と思わせてから見せられる（[reveal-curtain](../src/demos/reveal-curtain/README.md)）
 - 入るときと出るときで ease と長さを変える（[hover-control](../src/demos/hover-control/README.md)、[hover-control-css](../src/demos/hover-control-css/README.md)、[reveal-curtain](../src/demos/reveal-curtain/README.md)）
+- 速さだけでなく、続けて動かした量にもしきい値を置く。ちょっと払っただけでは起きず、わざと大きく動かしたときだけ起きる。量は向きが変わったときと止まったときに数え直す（[vhs-rewind](../src/demos/vhs-rewind/README.md)）
+- なめらかなノイズを段に切り、半分の段を「動かない」にすると、なめらかに波打つのではなく、止まった帯と大きくずれた帯がはっきり分かれる（[vhs-rewind](../src/demos/vhs-rewind/README.md)）
 
 ## イベントではなく、動き終わったときに今の状態を見る
 
