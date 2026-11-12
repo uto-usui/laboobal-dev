@@ -128,6 +128,7 @@ export default defineDemo({
 
 - 画像、動画、フォント、シェーダーは `assets/` に置いて import する。実行時に外のサーバーから読まない（`source.unsplash.com` が止まって、旧デモが 4 本壊れた）
 - 写真は軽い形式で出す。Demo.astro の `<img>` は Astro の `<Picture>` で AVIF と WebP にし、`loading="eager"` にする（写真がデモそのものなので。例は reveal-clip）。CSS の背景は `getImage` で WebP にする。JS で読んで WebGL のテクスチャや canvas に使う写真は、WebP にしてリポジトリに置く（AVIF は Safari の古い版で読めず、JS の側では代わりを出せない）
+- ほかのデモの写真を使い回すときは、写したあとに書き出し直して中身を変える。中身がまったく同じファイルが 2 つあると、ビルドで 1 つにまとめられ、片方のデモが読むファイルが出力されずに 404 になる（vhs-rewind で particle-photo の写真を写したときに起きた）
 
 ### 共有の部品（`src/shared/`）
 
