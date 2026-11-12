@@ -125,10 +125,16 @@ test.describe('指でのスクロールを奪わない', () => {
     'html-cloth',
     'html-emaki',
     'html-takiage',
+    'html-sticker',
   ]
   // HTML-in-Canvas（Chrome 157〜）のデモ。使えないブラウザではふつうの HTML を置くだけで touchGate を呼ばないので、
   // タップしてからの所は、使えるブラウザでだけ見る（Playwright の Chromium 156 では飛ばす）
-  const HTML_IN_CANVAS = ['html-cloth', 'html-emaki', 'html-takiage']
+  const HTML_IN_CANVAS = [
+    'html-cloth',
+    'html-emaki',
+    'html-takiage',
+    'html-sticker',
+  ]
 
   for (const slug of DRAG) {
     test(`${slug} を iframe に入れても、縦になぞると記事がスクロールする`, async ({
