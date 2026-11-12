@@ -46,6 +46,8 @@ const BUDGET = {
     'html-takiage': 20,
     // 8.7
     'html-cloth': 11,
+    // 11.2（2026-11-12）
+    'html-sticker': 14,
   },
   // 1 ファイルの最大。jpg 36.4、webm 324.1、webp 25.8
   previews: { jpg: 45, webm: 400, webp: 40 },
