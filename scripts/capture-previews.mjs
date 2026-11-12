@@ -36,6 +36,23 @@ const TUNE = {
   'processing-js-random-walk': { poster: 'late' },
   // スクロールで箱の色が緑から青へ変わる。始めのコマは緑のままなので、少し進んで色が変わりかけたところにする
   'scroll-reveal-color': { poster: 0.8 },
+  // 早送りと巻き戻しは、勢いよく長く動かしたときだけ出る。ふつうの往復では出ないので、下へ送ってから一気に戻し、巻き戻しのところをポスターにする
+  'vhs-rewind': {
+    poster: 2.7,
+    act: async (page) => {
+      await page.mouse.move(VIEW.width / 2, VIEW.height / 2)
+      for (let i = 0; i < 20; i++) {
+        await page.mouse.wheel(0, 60)
+        await wait(page, 80)
+      }
+      await wait(page, 200)
+      for (let i = 0; i < 10; i++) {
+        await page.mouse.wheel(0, -150)
+        await wait(page, 40)
+      }
+      await wait(page, 1400)
+    },
+  },
   // HTML-in-Canvas（Chrome 157〜）のデモ。Playwright の Chromium にはまだないので、手元の Google Chrome で撮る（chrome: true）
   'html-cloth': { chrome: true },
   // 開くときの再生が終わってから撮る
