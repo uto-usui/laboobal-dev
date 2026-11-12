@@ -47,8 +47,10 @@ export const cornerNear = (shape: Shape, x: number, y: number) => {
   if (shape.round) {
     const cx = w / 2
     const cy = h / 2
-    const len = Math.hypot(x - cx, y - cy) || 1
     const r = w / 2
+    const len = Math.hypot(x - cx, y - cy)
+    // ちょうど中心を押したときは、上の縁からめくる
+    if (len < 1e-6) return [cx, cy - r]
     return [cx + ((x - cx) / len) * r, cy + ((y - cy) / len) * r]
   }
   return [x < w / 2 ? 0 : w, y < h / 2 ? 0 : h]
@@ -75,11 +77,8 @@ export const extent = (
   return most
 }
 
-/**
- * 引いた向きを、角から中心へ向かう向き（cx, cy）の左右 limit の中に収める。
- * 外へ引いても、シールは内側へめくれていく
- */
-export const withinCone = (
+/** 引いた向きを、角から中心へ向かう向き（cx, cy）の左右 limit の中に収める */
+const withinCone = (
   dx: number,
   dy: number,
   cx: number,
@@ -97,4 +96,40 @@ export const withinCone = (
     cx * Math.cos(t) - cy * Math.sin(t),
     cx * Math.sin(t) + cy * Math.cos(t),
   ]
+}
+
+/**
+ * めくる起点と向きを、起点が「向きに沿っていちばん手前の点」になるように合わせる。
+ * こうしないと、引き始めた瞬間に、つまんだ角より先に別の縁がめくれる。
+ * 四角は角を動かさず、向きを角から内側の 90° に収める。丸は向きを左右 CONE に収め、起点をその向きの反対側の縁へ動かす。
+ * inX, inY は角から中心へ向かう向き。外へ引いても、シールは内側へめくれていく
+ */
+export const aim = (
+  shape: Shape,
+  p0x: number,
+  p0y: number,
+  inX: number,
+  inY: number,
+  dx: number,
+  dy: number,
+  cone: number,
+) => {
+  if (shape.round) {
+    const [ux, uy] = withinCone(dx, dy, inX, inY, cone)
+    const r = shape.w / 2
+    return { p0x: r - ux * r, p0y: shape.h / 2 - uy * r, dx: ux, dy: uy }
+  }
+  const sx = Math.sign(inX)
+  const sy = Math.sign(inY)
+  let ux = sx * Math.max(0, dx * sx)
+  let uy = sy * Math.max(0, dy * sy)
+  const len = Math.hypot(ux, uy)
+  if (len < 1e-3) {
+    ux = inX
+    uy = inY
+  } else {
+    ux /= len
+    uy /= len
+  }
+  return { p0x, p0y, dx: ux, dy: uy }
 }

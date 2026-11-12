@@ -11,14 +11,7 @@ import {
 } from '../../shared/html-canvas'
 import { clamp, toRadian } from '../../shared/math'
 import { touchGate } from '../../shared/touch'
-import {
-  cornerNear,
-  extent,
-  foldFor,
-  type Shape,
-  travel,
-  withinCone,
-} from './peel'
+import { aim, cornerNear, extent, foldFor, type Shape, travel } from './peel'
 import { createRenderer, type Placement } from './render'
 
 const stage = document.querySelector<HTMLElement>('.stage')!
@@ -27,7 +20,7 @@ const elements = [...canvas.querySelectorAll<HTMLElement>('.sticker')]
 
 // 透視の強さ（画面から目までの距離、px）
 const FOCAL = 1400
-// 角から中心へ向かう向きの左右この角度までは、引いた向きにめくれる
+// 丸いシールは、縁から中心へ向かう向きの左右この角度までは、引いた向きにめくれる
 const CONE = toRadian(70)
 // 折り目はシールの奥行きのこの割合まで。ここより先は引いても重くなり、剥がれきらない
 const HOLD = 0.82
@@ -78,12 +71,15 @@ function start(gl: WebGL2RenderingContext) {
       tex: elementTexture(gl, canvas, el),
       mesh: undefined as ReturnType<typeof renderer.createMesh> | undefined,
       at: {} as Placement,
-      // めくった角、めくれる向き（角から中へ）、めくった量
+      // つまんだ角。丸いシールでは、つまんだ縁の点
+      cornerX: 0,
+      cornerY: 0,
+      // めくれる起点、めくれる向き（起点から中へ）、めくった量
       p0x: 0,
       p0y: 0,
       dx: 1,
       dy: 0,
-      // 角から中心へ向かう向き。引いた向きはこの左右 CONE の中に収める
+      // 角から中心へ向かう向き
       inX: 1,
       inY: 0,
       amount: 0,
@@ -195,11 +191,21 @@ function start(gl: WebGL2RenderingContext) {
   const takeCorner = (s: Sticker, lx: number, ly: number) => {
     if (s.amount > 1) return
     const [px, py] = cornerNear(s.shape, lx, ly)
-    s.p0x = px
-    s.p0y = py
+    s.cornerX = px
+    s.cornerY = py
     const len = Math.hypot(s.shape.w / 2 - px, s.shape.h / 2 - py) || 1
-    s.inX = s.dx = (s.shape.w / 2 - px) / len
-    s.inY = s.dy = (s.shape.h / 2 - py) / len
+    s.inX = (s.shape.w / 2 - px) / len
+    s.inY = (s.shape.h / 2 - py) / len
+    pull(s, s.inX, s.inY)
+  }
+
+  /** 引いた向きから、めくれる起点と向きを決める */
+  const pull = (s: Sticker, dx: number, dy: number) => {
+    const a = aim(s.shape, s.cornerX, s.cornerY, s.inX, s.inY, dx, dy, CONE)
+    s.p0x = a.p0x
+    s.p0y = a.p0y
+    s.dx = a.dx
+    s.dy = a.dy
   }
 
   const local = (e: PointerEvent) => {
@@ -209,9 +215,11 @@ function start(gl: WebGL2RenderingContext) {
 
   const INTERACTIVE = 'input, button, label, a, select, textarea'
   let holding: Sticker | undefined
+  // つかんでいる指。ほかの指の動きや離すのは見ない
+  let holdingId = -1
 
   stage.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0) return
+    if (e.button !== 0 || holding) return
     const [x, y] = local(e)
     const s = topAt(x, y)
     if (!s) return
@@ -221,11 +229,14 @@ function start(gl: WebGL2RenderingContext) {
     e.preventDefault()
     const [lx, ly] = toLocal(s, x, y)
     takeCorner(s, lx, ly)
-    // 跳ねている途中でつかんでも、めくれた量がそこから続くようにする
-    s.pressX = lx - s.dx * s.amount
-    s.pressY = ly - s.dy * s.amount
+    // 跳ねている途中でつかんでも、めくれた量がそこから続くようにする。指の動きに直した量から始める
+    const start = unlimited(s, s.amount)
+    s.pressX = lx - s.dx * start
+    s.pressY = ly - s.dy * start
+    s.target = start
     s.held = true
     holding = s
+    holdingId = e.pointerId
     for (const o of stickers) if (o !== s) o.target = 0
     awake = true
     stage.setPointerCapture(e.pointerId)
@@ -235,11 +246,12 @@ function start(gl: WebGL2RenderingContext) {
   stage.addEventListener('pointermove', (e) => {
     const [x, y] = local(e)
     if (holding) {
+      if (e.pointerId !== holdingId) return
       const s = holding
       const [lx, ly] = toLocal(s, x, y)
       const mx = lx - s.pressX
       const my = ly - s.pressY
-      ;[s.dx, s.dy] = withinCone(mx, my, s.inX, s.inY, CONE)
+      pull(s, mx, my)
       s.target = Math.hypot(mx, my)
       awake = true
       return
@@ -267,8 +279,8 @@ function start(gl: WebGL2RenderingContext) {
     }
   })
 
-  const release = () => {
-    if (!holding) return
+  const release = (e: PointerEvent) => {
+    if (!holding || e.pointerId !== holdingId) return
     holding.held = false
     holding.target = 0
     holding = undefined
@@ -295,6 +307,15 @@ function start(gl: WebGL2RenderingContext) {
     return soft + (max - soft) * Math.tanh((raw - soft) / (max - soft))
   }
 
+  /** limited の逆。めくれた量から、指がどれだけ動いたことにするか */
+  const unlimited = (s: Sticker, amount: number) => {
+    const max = travelLimit(s)
+    const soft = max * 0.7
+    if (amount <= soft) return amount
+    const k = Math.min((amount - soft) / (max - soft), 0.999)
+    return soft + (max - soft) * Math.atanh(k)
+  }
+
   /** 折り目が HOLD の所まで進んだときに、角が動いた距離 */
   const travelLimit = (s: Sticker) =>
     travel(extent(s.shape, s.p0x, s.p0y, s.dx, s.dy) * HOLD)
@@ -313,10 +334,16 @@ function start(gl: WebGL2RenderingContext) {
     // 動きを減らす設定では、行き過ぎずに貼り戻す
     const friction = calm ? 2 * Math.sqrt(SPRING) : FRICTION
     const bounce = calm ? 0 : BOUNCE
+    // 勢いよく離しても、剥がれきらない所の先へは行かせない
+    const max = travelLimit(s)
     for (let t = 0; t < dt; t += STEP) {
       const h = Math.min(STEP, dt - t)
       s.velocity += (SPRING * (s.target - s.amount) - friction * s.velocity) * h
       s.amount += s.velocity * h
+      if (s.amount > max) {
+        s.amount = max
+        s.velocity = Math.min(s.velocity, 0)
+      }
       if (s.amount < 0) {
         s.amount = 0
         s.velocity = Math.min(-s.velocity * bounce, BOUNCE_MAX)
