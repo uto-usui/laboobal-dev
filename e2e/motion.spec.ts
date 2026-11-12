@@ -42,6 +42,7 @@ const AUTOPLAY = [
   'three-video',
   'trigonometry-random-floating',
   'tweenmax-easing-of-scroll-parallax',
+  'vhs-rewind',
 ]
 
 // WebGL を使わないデモ。GPU のない CI でも、ふだんは動いていることまで見られる
@@ -65,6 +66,7 @@ const AUTOPLAY_WITHOUT_GL = [
   'smooth-movement-using-sin-wave',
   'splitting',
   'trigonometry-random-floating',
+  'vhs-rewind',
 ]
 
 /** gap ミリ秒あけた 2 枚のスクショが同じか */

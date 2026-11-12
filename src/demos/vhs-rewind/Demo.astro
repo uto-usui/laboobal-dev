@@ -1,0 +1,271 @@
+---
+import { Picture } from 'astro:assets'
+import field from './assets/field.jpg'
+import fjord from './assets/fjord.jpg'
+import jellyfish from './assets/jellyfish.jpg'
+import lioness from './assets/lioness.jpg'
+
+const scenes = [
+  { photo: field, label: 'FIELD' },
+  { photo: fjord, label: 'FJORD' },
+  { photo: jellyfish, label: 'AQUARIUM' },
+  { photo: lioness, label: 'ZOO' },
+]
+
+// discrete の 16 段。半分（8 段）を 0.5 にして、その帯はずらさない。fractalNoise は 0.5 のまわりに寄るので、
+// 真ん中の段にずれる値を混ぜておかないと、ほとんどの帯が止まったままになる
+const bandTable =
+  '0.5 0.05 0.5 0.8 0.5 0.3 0.9 0.5 0.15 0.5 0.7 0.35 0.5 1 0.5 0.5'
+---
+
+<div class="page">
+  <div class="screen">
+    <div class="picture">
+      {/* 場面は重ねて置き、いま再生している 1 つだけを見せる。スクロールで縦に流さず、テープの時間として進める */}
+      <section class="card" data-scene>
+        <p class="card-title">TAPE 01</p>
+        <p class="card-sub">
+          HOME VIDEO<span class="cursor" data-motion="auto">_</span>
+        </p>
+      </section>
+      {scenes.map(({ photo, label }, i) => (
+        <section class="scene" data-scene>
+          <Picture
+            class="photo"
+            src={photo}
+            formats={['avif']}
+            fallbackFormat="webp"
+            loading="eager"
+            alt=""
+          />
+          <p
+            class="label"
+            data-label={`${String(i + 1).padStart(2, '0')} ${label}`}
+          />
+        </section>
+      ))}
+      <section class="card" data-scene>
+        <p class="card-title">END</p>
+      </section>
+    </div>
+    <canvas class="snow" aria-hidden="true"></canvas>
+    <div class="osd" aria-hidden="true">
+      <p data-mode>▶ PLAY</p>
+      <p data-timecode>00:00:00:00</p>
+    </div>
+    <p class="stamp" aria-hidden="true" data-stamp></p>
+  </div>
+  <p class="demo-hint">scroll</p>
+
+  <svg class="defs" aria-hidden="true">
+    {/* 範囲は main.ts が画面の大きさに合わせる。単位は画面の px */}
+    <filter
+      id="vhs-rewind-filter"
+      filterUnits="userSpaceOnUse"
+      primitiveUnits="userSpaceOnUse"
+      x="0"
+      y="0"
+      width="100"
+      height="100"
+      color-interpolation-filters="sRGB"
+    >
+      {/* x の周波数を 0 にして、ノイズを縦の向きにしか変えない。横縞になる */}
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0 0.0075"
+        numOctaves="1"
+        seed="1"
+        result="noise"
+      ></feTurbulence>
+      {/* R を 16 段の表に置き換え、G は 0.5 に固定する。G が 0.5 なので縦にはずれない */}
+      <feComponentTransfer in="noise" result="bands">
+        <feFuncR type="discrete" tableValues={bandTable}></feFuncR>
+        <feFuncG type="linear" slope="0" intercept="0.5"></feFuncG>
+        <feFuncA type="linear" slope="0" intercept="1"></feFuncA>
+      </feComponentTransfer>
+      <feDisplacementMap
+        in="SourceGraphic"
+        in2="bands"
+        scale="0"
+        xChannelSelector="R"
+        yChannelSelector="G"
+        result="shifted"
+      ></feDisplacementMap>
+      {/* 赤と青を逆の向きへずらし、緑はそのままで足し戻す */}
+      <feColorMatrix
+        in="shifted"
+        type="matrix"
+        values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"
+        result="red"
+      ></feColorMatrix>
+      <feOffset in="red" dx="0" result="redShifted"></feOffset>
+      <feColorMatrix
+        in="shifted"
+        type="matrix"
+        values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"
+        result="green"
+      ></feColorMatrix>
+      <feColorMatrix
+        in="shifted"
+        type="matrix"
+        values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"
+        result="blue"
+      ></feColorMatrix>
+      <feOffset in="blue" dx="0" result="blueShifted"></feOffset>
+      <feComposite
+        in="redShifted"
+        in2="green"
+        operator="arithmetic"
+        k1="0"
+        k2="1"
+        k3="1"
+        k4="0"
+        result="redGreen"
+      ></feComposite>
+      <feComposite
+        in="redGreen"
+        in2="blueShifted"
+        operator="arithmetic"
+        k1="0"
+        k2="1"
+        k3="1"
+        k4="0"
+      ></feComposite>
+    </filter>
+  </svg>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .page {
+    position: relative;
+  }
+
+  .screen {
+    container-type: size;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .picture {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  .scene,
+  .card {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    visibility: hidden;
+  }
+
+  [data-scene][data-current] {
+    visibility: visible;
+  }
+
+  /* カメラを寄せたり振ったりしても縁が出ないよう、はじめから少し大きくしておく */
+  .photo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    scale: 1.15;
+  }
+
+  .card {
+    display: grid;
+    place-content: center;
+    gap: 0.5em;
+    text-align: center;
+    background: #0b1a6e;
+  }
+
+  .card-title,
+  .card-sub,
+  .label,
+  .osd,
+  .stamp {
+    margin: 0;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    color: #fff;
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 4px rgb(255 255 255 / 0.4);
+  }
+
+  .card-title {
+    font-size: clamp(32px, 9cqw, 120px);
+    line-height: 1;
+  }
+
+  .card-sub {
+    font-size: clamp(12px, 2cqw, 20px);
+  }
+
+  .label {
+    position: absolute;
+    bottom: 48px;
+    left: 24px;
+    font-size: clamp(14px, 2.4cqw, 28px);
+  }
+
+  .snow {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    opacity: 0;
+  }
+
+  .osd {
+    position: absolute;
+    top: 40px;
+    left: 24px;
+    font-size: clamp(14px, 2.4cqw, 24px);
+    line-height: 1.4;
+  }
+
+  .osd p {
+    margin: 0;
+  }
+
+  .cursor {
+    animation-name: vhs-rewind-blink;
+    animation-duration: 1s;
+    animation-timing-function: steps(1);
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes vhs-rewind-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  .stamp {
+    position: absolute;
+    bottom: 16px;
+    left: 24px;
+    font-size: clamp(12px, 1.8cqw, 20px);
+  }
+
+  .demo-hint {
+    color: #fff;
+    mix-blend-mode: difference;
+  }
+
+  .defs {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+</style>
