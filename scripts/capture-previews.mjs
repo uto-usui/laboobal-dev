@@ -73,6 +73,38 @@ const TUNE = {
       await wait(page, LENGTH - 500)
     },
   },
+  // 宛名ラベルとこわれものを角からめくって離す。ラベルが大きくめくれたところをポスターにする
+  'html-sticker': {
+    chrome: true,
+    poster: 1.1,
+    act: async (page) => {
+      const peel = async (path, duration) => {
+        await page.mouse.move(...path[0])
+        await page.mouse.down()
+        await glide(page, path, duration)
+        await wait(page, 300)
+        await page.mouse.up()
+      }
+      await peel(
+        [
+          [225, 345],
+          [320, 295],
+          [400, 245],
+        ],
+        900,
+      )
+      await wait(page, 700)
+      await peel(
+        [
+          [492, 158],
+          [560, 200],
+          [615, 235],
+        ],
+        800,
+      )
+      await wait(page, LENGTH - 3000)
+    },
+  },
 }
 
 const demos = readdirSync('src/demos')
