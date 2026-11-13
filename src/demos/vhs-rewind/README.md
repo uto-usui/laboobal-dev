@@ -30,13 +30,13 @@
 - フィルターの範囲と単位は `userSpaceOnUse` にして、画面の幅と高さに合わせる。`color-interpolation-filters="sRGB"` にして、途中で色空間を変えない
 - 赤と青の分け方: 変位後の絵を `feColorMatrix` で R、G、B の 3 枚に分け、R と B を `feOffset` で逆向きにずらし、`feComposite` の arithmetic（k2 = k3 = 1）で足し戻す
 - ノイズは横 320px の canvas に 1 画素ずつ書き、画面いっぱいに引き伸ばして `mix-blend-mode: screen` で重ねる。高さは 1 画素が横 2 : 縦 1 になるように決めるので、粒が横に流れた筋に見える。`ImageData` は使い回す
-- タッチの端末（`pointer: coarse`）では SVG のフィルターを使わず、帯を入れ替えるのと同じ間隔で画面ごと左右にずらす。もとのサイトも、マウスのない端末と狭い画面ではフィルターを使っていない
+- タッチの端末（`pointer: coarse`）では SVG のフィルターを使わず、帯を入れ替えるのと同じ間隔で画面ごと左右にずらす
 - 1280×800 と 1440×900 の 2 倍で、乱れているあいだのフレームの時間を Chrome と Playwright の WebKit で測り、どちらも 60fps を保った（2026-11-12、手元の Mac。本物の Safari と iPhone では測っていない）
 - 動きを減らす設定: 開いたときの乱れ、いちばん上での乱れ、場面の替わり目の乱れは出さない（替わり目はそのまま切り替わる）。カードのカーソルは点滅させない。早送りと巻き戻しの乱れは読む人の操作に応じて出るので残すが、帯の入れ替えとノイズの書き換えは点滅にあたるので止め、1 つの形のまま左右にずれるだけにする。カメラの動きと場面の名前の打ち込みはスクロールについてくるので残す
 
-## もと
+## 参考
 
-- webmanab の clip「Jani Kurtti」の「勢いよく上へ戻したときの巻き戻し」の節。コードは読まず、clip に書いた仕組みから作り直した
+- Jani Kurtti（Online Studio）: https://www.janzkak.com
 
 ## 写真
 
@@ -49,5 +49,4 @@
 
 ## クレジット
 
-- Jani Kurtti（Online Studio）: https://www.janzkak.com （巻き戻しの乱れの考え方。コードは使っていない）
 - 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真ごとの出どころは上の「写真」）
