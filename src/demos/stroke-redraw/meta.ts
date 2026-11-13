@@ -14,7 +14,7 @@ export default defineDemo({
   created: '2026-11-13',
   added: '2026-11-13',
   description:
-    '長さの違う手書きの線が同時に描き終わり、自分で書き足した線も一緒に描き直される。',
+    '図形がひと筆で次々に描かれ、ドラッグすると自分の線に置き換わってくり返し描き直される。',
   tags: ['drag', 'reveal'],
   tech: ['glsl', 'js'],
 })

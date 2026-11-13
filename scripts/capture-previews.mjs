@@ -26,10 +26,10 @@ const LENGTH = 3600
 // poster: 'late' は、切り出しの終わりの 0.4 秒前のコマにする。描き足していくデモで、始めのコマではほとんど何も映らないため。
 // poster に数を書くと、切り出しの始めからその秒数のコマにする
 const TUNE = {
-  // 標準の drag で線を足さず、2.4 秒で描き終えた直後をポスターにする
+  // 標準の drag で図形を置き換えず、準備の 0.2 秒を含めて 1.6 秒で描き終えた直後を選ぶ
   'stroke-redraw': {
     warmup: 200,
-    poster: 2.5,
+    poster: 1.5,
     act: async (page) => {
       await wait(page, LENGTH)
     },
@@ -239,7 +239,7 @@ for (const demo of targets) {
   // info のボタンとパネル、組の切り替えのボタン、lil-gui のパネルは一覧のサムネイルには要らない
   await page.addStyleTag({
     content:
-      '.links, .info, .variant-toggle, .lil-gui { display: none !important }',
+      '.links, .info, .variant-toggle, .lil-gui, [data-capture-hide] { display: none !important }',
   })
   await wait(page, tune.warmup ?? WARMUP)
   const offset = (Date.now() - started) / 1000

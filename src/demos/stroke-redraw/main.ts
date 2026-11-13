@@ -6,7 +6,7 @@ import {
 } from '../../shared/dom'
 import { autoplayLoop } from '../../shared/motion'
 import { touchGate } from '../../shared/touch'
-import recorded from './assets/strokes.json'
+import { nextShape } from './shapes'
 import { createRenderer } from './render'
 import {
   hasPressure,
@@ -17,12 +17,18 @@ import {
 } from './stroke'
 
 // 配色はここだけで替える。背景は初期化前や context 喪失中にも同じ色を出す
-const COLORS = { paper: '#f3efe5', ink: '#292823' }
+const COLORS = { paper: '#003c26', ink: '#dde3d6', tip: '#ffffff' }
+const SIZE = { width: 800, height: 500 }
+const DRAW = 1.6
+const HOLD = 0.7
+const FADE = 0.4
+const CYCLE = DRAW + HOLD + FADE
 const rgb = (hex: string) =>
   [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
 const stage = document.querySelector<HTMLElement>('.stage')!
 const canvas = stage.querySelector('canvas')!
 stage.style.background = COLORS.paper
+stage.style.color = COLORS.ink
 const gl = canvas.getContext('webgl2', {
   alpha: false,
   antialias: false,
@@ -33,11 +39,9 @@ else showFallback('この環境では WebGL2 が使えません')
 
 function start(gl: WebGL2RenderingContext) {
   type Saved = { points: Point[]; pressure: boolean }
-  const seeds: Saved[] = recorded.strokes.map(({ points }) => ({
-    points: points as Point[],
-    pressure: points.some((p) => hasPressure(p[3])),
-  }))
-  let added: Saved | undefined
+  let shape = nextShape()
+  let saved: Saved = { points: shape.points, pressure: false }
+  let custom = false
   let writing:
     | (Saved & {
         id: number
@@ -49,7 +53,9 @@ function start(gl: WebGL2RenderingContext) {
       })
     | undefined
   let renderer: ReturnType<typeof createRenderer> | undefined
-  let meshes: ReturnType<ReturnType<typeof createRenderer>['createMesh']>[] = []
+  let mesh:
+    | ReturnType<ReturnType<typeof createRenderer>['createMesh']>
+    | undefined
   let stopAuto: (() => void) | undefined
   let clearFallback: (() => void) | undefined
   let lost = false
@@ -67,7 +73,7 @@ function start(gl: WebGL2RenderingContext) {
   const draw = () => {
     if (!lost && !failed && width && height)
       renderer?.draw(
-        meshes,
+        mesh,
         width,
         height,
         offset,
@@ -75,26 +81,21 @@ function start(gl: WebGL2RenderingContext) {
         opacity,
         paper,
         ink,
+        rgb(COLORS.tip),
       )
   }
   const rebuild = () => {
     if (!renderer || lost || failed) return
-    for (const mesh of meshes) mesh.dispose()
-    const strokes = [
-      ...seeds,
-      ...(added ? [added] : []),
-      ...(writing ? [writing] : []),
-    ]
-    meshes = strokes.map((s) =>
-      renderer!.createMesh(prepare(s.points, s.pressure, scale)),
-    )
+    mesh?.dispose()
+    const stroke = writing ?? saved
+    mesh = renderer.createMesh(prepare(stroke.points, stroke.pressure, scale))
   }
   const layout = () => {
     if (!renderer || lost || failed || !width || !height) return
-    scale = Math.min(width / recorded.width, height / recorded.height)
+    scale = Math.min(width / SIZE.width, height / SIZE.height)
     offset = [
-      (width - recorded.width * scale) / 2,
-      (height - recorded.height * scale) / 2,
+      (width - SIZE.width * scale) / 2,
+      (height - SIZE.height * scale) / 2,
     ]
     renderer.resize(width, height, pixelRatio())
     rebuild()
@@ -111,10 +112,18 @@ function start(gl: WebGL2RenderingContext) {
     stopAuto = autoplayLoop(
       (dt) => {
         if (writing || lost || failed) return
-        time = (time + dt) % 3.8
-        const q = Math.min(time / 2.4, 1)
+        time += dt
+        if (time >= CYCLE) {
+          time %= CYCLE
+          if (!custom) {
+            shape = nextShape(shape.index)
+            saved = { points: shape.points, pressure: false }
+            rebuild()
+          }
+        }
+        const q = Math.min(time / DRAW, 1)
         progress = q * q * (3 - 2 * q)
-        opacity = time <= 3.4 ? 1 : (3.8 - time) / 0.4
+        opacity = time <= DRAW + HOLD ? 1 : (CYCLE - time) / FADE
         draw()
       },
       () => {
@@ -129,7 +138,7 @@ function start(gl: WebGL2RenderingContext) {
   const init = () => {
     try {
       renderer = createRenderer(gl)
-      meshes = []
+      mesh = undefined
       lost = failed = false
       clearFallback?.()
       clearFallback = undefined
@@ -187,21 +196,11 @@ function start(gl: WebGL2RenderingContext) {
     if (canvas.hasPointerCapture(pending.id))
       canvas.releasePointerCapture(pending.id)
     if (valid) {
-      added = { points: pending.points, pressure: pending.pressure }
-      // 作者が仮の3本を差し替えるための出力。本番ビルドではこの分岐ごと消える
-      if (import.meta.env.DEV)
-        console.log(
-          JSON.stringify({
-            points: added.points.map((p) =>
-              // 再サンプリングで生じた中間値を、有効な筆圧と誤認させない
-              p.map((v, i) =>
-                i === 3 && !added!.pressure ? 0.5 : Math.round(v * 1000) / 1000,
-              ),
-            ),
-          }),
-        )
+      saved = { points: pending.points, pressure: pending.pressure }
+      custom = true
+      stage.querySelector('[data-draw-prompt]')?.classList.add('is-hidden')
     }
-    time = valid ? 0 : 2.4
+    time = valid ? 0 : DRAW
     progress = valid && !prefersReducedMotion() ? 0 : 1
     opacity = 1
     rebuild()
@@ -232,7 +231,7 @@ function start(gl: WebGL2RenderingContext) {
     }
     append(e)
     canvas.setPointerCapture(e.pointerId)
-    time = 2.4
+    time = DRAW
     progress = opacity = 1
     rebuild()
     draw()
@@ -260,7 +259,7 @@ function start(gl: WebGL2RenderingContext) {
       if ((e as PointerEvent).pointerId === writing?.id) finish(false)
     })
   canvas.addEventListener('pointerleave', (e) => {
-    if (e.pointerId === writing?.id) finish(false)
+    if (e.pointerId === writing?.id) finish(true)
   })
   touchGate(stage)
 

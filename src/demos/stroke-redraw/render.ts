@@ -28,13 +28,14 @@ const FS = /* glsl */ `#version 300 es
   in float vS;
   flat in float vCircle;
   uniform float uLimit;
+  uniform vec4 uColor;
   out vec4 outColor;
   void main() {
     if (vS > uLimit) discard;
     float d = (vCircle > 0.5 ? length(vLocal) : abs(vLocal.x)) - vRadius;
     float aa = max(fwidth(d), 0.0001);
     float a = 1.0 - smoothstep(-aa * 0.5, aa * 0.5, d);
-    outColor = vec4(a);
+    outColor = uColor * a;
   }`
 const QUAD = /* glsl */ `#version 300 es
   out vec2 vUv;
@@ -184,7 +185,7 @@ export const createRenderer = (gl: WebGL2RenderingContext) => {
   }
 
   const draw = (
-    meshes: ReturnType<typeof createMesh>[],
+    mesh: ReturnType<typeof createMesh> | undefined,
     width: number,
     height: number,
     offset: number[],
@@ -192,6 +193,7 @@ export const createRenderer = (gl: WebGL2RenderingContext) => {
     opacity: number,
     paper: number[],
     ink: number[],
+    tipColor: number[],
   ) => {
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight)
     gl.bindFramebuffer(gl.FRAMEBUFFER, target)
@@ -204,22 +206,12 @@ export const createRenderer = (gl: WebGL2RenderingContext) => {
     // 色を混ぜる前の被覆率に MAX を使い、縁も交差部も描画回数で濃くしない
     gl.blendEquation(gl.MAX)
     gl.blendFunc(gl.ONE, gl.ONE)
-    if (p > 0)
-      for (const mesh of meshes) {
-        if (!mesh.stroke.length) continue
-        gl.uniform1f(line.u('uLimit'), p * mesh.stroke.length)
-        gl.bindVertexArray(mesh.vao)
-        gl.drawArrays(gl.TRIANGLES, 0, mesh.count)
-        if (p < 1) {
-          const data: number[] = []
-          const tipPoint = tipAt(mesh.stroke, p)
-          // 表示長の境界と同値で比較せず、丸め誤差で先端の点が消えるのを避ける
-          circle(data, [tipPoint[0], tipPoint[1], tipPoint[2], 0], 1.5)
-          tip.set(data, true)
-          gl.bindVertexArray(tip.vao)
-          gl.drawArrays(gl.TRIANGLES, 0, tip.count)
-        }
-      }
+    gl.uniform4f(line.u('uColor'), 1, 1, 1, 1)
+    if (p > 0 && mesh?.stroke.length) {
+      gl.uniform1f(line.u('uLimit'), p * mesh.stroke.length)
+      gl.bindVertexArray(mesh.vao)
+      gl.drawArrays(gl.TRIANGLES, 0, mesh.count)
+    }
     gl.disable(gl.BLEND)
     gl.bindFramebuffer(gl.FRAMEBUFFER, null)
     gl.bindVertexArray(null)
@@ -231,6 +223,29 @@ export const createRenderer = (gl: WebGL2RenderingContext) => {
     gl.uniform3fv(composite.u('uInk'), ink)
     gl.uniform1f(composite.u('uOpacity'), opacity)
     gl.drawArrays(gl.TRIANGLES, 0, 3)
+    // 先端は合成済みの線の上に描き、交差部でも白を保つ
+    if (p > 0 && p < 1 && mesh?.stroke.length) {
+      const data: number[] = []
+      const point = tipAt(mesh.stroke, p)
+      circle(data, [point[0], point[1], point[2], 0], 1.5)
+      tip.set(data, true)
+      gl.useProgram(line.program)
+      gl.uniform1f(line.u('uLimit'), 1)
+      gl.uniform4f(
+        line.u('uColor'),
+        tipColor[0],
+        tipColor[1],
+        tipColor[2],
+        opacity,
+      )
+      gl.enable(gl.BLEND)
+      gl.blendEquation(gl.FUNC_ADD)
+      // シェーダーで色にも被覆率を掛けているため、乗算済みの色として混ぜる
+      gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
+      gl.bindVertexArray(tip.vao)
+      gl.drawArrays(gl.TRIANGLES, 0, tip.count)
+      gl.disable(gl.BLEND)
+    }
   }
   return { createMesh, resize, draw }
 }
