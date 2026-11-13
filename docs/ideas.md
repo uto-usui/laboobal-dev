@@ -56,6 +56,7 @@ GSAP で同じことをするなら、マウスが動くたびに「n 秒かけ�
 - 遅れが要らないなら、CSS の `animation-timeline: view()` と `animation-range` でブラウザに進み具合を計算させ、`@property` で登録した数 1 つだけを動かす（[scroll-reveal-color](../src/demos/scroll-reveal-color/README.md)）
 - 進み具合を 1 つの値にまとめておくと、子は CSS だけでずらせる。locomotive-scroll 5 の `--progress` は子に受け継がれる（[scrollmanager](../src/demos/scrollmanager/README.md)）
 - 崩れ方の強さを 1 つの値にまとめ、すべてのノイズがそれを見るようにすると、緩急を 1 か所で決められる（[canvas-glitch-image](../src/demos/canvas-glitch-image/README.md)）
+- 進み具合 p に線の全長を掛けると、図形でも自分で書いた長い線でも、長さに関係なく同じ時間で描き終わる。ease は p に 1 回だけ掛ける（[stroke-redraw](../src/demos/stroke-redraw/README.md)）
 - スクロールを縦の移動ではなく時間として使う。画面は止め、進み具合で場面を選び、場面の中の動き（カメラの寄りなど）に写す。写真を縦に並べて流すだけだと、下へ進む理由が生まれない（[vhs-rewind](../src/demos/vhs-rewind/README.md)）
 
 ## 乱数は行き先にする

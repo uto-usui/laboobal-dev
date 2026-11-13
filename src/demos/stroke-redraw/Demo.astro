@@ -1,0 +1,49 @@
+<div class="stage">
+  <canvas
+    aria-label="図形がひと筆で描かれる。ドラッグすると自分の線に置き換わる"
+  ></canvas>
+  <span class="draw-prompt" data-draw-prompt data-capture-hide>draw it</span>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    touch-action: pan-y;
+    cursor: crosshair;
+    container-type: inline-size;
+  }
+
+  .draw-prompt {
+    position: absolute;
+    left: 5cqw;
+    bottom: 5cqw;
+    color: inherit;
+    font-size: clamp(12px, 2cqw, 16px);
+    letter-spacing: 0.08em;
+    opacity: 0.65;
+    pointer-events: none;
+    transition: opacity 400ms;
+  }
+
+  .draw-prompt.is-hidden {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .draw-prompt {
+      transition: none;
+    }
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>

@@ -48,6 +48,8 @@ const BUDGET = {
     'html-cloth': 11,
     // 11.5（2026-11-12）
     'html-sticker': 14,
+    // 可変幅の線、MAX のマスク合成と白い先端、図形の生成と入力処理。9.7（2026-11-13）
+    'stroke-redraw': 12,
   },
   // 1 ファイルの最大。jpg 36.4、webm 324.1、webp 25.8
   previews: { jpg: 45, webm: 400, webp: 40 },
