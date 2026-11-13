@@ -1,0 +1,23 @@
+<div class="stage">
+  <canvas aria-label="手書きの線。ドラッグすると線を1本書き足せる"></canvas>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    touch-action: pan-y;
+    cursor: crosshair;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+</style>

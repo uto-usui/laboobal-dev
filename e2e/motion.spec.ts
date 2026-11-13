@@ -38,6 +38,7 @@ const AUTOPLAY = [
   'rotate3d-xyz',
   'smooth-movement-using-sin-wave',
   'splitting',
+  'stroke-redraw',
   'three-typo',
   'three-video',
   'trigonometry-random-floating',
@@ -126,6 +127,7 @@ test.describe('指でのスクロールを奪わない', () => {
     'html-emaki',
     'html-takiage',
     'html-sticker',
+    'stroke-redraw',
   ]
   // HTML-in-Canvas（Chrome 157〜）のデモ。使えないブラウザではふつうの HTML を置くだけで touchGate を呼ばないので、
   // タップしてからの所は、使えるブラウザでだけ見る（Playwright の Chromium 156 では飛ばす）
