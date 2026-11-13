@@ -6,12 +6,8 @@ export default defineDemo({
   category: 'scroll',
   batch: 'new',
   article: undefined,
-  origin:
-    '新しく作ったデモ（Jani Kurtti のサイトの巻き戻しの乱れを、clip に書いた仕組みから作り直した）',
-  credits: [
-    { label: 'Jani Kurtti（Online Studio）', url: 'https://www.janzkak.com' },
-    { label: '写真 Unsplash', url: 'https://unsplash.com/license' },
-  ],
+  origin: '新しく作ったデモ（参考: Jani Kurtti（Online Studio））',
+  credits: [{ label: '写真 Unsplash', url: 'https://unsplash.com/license' }],
   webgl: false,
   interaction: 'scroll',
   created: '2026-11-12',

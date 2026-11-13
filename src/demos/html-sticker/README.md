@@ -24,10 +24,6 @@
 - three は使っていない。html-cloth と同じく、`texElementSubImage2D` は WebGL のテクスチャを直に渡す API のため
 - 使えないブラウザでは、シールを canvas の外へ出して、ふつうの HTML として並べる
 
-## もと
+## 参考
 
-- webmanab の clip「NOCTURNAL」の「剥がれるステッカー」の節。コードは読まず、clip に書いた仕組みから作り直した
-
-## クレジット
-
-- NOCTURNAL: https://www.nocturnaldream.com （ステッカーを剥がす動きの考え方。コードは使っていない）
+- NOCTURNAL: https://www.nocturnaldream.com

@@ -6,9 +6,8 @@ export default defineDemo({
   category: 'drag',
   batch: 'new',
   article: undefined,
-  origin:
-    '新しく作ったデモ（Ondo Collective のサイトの手書きの線を、clip に書いた仕組みから作り直した）',
-  credits: [{ label: 'Ondo Collective', url: 'https://ondocollective.jp' }],
+  origin: '新しく作ったデモ（参考: Ondo Collective）',
+  credits: [],
   webgl: true,
   interaction: 'drag',
   created: '2026-11-13',

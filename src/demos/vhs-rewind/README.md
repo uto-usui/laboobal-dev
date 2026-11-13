@@ -34,9 +34,9 @@
 - 1280×800 と 1440×900 の 2 倍で、乱れているあいだのフレームの時間を Chrome と Playwright の WebKit で測り、どちらも 60fps を保った（2026-11-12、手元の Mac。本物の Safari と iPhone では測っていない）
 - 動きを減らす設定: 開いたときの乱れ、いちばん上での乱れ、場面の替わり目の乱れは出さない（替わり目はそのまま切り替わる）。カードのカーソルは点滅させない。早送りと巻き戻しの乱れは読む人の操作に応じて出るので残すが、帯の入れ替えとノイズの書き換えは点滅にあたるので止め、1 つの形のまま左右にずれるだけにする。カメラの動きと場面の名前の打ち込みはスクロールについてくるので残す
 
-## もと
+## 参考
 
-- webmanab の clip「Jani Kurtti」の「勢いよく上へ戻したときの巻き戻し」の節。コードは読まず、clip に書いた仕組みから作り直した
+- Jani Kurtti（Online Studio）: https://www.janzkak.com
 
 ## 写真
 
@@ -49,5 +49,4 @@
 
 ## クレジット
 
-- Jani Kurtti（Online Studio）: https://www.janzkak.com （巻き戻しの乱れの考え方。コードは使っていない）
 - 写真 Unsplash: https://unsplash.com/license （Unsplash License。写真ごとの出どころは上の「写真」）
