@@ -26,6 +26,14 @@ const LENGTH = 3600
 // poster: 'late' は、切り出しの終わりの 0.4 秒前のコマにする。描き足していくデモで、始めのコマではほとんど何も映らないため。
 // poster に数を書くと、切り出しの始めからその秒数のコマにする
 const TUNE = {
+  // 標準の drag で線を足さず、2.4 秒で描き終えた直後をポスターにする
+  'stroke-redraw': {
+    warmup: 200,
+    poster: 2.5,
+    act: async (page) => {
+      await wait(page, LENGTH)
+    },
+  },
   // 写真を読み終えてから開く。開ききったところから撮り始める
   'reveal-clip': { warmup: 2600, poster: 'brightest' },
   // 字が上へ抜けて消え、戻ってくるのを繰り返す。決まった時刻だと字が消えたところに当たりやすい
