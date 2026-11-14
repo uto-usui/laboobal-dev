@@ -24,7 +24,7 @@
   "dependencies": {
     "@fontsource/molle": "5.3.0",
     "@fontsource/montserrat": "5.3.0",
-    "astro": "7.4.4",
+    "astro": "7.4.7",
     "gsap": "3.15.0",
     "lil-gui": "0.21.0",
     "locomotive-scroll": "5.0.1",
