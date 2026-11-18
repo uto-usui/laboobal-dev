@@ -35,6 +35,8 @@ const BUDGET = {
     'gsap-motion-path': 44,
     // lil-gui と WebGPU のシェーダー。24.4
     'particle-photo': 27,
+    // lil-gui、WGSL、src/shared/gpu のエンジン。26.2（2026-11-18）
+    'nature-school': 32,
     // locomotive-scroll。15.1
     scrollmanager: 17,
     // HTML-in-Canvas の作例。three を使わず、WebGL とシェーダーのコードをデモのチャンクにそのまま入れている（2026-11-07）
