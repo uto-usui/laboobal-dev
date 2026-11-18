@@ -10,6 +10,7 @@ export type Interaction = 'drag' | 'hover' | 'scroll' | 'click' | 'none'
  * - trigonometry sin・cos で動かす
  * - slider 写真の切り替え / distortion ゆがみ / reveal 現れ方
  * - layout 組み方 / form 入力欄 / ui 目次などの部品
+ * - nature 自然のシミュレーション（The Nature of Code の章を WebGPU で作り直すシリーズ）
  */
 export const TAGS = [
   'text',
@@ -33,6 +34,7 @@ export const TAGS = [
   'layout',
   'form',
   'ui',
+  'nature',
 ] as const
 export type Tag = (typeof TAGS)[number]
 
@@ -85,6 +87,8 @@ export interface DemoMeta {
   tags: Tag[]
   /** 使っている技術。TECH の中から選ぶ */
   tech: Tech[]
+  /** 動きの元にした考え方やアルゴリズムの短い名前。info のパネルに出す */
+  algorithm?: string[]
   /** 入っている組の名前（src/groups/<group>/）。組に入れるときは variant も書く */
   group?: string
   /** 組の中での短い呼び名。切り替えの欄とトップの行に出る */

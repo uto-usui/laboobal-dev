@@ -12,6 +12,8 @@ const { demo } = Astro.props
 const codeUrl = `https://github.com/uto-usui/laboobal-dev/tree/master/src/demos/${demo.slug}/`
 const meta = [
   { key: 'created', value: demo.created },
+  // アルゴリズムは名前が長いので、1 つずつ改行して並べる
+  { key: 'algorithm', value: demo.algorithm?.join('\n') },
   { key: 'tags', value: demo.tags?.join(' / ') },
   { key: 'tech', value: demo.tech?.join(' / ') },
 ].filter((row) => row.value)
@@ -271,7 +273,7 @@ const groupData = group && {
 
   .info-meta div {
     display: grid;
-    grid-template-columns: 64px 1fr;
+    grid-template-columns: 80px 1fr;
   }
 
   .info-meta dt {
@@ -283,6 +285,7 @@ const groupData = group && {
 
   .info-meta dd {
     margin: 0;
+    white-space: pre-line;
   }
 
   .info-links {

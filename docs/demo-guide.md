@@ -72,6 +72,7 @@ export default defineDemo({
 | `description` | 要る | 何が起きるかを一文で。ページの description、OGP、info のパネルに出る |
 | `tags` | 要る | 何を見せるデモか。`src/lib/demos.ts` の `TAGS` の中から選ぶ |
 | `tech` | 要る | 何で作ったか。`src/lib/demos.ts` の `TECH` の中から選ぶ |
+| `algorithm` | 省略可 | 動きの元にした考え方やアルゴリズムの短い名前の配列。info のパネルに 1 つずつ改行して出る。例: `['Boids（Reynolds 1987）']` |
 | `pick` | 省略可 | `true` にするとトップのピックアップに出る。どれを出すかは作者が決める |
 | `group` | 省略可 | 入っている組の名前（`src/groups/<組>/` のフォルダ名）。組に入れるときだけ（12 章） |
 | `variant` | 組なら要る | 組の中での短い呼び名。日本語でよい。切り替えの欄とトップの組の行に出る |
