@@ -39,6 +39,8 @@ const BUDGET = {
     'nature-school': 32,
     // locomotive-scroll。15.1
     scrollmanager: 17,
+    // lil-gui、葉の角ばねと凸包の接触、透過光。40.2（2026-11-19）
+    'nature-aspen': 49,
     // HTML-in-Canvas の作例。three を使わず、WebGL とシェーダーのコードをデモのチャンクにそのまま入れている（2026-11-07）
     // 20.7（絵巻 8 枚の HTML と SVG が大きい）
     'html-emaki': 25,

@@ -44,6 +44,23 @@ const TUNE = {
   'nature-school': { warmup: 7000 },
   'processing-js-circle-at-the-mouse-position': { poster: 'late' },
   'processing-js-random-walk': { poster: 'late' },
+  // 標準の drag はゆっくりで風が弱い。左右に速くなぞって風を送り、葉が裏返って揺れているところをポスターにする
+  'nature-aspen': {
+    poster: 1.0,
+    act: async (page) => {
+      for (const [from, to] of [
+        [60, 760],
+        [760, 60],
+      ]) {
+        await page.mouse.move(from, 250)
+        await page.mouse.down()
+        await page.mouse.move(to, 240, { steps: 10 })
+        await page.mouse.up()
+        await wait(page, 500)
+      }
+      await wait(page, LENGTH - 1200)
+    },
+  },
   // スクロールで箱の色が緑から青へ変わる。始めのコマは緑のままなので、少し進んで色が変わりかけたところにする
   'scroll-reveal-color': { poster: 0.8 },
   // 早送りと巻き戻しは、勢いよく長く動かしたときだけ出る。ふつうの往復では出ないので、下へ送ってから一気に戻し、巻き戻しのところをポスターにする
