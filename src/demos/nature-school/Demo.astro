@@ -1,0 +1,124 @@
+<div class="nature-school">
+  <canvas
+    class="view"
+    aria-label="青い海でイワシの群れが銀色に光りながら泳ぐ。捕食魚が自動で狩りをし、群れが割れて逃げ、またまとまる。自分で動かすモードではカーソルや指を泳いで追う。クリックやタップで水を叩くと、群れが広がる"
+  ></canvas>
+  <div class="hint" data-capture-hide>
+    <fieldset class="modes" aria-label="捕食魚の動かし方">
+      捕食魚:
+      <button type="button" data-mode="auto" aria-pressed="true">自動</button>
+      <span aria-hidden="true">/</span>
+      <button type="button" data-mode="manual" aria-pressed="false">
+        自分で動かす
+      </button>
+    </fieldset>
+    <span class="mode-note" role="status">クリック・タップで散らす</span>
+  </div>
+  <p class="unsupported">このブラウザは WebGPU に対応していません</p>
+  <pre class="error" hidden></pre>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .nature-school {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    color: #e3f2f5;
+    /* WebGPU の絵が出るまでの間も、海の色にしておく */
+    background: linear-gradient(#7fc8d8, #1f5f8a 48%, #05162a);
+  }
+
+  .view {
+    width: 100%;
+    height: 100%;
+    /* 縦のスクロールは記事に渡す。捕食魚はカーソルと指の位置を追うだけなので、指を奪わない */
+    touch-action: pan-y;
+    cursor: crosshair;
+  }
+
+  .hint {
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    margin: 0;
+    font-size: 12px;
+    color: rgb(255 255 255 / 60%);
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 3px rgb(0 0 0 / 30%);
+    right: 48px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
+    line-height: 1.6;
+  }
+
+  .modes {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    white-space: nowrap;
+  }
+
+  .modes button {
+    padding: 2px 1px;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-shadow: inherit;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .modes button[aria-pressed="true"] {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .modes button:focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .is-unsupported .hint {
+    display: none;
+  }
+
+  .unsupported {
+    position: absolute;
+    inset: 0;
+    display: none;
+    place-items: center;
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.7;
+  }
+
+  .is-unsupported .unsupported {
+    display: grid;
+  }
+
+  .error {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    margin: 0;
+    padding: 12px;
+    font-size: 11px;
+    white-space: pre-wrap;
+    color: #b00020;
+    background: #fff;
+    border: 1px solid rgb(176 0 32 / 27%);
+    border-radius: 8px;
+  }
+</style>

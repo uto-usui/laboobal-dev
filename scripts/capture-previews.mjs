@@ -40,6 +40,8 @@ const TUNE = {
   splitting: { poster: 'brightest' },
   // 粒が集まって写真になるまで 1 秒ほどかかる。ぼやけたままのポスターにならないよう待つ
   'particle-photo': { warmup: 2400 },
+  // 読み込んですぐは群れが一点から広がる球に見える。群れが泳ぎ出し、捕食魚が近づくまで待つ
+  'nature-school': { warmup: 7000 },
   'processing-js-circle-at-the-mouse-position': { poster: 'late' },
   'processing-js-random-walk': { poster: 'late' },
   // スクロールで箱の色が緑から青へ変わる。始めのコマは緑のままなので、少し進んで色が変わりかけたところにする
