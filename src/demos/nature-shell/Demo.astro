@@ -1,0 +1,122 @@
+<div class="nature-shell">
+  <button
+    class="shell-input"
+    type="button"
+    aria-label="殻口の縁を押すと模様が広がる。空いた所をドラッグすると向きが変わる。Enterでも縁に波を起こせる"
+  >
+    <canvas
+      class="view"
+      aria-label="65%まで育った所から成長を続ける貝殻。伸びる殻口の縁にセルの活性と抑制が模様として残る"
+    ></canvas>
+  </button>
+  <span class="rim-flash" aria-hidden="true"></span>
+  <p class="hint" data-capture-hide>縁をタップで波が広がる</p>
+  <p class="unsupported">このブラウザは WebGPU に対応していません</p>
+  <pre class="error" hidden></pre>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .nature-shell {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    color: #d6c8af;
+    background: radial-gradient(
+      ellipse at 35% 22%,
+      #302b28,
+      #1a1716 65%,
+      #121010
+    );
+  }
+
+  .view {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y;
+  }
+
+  .shell-input {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    touch-action: pan-y;
+    background: transparent;
+    border: 0;
+    cursor: grab;
+  }
+
+  .shell-input:focus-visible {
+    outline: 2px solid #c2ad85;
+    outline-offset: -3px;
+  }
+
+  .rim-flash {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    pointer-events: none;
+    background: #fff0ce;
+    border-radius: 50%;
+    box-shadow: 0 0 12px 6px rgb(255 215 150 / 70%);
+    opacity: 0;
+    transform: translate(-50%, -50%);
+  }
+
+  .hint {
+    position: absolute;
+    bottom: 14px;
+    left: 16px;
+    margin: 0;
+    font-size: 12px;
+    white-space: nowrap;
+    letter-spacing: 0.04em;
+    color: rgb(255 255 255 / 60%);
+    text-shadow: 0 1px 3px rgb(0 0 0 / 35%);
+    pointer-events: none;
+  }
+
+  /* touchGate の補助文は、操作をまとめた左下の一行と重ねない。 */
+  :global(.demo-hint-touch) {
+    display: none;
+  }
+
+  .unsupported {
+    position: absolute;
+    inset: 0;
+    display: none;
+    place-items: center;
+    margin: 0;
+    padding: 20px;
+    font-size: 13px;
+  }
+
+  .is-unsupported .unsupported {
+    display: grid;
+  }
+
+  .is-unsupported .hint {
+    visibility: hidden;
+  }
+
+  .error {
+    position: absolute;
+    top: 48px;
+    right: 16px;
+    left: 16px;
+    max-height: 40%;
+    overflow: auto;
+    margin: 0;
+    padding: 12px;
+    font-size: 11px;
+    white-space: pre-wrap;
+    color: #8e241c;
+    background: #fff7e9;
+    border-radius: 6px;
+  }
+</style>
