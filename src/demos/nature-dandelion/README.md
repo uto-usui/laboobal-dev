@@ -2,9 +2,9 @@
 
 ## 何をしているか
 
-春の午後、ぼけた野原を背景に、逆光に透けたタンポポの種が風に乗る。綿毛のそばでカーソルや指を動かすと、移動の速さと向きがその場所の空気に伝わる。外れた種はその流れを受け、傘を上、茶色い種を下にして漂う。別の向きからなぞれば、すでに飛んでいる種のまわりの流れも変わる。
+低い日が差す、ぼけた野原を背景に、逆光に透けたタンポポの種が風に乗る。綿毛のそばでカーソルや指を動かすと、移動の速さと向きがその場所の空気に伝わる。外れた種はその流れを受け、傘を上、茶色い種を下にして漂う。別の向きからなぞれば、すでに飛んでいる種のまわりの流れも変わる。
 
-The Nature of Code 1 章の位置・速度・加速度を、種の並進と回転、空気との相対速度へ広げたデモ。物理量は見た目のための相対単位で、実物の飛距離や風速の計測には使わない。
+The Nature of Code 4 章の粒子系（外す、漂わせる、入れ替える）に、格子の流体と、向きで変わる空気抵抗を足したデモ。物理量は見た目のための相対単位で、実物の飛距離や風速の計測には使わない。
 
 ## 大事なところ
 
@@ -59,7 +59,7 @@ WebGPU の compute で 40×24×12 の三次元流体を解く。速度は各セ�
 
 ## 参考
 
-- The Nature of Code 1. Vectors: https://natureofcode.com/vectors/
+- The Nature of Code 4 章「Particle Systems」: https://natureofcode.com/particles/
 - Dreamy Pixel「Dandelion in the setting sun」: https://commons.wikimedia.org/wiki/File:Dandelion_in_the_setting_sun.jpg
 - Meganbeckett27「Dandelion seeds flying off」: https://commons.wikimedia.org/wiki/File:Dandelion_seeds_flying_off.jpg
 - Thomas Heins「Dandelion seeds on a black」: https://commons.wikimedia.org/wiki/File:Dandelion_seeds_on_a_black.jpg
