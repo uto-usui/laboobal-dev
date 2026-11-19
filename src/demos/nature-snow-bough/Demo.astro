@@ -1,0 +1,68 @@
+<div class="nature-snow-bough">
+  <canvas class="still" aria-hidden="true"></canvas>
+  <canvas
+    class="view"
+    aria-label="雪を載せた松の枝。枝や雪の上から下へ引いて離す。強く引くと雪が落ち、枝が跳ね返る。しばらくすると雪が積もり直す"
+  ></canvas>
+  <p class="hint" data-capture-hide>枝を下へ引いて、離す</p>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .nature-snow-bough {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #b6c0ba;
+    color: #35473f;
+  }
+
+  .view,
+  .still {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .view {
+    opacity: 0;
+    touch-action: pan-y;
+    cursor: default;
+  }
+
+  .is-grabbable .view {
+    cursor: grab;
+  }
+
+  .is-ready .view {
+    opacity: 1;
+  }
+
+  .is-ready .still {
+    visibility: hidden;
+  }
+
+  .is-dragging .view {
+    cursor: grabbing;
+  }
+
+  .is-unsupported .view {
+    cursor: default;
+  }
+
+  .hint {
+    position: absolute;
+    bottom: 14px;
+    left: 16px;
+    margin: 0;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    pointer-events: none;
+    color: rgb(0 0 0 / 60%);
+    text-shadow: 0 1px 3px rgb(255 255 255 / 35%);
+  }
+</style>
