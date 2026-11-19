@@ -1,0 +1,76 @@
+<div class="nature-dandelion">
+  <canvas
+    class="view"
+    aria-label="春の野原で逆光に透けるタンポポ。綿毛の近くでカーソルや指を横に動かすと、息の流れに種が乗る"
+  ></canvas>
+  <p class="demo-hint" data-capture-hide>
+    綿毛のそばを横になぞると、息で種が飛ぶ
+  </p>
+  <p class="unsupported">このブラウザは WebGPU に対応していません</p>
+  <pre class="error" hidden></pre>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .nature-dandelion {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #6b7651;
+    color: #f6f1da;
+  }
+
+  .view {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y;
+  }
+
+  .demo-hint {
+    pointer-events: none;
+    position: absolute;
+    top: auto;
+    left: 16px;
+    bottom: 14px;
+    margin: 0;
+    font-size: 12px;
+    color: rgb(255 255 255 / 60%);
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 3px rgb(0 0 0 / 45%);
+    white-space: nowrap;
+  }
+
+  .unsupported {
+    position: absolute;
+    inset: 0;
+    display: none;
+    place-items: center;
+    margin: 0;
+    font-size: 13px;
+  }
+
+  .is-unsupported .unsupported {
+    display: grid;
+  }
+
+  .is-unsupported .demo-hint {
+    display: none;
+  }
+
+  .error {
+    position: absolute;
+    inset: 16px 16px auto;
+    margin: 0;
+    padding: 12px;
+    color: #942e27;
+    background: #fffaf0;
+    font-size: 11px;
+    white-space: pre-wrap;
+    border: 1px solid #942e2744;
+    border-radius: 8px;
+  }
+</style>
