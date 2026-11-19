@@ -11,8 +11,8 @@ export default defineDemo({
   webgl: false,
   webgpu: true,
   interaction: 'hover',
-  created: '2026-11-18',
-  added: '2026-11-18',
+  created: '2026-11-19',
+  added: '2026-11-19',
   description:
     '青い海でイワシの群れに銀色の光の帯が走る。立体の捕食魚が自動で狩るモードと、カーソルや指を泳いで追うモードを切り替えられ、クリックやタップで群れが広がる。',
   tags: ['nature', 'particles', 'physics', '3d', 'cursor'],
