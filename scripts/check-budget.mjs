@@ -48,6 +48,8 @@ const BUDGET = {
     'html-mizu-mikuji': 21,
     // 16.4
     'html-takiage': 20,
+    // lil-gui、L-system の林と深度シャドウマップ。21.5（2026-11-19）
+    'nature-grove': 26,
     // 8.7
     'html-cloth': 11,
     // 11.5（2026-11-12）

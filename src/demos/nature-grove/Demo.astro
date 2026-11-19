@@ -1,0 +1,181 @@
+<div class="nature-grove" aria-busy="true">
+  <button
+    class="planting"
+    type="button"
+    aria-label="地面をタップして木を植える。Enter または Space キーでは、空いている地面に植える"
+    aria-describedby="grove-hint"
+  >
+    <canvas
+      class="view"
+      aria-label="初夏の林の縁で、苗の芽が一斉に枝と次の芽へ変わり、枝葉を広げる若木"
+    ></canvas>
+  </button>
+  <div class="plant-marks" aria-hidden="true"></div>
+  <p id="grove-hint" class="interaction-hint" data-capture-hide>
+    地面をタップして木を植える
+  </p>
+  <p class="plant-status" role="status" aria-live="polite"></p>
+  <p class="loading" role="status">林を準備しています</p>
+  <p class="unsupported" role="status">このデモには WebGPU が必要です</p>
+  <pre class="error" hidden></pre>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .nature-grove {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    color: #243c24;
+    /* WebGPU の絵が出るまでの間も、空と草地の色にしておく */
+    background: linear-gradient(#e1eadb, #c4d5b8 45%, #8ea56c);
+  }
+
+  .view,
+  .planting {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y;
+    cursor: crosshair;
+  }
+
+  .planting {
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .planting:focus-visible {
+    outline: 2px solid #2e5627;
+    outline-offset: -5px;
+  }
+
+  .plant-marks {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  /* タップ時に作る要素には Astro の属性が付かないので、親の内側だけを global にする。 */
+  .plant-marks :global(.plant-mark) {
+    position: absolute;
+    width: 17px;
+    height: 8px;
+    background: #765331;
+    border: 1px solid #b5a271;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: planted-soil 1.2s ease-out forwards;
+  }
+
+  .plant-marks :global(.plant-mark::before),
+  .plant-marks :global(.plant-mark::after) {
+    position: absolute;
+    bottom: 4px;
+    width: 7px;
+    height: 4px;
+    content: "";
+    background: #b5d16c;
+    border-radius: 80% 0 80% 0;
+  }
+
+  .plant-marks :global(.plant-mark::before) {
+    left: 2px;
+    transform: rotate(35deg);
+  }
+
+  .plant-marks :global(.plant-mark::after) {
+    right: 1px;
+    transform: rotate(-25deg);
+  }
+
+  @keyframes planted-soil {
+    0%,
+    65% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .interaction-hint {
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #f5f8e9;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    text-shadow: 0 1px 4px rgb(25 42 20 / 75%);
+    pointer-events: none;
+  }
+
+  .nature-grove:not(.is-ready) .interaction-hint {
+    visibility: hidden;
+  }
+
+  .plant-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .loading,
+  .unsupported {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    font-size: 13px;
+    pointer-events: none;
+  }
+
+  .unsupported {
+    display: none;
+  }
+
+  .is-ready .loading,
+  .is-unsupported .loading,
+  .is-error .loading {
+    display: none;
+  }
+
+  .is-unsupported .interaction-hint,
+  .is-error .interaction-hint {
+    visibility: hidden;
+  }
+
+  .is-error .view {
+    visibility: hidden;
+  }
+
+  .is-unsupported .unsupported {
+    display: grid;
+  }
+
+  .error {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    margin: 0;
+    padding: 12px;
+    font-size: 11px;
+    white-space: pre-wrap;
+    color: #b00020;
+    background: #fff;
+    border: 1px solid rgb(176 0 32 / 27%);
+    border-radius: 8px;
+  }
+</style>

@@ -38,6 +38,17 @@ const TUNE = {
   'reveal-clip': { warmup: 2600, poster: 'brightest' },
   // 字が上へ抜けて消え、戻ってくるのを繰り返す。決まった時刻だと字が消えたところに当たりやすい
   splitting: { poster: 'brightest' },
+  // 見本の 3 本が育ちきってから、地面の左右に 1 本ずつ植え、育っていくところを撮る
+  'nature-grove': {
+    warmup: 5000,
+    poster: 'late',
+    act: async (page) => {
+      await page.mouse.click(230, 440)
+      await wait(page, 900)
+      await page.mouse.click(600, 450)
+      await wait(page, LENGTH - 900)
+    },
+  },
   // 粒が集まって写真になるまで 1 秒ほどかかる。ぼやけたままのポスターにならないよう待つ
   'particle-photo': { warmup: 2400 },
   // 標準の hover はゆっくりで息にならない。綿毛の上を速く 2 回なぞり、種が漂い出したところをポスターにする
