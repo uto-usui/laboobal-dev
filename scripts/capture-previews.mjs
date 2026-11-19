@@ -40,6 +40,18 @@ const TUNE = {
   splitting: { poster: 'brightest' },
   // 粒が集まって写真になるまで 1 秒ほどかかる。ぼやけたままのポスターにならないよう待つ
   'particle-photo': { warmup: 2400 },
+  // 標準の hover はゆっくりで息にならない。綿毛の上を速く 2 回なぞり、種が漂い出したところをポスターにする
+  'nature-dandelion': {
+    warmup: 2500,
+    poster: 1.2,
+    act: async (page) => {
+      await page.mouse.move(80, 300)
+      await page.mouse.move(560, 320, { steps: 12 })
+      await wait(page, 1300)
+      await page.mouse.move(80, 280, { steps: 12 })
+      await wait(page, LENGTH - 1500)
+    },
+  },
   // 読み込んですぐは群れが一点から広がる球に見える。群れが泳ぎ出し、捕食魚が近づくまで待つ
   'nature-school': { warmup: 7000 },
   'processing-js-circle-at-the-mouse-position': { poster: 'late' },

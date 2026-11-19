@@ -31,6 +31,8 @@ const BUDGET = {
   demoOverride: {
     // ScrollTrigger。45.3
     'tweenmax-visual-range-animation-class': 52,
+    // lil-gui、WGSL の格子の流体と冠毛。22.9（2026-11-19）
+    'nature-dandelion': 28,
     // MotionPathPlugin。37.8
     'gsap-motion-path': 44,
     // lil-gui と WebGPU のシェーダー。24.4
