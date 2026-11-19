@@ -1,0 +1,96 @@
+<div class="nature-galaxy-tides">
+  <canvas
+    class="view"
+    aria-label="小さい銀河の円盤が手について動き、離すと勢いを弱めて近くを進む。何もない所をドラッグすると見る向きが変わる"
+  ></canvas>
+  <svg class="trajectory is-hidden" aria-hidden="true" data-capture-hide>
+    <polyline />
+  </svg>
+  <p class="hint" data-capture-hide>小銀河をつかんで投げる</p>
+  <p class="unsupported">このブラウザは WebGPU に対応していません</p>
+  <pre class="error" hidden></pre>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .nature-galaxy-tides {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #000;
+  }
+  .view {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: pan-y;
+    cursor: move;
+  }
+  .trajectory {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    fill: none;
+    stroke: #d8d5c9;
+    stroke-width: 0.75;
+    opacity: 0.3;
+  }
+  .trajectory.is-hidden {
+    display: none;
+  }
+  .hint {
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: rgb(255 255 255 / 60%);
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 3px rgb(0 0 0 / 40%);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  /* touchGate の操作許可は使い、案内は左下の一行にまとめる。 */
+  :global(main.demo:has(.nature-galaxy-tides) > .demo-hint-touch) {
+    display: none;
+  }
+  .unsupported {
+    position: absolute;
+    inset: 0;
+    display: none;
+    place-items: center;
+    margin: 0;
+    padding: 20px;
+    font-size: 13px;
+    color: #ccc;
+    text-align: center;
+  }
+  .is-unsupported .unsupported {
+    display: grid;
+  }
+  .is-unsupported .hint,
+  .is-failed .hint,
+  .is-failed .trajectory {
+    display: none;
+  }
+  .error {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    padding: 12px;
+    margin: 0;
+    font-size: 11px;
+    white-space: pre-wrap;
+    color: #b00020;
+    background: #fff;
+    border: 1px solid #b0002045;
+    border-radius: 8px;
+  }
+</style>
