@@ -54,7 +54,7 @@ WebGPU の compute で 2,048 個の質量点がすべての相手から受ける
 
 ## 参考
 
-- The Nature of Code（2024）2 章 Forces: https://natureofcode.com/forces/
+- The Nature of Code 2 章「Forces」: https://natureofcode.com/forces/
 - ESA/Hubble, The Whirlpool Galaxy (M51) and companion galaxy: https://esahubble.org/images/heic0506a/
 - ESA, Multi-observatory views of M74: https://www.esa.int/media/multi-observatory-views-of-m74
 - ESA/Hubble, The Mice/NGC 4676 (ACS Full Field Image): https://esahubble.org/images/heic0206h/

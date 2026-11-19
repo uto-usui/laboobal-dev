@@ -6,7 +6,7 @@ export default defineDemo({
   category: 'webgpu',
   batch: 'new',
   article: undefined,
-  origin: '新しく作ったデモ（参考: The Nature of Code 1 章）',
+  origin: '新しく作ったデモ（参考: The Nature of Code 4 章）',
   credits: [],
   webgl: false,
   webgpu: true,

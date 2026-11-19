@@ -513,11 +513,8 @@ const start = async (gpu: Gpu) => {
   gui
     .add(P, 'pattern', Object.keys(PATTERNS))
     .name('模様の決まり')
-    .onChange(() => {
-      takeControl()
-      automaton.configure(PATTERNS[P.pattern])
-      excite(Math.floor(CELLS / 2))
-    })
+    // 決まりを替えたら新しい貝から育て直す。今の貝に入れると、触った扱いになって自然発火が止まり、新しい模様が出ない
+    .onChange(restart)
   gui.add({ restart }, 'restart').name('新しい貝')
   gui.close()
   const offMotion = onReducedMotion((value) => {
