@@ -21,7 +21,7 @@ export default defineDemo({
     'Boids（Reynolds 1987）',
     '近い 7 匹に合わせる群れ（Ballerini ほか 2008）',
     '格子のハッシュと連結リストによる近所探し',
-    '待ち時間を持つおびえの伝わり',
-    'seek・pursue・arrive・wander による捕食魚の操舵（加速と旋回の上限）',
+    'おびえの伝わり',
+    '捕食魚の操舵（seek・pursue・arrive・wander）',
   ],
 })
