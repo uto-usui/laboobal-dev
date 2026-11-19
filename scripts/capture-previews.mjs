@@ -43,6 +43,13 @@ const TUNE = {
   // 読み込んですぐは群れが一点から広がる球に見える。群れが泳ぎ出し、捕食魚が近づくまで待つ
   'nature-school': { warmup: 7000 },
   'processing-js-circle-at-the-mouse-position': { poster: 'late' },
+  // 標準の click は殻の真ん中を押すだけで縁に当たらない。触らずに、殻が伸びて縁に模様が足されるのを撮る
+  'nature-shell': {
+    poster: 'late',
+    act: async (page) => {
+      await wait(page, LENGTH)
+    },
+  },
   'processing-js-random-walk': { poster: 'late' },
   // スクロールで箱の色が緑から青へ変わる。始めのコマは緑のままなので、少し進んで色が変わりかけたところにする
   'scroll-reveal-color': { poster: 0.8 },

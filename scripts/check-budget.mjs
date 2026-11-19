@@ -44,6 +44,8 @@ const BUDGET = {
     'html-emaki': 25,
     // 17.2
     'html-mizu-mikuji': 21,
+    // lil-gui、セル・オートマトンと殻の成長曲面。21.7（2026-11-19）
+    'nature-shell': 27,
     // 16.4
     'html-takiage': 20,
     // 8.7
