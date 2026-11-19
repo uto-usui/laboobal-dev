@@ -48,6 +48,6 @@ AppleのMetal 3アダプターを使う専用のヘッドレスブラウザで�
 
 ## 参考
 
-- Daniel Shiffman『The Nature of Code』（2024）3章 Oscillation: https://natureofcode.com/oscillation/
+- The Nature of Code 3 章「Oscillation」: https://natureofcode.com/oscillation/
 - G Dan Mitchell「Backlit Aspen Leaves」: https://www.flickr.com/photos/gdanmitchell/50591073336
 - Sky Pond Photo & Video「Quaking_Aspen_Leaves_Blowing_In_Wind.mp4」: https://vimeo.com/791450198

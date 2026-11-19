@@ -78,4 +78,4 @@ node src/demos/nature-grove/check-variation.mjs
 
 ## 参考
 
-- Daniel Shiffman『The Nature of Code』（2024年版）8章「Fractals」: https://natureofcode.com/fractals/
+- The Nature of Code 8 章「Fractals」: https://natureofcode.com/fractals/
