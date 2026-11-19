@@ -42,6 +42,8 @@ const BUDGET = {
     // HTML-in-Canvas の作例。three を使わず、WebGL とシェーダーのコードをデモのチャンクにそのまま入れている（2026-11-07）
     // 20.7（絵巻 8 枚の HTML と SVG が大きい）
     'html-emaki': 25,
+    // lil-gui、弾性棒と雪の接触、雪のレイマーチ。31.5（2026-11-19）
+    'nature-snow-bough': 38,
     // 17.2
     'html-mizu-mikuji': 21,
     // 16.4

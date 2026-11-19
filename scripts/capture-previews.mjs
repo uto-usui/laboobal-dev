@@ -46,6 +46,18 @@ const TUNE = {
   'processing-js-random-walk': { poster: 'late' },
   // スクロールで箱の色が緑から青へ変わる。始めのコマは緑のままなので、少し進んで色が変わりかけたところにする
   'scroll-reveal-color': { poster: 0.8 },
+  // 標準の drag は真ん中を押して枝に当たらない。枝の先近くをつかんで下へ引いて離し、雪が放られて落ちるところをポスターにする
+  'nature-snow-bough': {
+    warmup: 2500,
+    poster: 1.0,
+    act: async (page) => {
+      await page.mouse.move(625, 281)
+      await page.mouse.down()
+      await page.mouse.move(625, 380, { steps: 12 })
+      await page.mouse.up()
+      await wait(page, LENGTH - 400)
+    },
+  },
   // 早送りと巻き戻しは、勢いよく長く動かしたときだけ出る。ふつうの往復では出ないので、下へ送ってから一気に戻し、巻き戻しのところをポスターにする
   'vhs-rewind': {
     poster: 2.7,
