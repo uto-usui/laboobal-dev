@@ -33,6 +33,8 @@ const BUDGET = {
     'tweenmax-visual-range-animation-class': 52,
     // MotionPathPlugin。37.8
     'gsap-motion-path': 44,
+    // lil-gui、相互重力と円盤のメッシュ。24.1（2026-11-19）
+    'nature-galaxy-tides': 29,
     // lil-gui と WebGPU のシェーダー。24.4
     'particle-photo': 27,
     // lil-gui、WGSL、src/shared/gpu のエンジン。26.2（2026-11-18）

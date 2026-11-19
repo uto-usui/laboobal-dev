@@ -36,6 +36,14 @@ const TUNE = {
   },
   // 写真を読み終えてから開く。開ききったところから撮り始める
   'reveal-clip': { warmup: 2600, poster: 'brightest' },
+  // 標準の drag は何もない所を押してカメラが回る。触らずに、読み込み直後の 1 回目のすれ違いで尾が伸びるところを撮る
+  'nature-galaxy-tides': {
+    warmup: 4000,
+    poster: 'late',
+    act: async (page) => {
+      await wait(page, LENGTH)
+    },
+  },
   // 字が上へ抜けて消え、戻ってくるのを繰り返す。決まった時刻だと字が消えたところに当たりやすい
   splitting: { poster: 'brightest' },
   // 粒が集まって写真になるまで 1 秒ほどかかる。ぼやけたままのポスターにならないよう待つ
