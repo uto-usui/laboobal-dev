@@ -1,0 +1,123 @@
+---
+import { fallback } from './fallback'
+---
+
+<div class="nature-aspen">
+  <div class="still still-wide" set:html={fallback(false)}></div>
+  <div class="still still-narrow" set:html={fallback(true)}></div>
+  <canvas
+    class="view"
+    tabindex="0"
+    role="img"
+    aria-label="秋のアスペンの小枝。横になぞるか、左右の矢印キーで風を送ると、葉が光を透かしながら揺れ戻る"
+  ></canvas>
+  <p class="hint" data-capture-hide>横になぞって風 · 速くなぞると葉が裏返る</p>
+  <p class="unsupported">この環境では静止画を表示しています</p>
+  <span class="error" role="status" hidden></span>
+</div>
+
+<script>
+  import './main'
+</script>
+
+<style>
+  .nature-aspen {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    container-type: inline-size;
+    /* WebGPU の絵が出るまでの間も、秋の林の色にしておく */
+    background: linear-gradient(#c7b07a, #8e7953 55%, #5a4c33);
+    color: #fff4db;
+  }
+
+  .view,
+  .still {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .view {
+    opacity: 0;
+    cursor: grab;
+    touch-action: pan-y;
+  }
+
+  .view:active {
+    cursor: grabbing;
+  }
+
+  .view:focus-visible {
+    outline: 2px solid #fff4db;
+    outline-offset: -6px;
+  }
+
+  .is-ready .view {
+    opacity: 1;
+  }
+
+  .is-ready .still,
+  .still-narrow {
+    display: none;
+  }
+
+  .still :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hint,
+  .unsupported {
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    margin: 0;
+    font-size: 12px;
+    color: rgb(255 255 255 / 60%);
+    letter-spacing: 0.04em;
+    pointer-events: none;
+    text-shadow: 0 1px 5px #342714;
+  }
+
+  .hint {
+    white-space: nowrap;
+  }
+
+  .unsupported,
+  .is-unsupported .hint {
+    display: none;
+  }
+
+  .is-unsupported .unsupported {
+    display: block;
+  }
+
+  .nature-aspen ~ :global(.demo-hint-touch) {
+    display: none;
+  }
+
+  .error {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  @container (width < 600px) {
+    .still-wide {
+      display: none;
+    }
+
+    .still-narrow {
+      display: block;
+    }
+
+    .is-ready .still-narrow {
+      display: none;
+    }
+  }
+</style>
