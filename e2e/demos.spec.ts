@@ -7,7 +7,7 @@ import {
   type Page,
 } from '@playwright/test'
 import type { Batch, DemoMeta, Interaction } from '../src/lib/demos'
-import { GPU_ONLY, softwareGl } from './gpu'
+import { skipOnCi } from './meta'
 
 type Demo = Pick<DemoMeta, 'slug' | 'batch' | 'interaction'>
 
@@ -164,6 +164,7 @@ test('トップに全デモが並ぶ', async ({ page }) => {
 
 for (const demo of demos) {
   test(`@${demo.batch} ${demo.slug}`, async ({ page }) => {
+    test.skip(skipOnCi(demo.slug), 'CI では飛ばす（e2e/meta.ts の SKIP_ON_CI）')
     const errors = watchErrors(page)
     const response = await page.goto(`/${demo.slug}/`)
     expect(response?.status()).toBe(200)
@@ -181,9 +182,7 @@ for (const demo of demos) {
 
     await expectDrawn('')
 
-    // GPU がないと 1 コマが遅すぎて、マウスの移動が時間切れになる
-    if (!GPU_ONLY.includes(demo.slug) || !(await softwareGl(page)))
-      await interact(page, demo)
+    await interact(page, demo)
 
     // 開いたまま縮めても、横にはみ出さない
     await page.setViewportSize({ width: 800, height: 500 })
@@ -205,6 +204,7 @@ for (const demo of demos) {
     page,
     baseURL,
   }) => {
+    test.skip(skipOnCi(demo.slug), 'CI では飛ばす（e2e/meta.ts の SKIP_ON_CI）')
     const errors = watchErrors(page)
     const src = new URL(`/${demo.slug}/`, baseURL).href
     // 親のページは 127.0.0.1 に置く（localhost とは別のオリジン）。中身は route で返すので、サーバーには届かない

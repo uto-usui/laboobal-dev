@@ -1,7 +1,7 @@
 import { once } from 'node:events'
 import { createServer } from 'node:http'
 import { devices, expect, test, type Page } from '@playwright/test'
-import { GPU_ONLY, softwareGl } from './gpu'
+import { skipOnCi } from './meta'
 
 /**
  * 動きを減らす設定（docs/demo-guide.md の 5 章）と、指でのスクロールを奪わないこと（src/shared/touch.ts）を見る
@@ -93,10 +93,7 @@ test.describe('動きを減らす設定', () => {
 
   for (const slug of AUTOPLAY) {
     test(`${slug} は止まった絵になる`, async ({ page }) => {
-      test.skip(
-        GPU_ONLY.includes(slug) && (await softwareGl(page)),
-        'GPU がないと遅すぎる。toy-figure.spec で見る',
-      )
+      test.skip(skipOnCi(slug), 'CI では飛ばす（e2e/meta.ts の SKIP_ON_CI）')
       const errors = watchErrors(page)
       await page.goto(`/${slug}/`)
       // 写真やフォントを読み終えて絵が落ち着くまで待ち、そのあと 3.5 秒（自動で進むスライダーの間隔より長い）止まっているかを見る
@@ -153,10 +150,7 @@ test.describe('指でのスクロールを奪わない', () => {
       context,
       baseURL,
     }) => {
-      test.skip(
-        GPU_ONLY.includes(slug) && (await softwareGl(page)),
-        'GPU がないと遅すぎる。toy-figure.spec で見る',
-      )
+      test.skip(skipOnCi(slug), 'CI では飛ばす（e2e/meta.ts の SKIP_ON_CI）')
       const horizontalOnly = slug === 'toy-figure'
       const demo = new URL(`/${slug}/`, baseURL)
       const article = `<!doctype html><meta name="viewport" content="width=device-width">
