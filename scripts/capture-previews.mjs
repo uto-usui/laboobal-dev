@@ -15,8 +15,8 @@ import { join } from 'node:path'
 import { chromium } from '@playwright/test'
 
 const BASE = process.env.PREVIEW_BASE_URL ?? 'http://localhost:4322'
-const OUT = 'public/previews'
-const TMP = 'node_modules/.cache/previews'
+const OUT = process.env.PREVIEW_OUT_DIR ?? 'public/previews'
+const TMP = process.env.PREVIEW_TMP_DIR ?? 'node_modules/.cache/previews'
 const VIEW = { width: 800, height: 500 }
 // 読み込んで動き出すまで待ってから、この長さだけ切り出す
 const WARMUP = 1200
@@ -26,6 +26,32 @@ const LENGTH = 3600
 // poster: 'late' は、切り出しの終わりの 0.4 秒前のコマにする。描き足していくデモで、始めのコマではほとんど何も映らないため。
 // poster に数を書くと、切り出しの始めからその秒数のコマにする
 const TUNE = {
+  'toy-figure': {
+    chrome: true,
+    ready: '.toy-figure[aria-busy="false"]',
+    warmup: 0,
+    poster: 0.2,
+    act: async (page) => {
+      const start = performance.now()
+      const x = VIEW.width / 2
+      const y = VIEW.height / 2
+      await wait(page, 350)
+      await page.mouse.move(x, y)
+      await page.mouse.down()
+      await glide(
+        page,
+        [
+          [x, y],
+          [x + 140, y],
+        ],
+        640,
+      )
+      await page.mouse.up()
+      await wait(page, 700)
+      await page.mouse.click(x + 140, y)
+      await wait(page, Math.max(0, LENGTH - (performance.now() - start)))
+    },
+  },
   // 標準の drag で図形を置き換えず、準備の 0.2 秒を含めて 1.6 秒で描き終えた直後を選ぶ
   'stroke-redraw': {
     warmup: 200,
@@ -310,6 +336,7 @@ for (const demo of targets) {
     content:
       '.links, .info, .variant-toggle, .lil-gui, [data-capture-hide] { display: none !important }',
   })
+  if (tune.ready) await page.locator(tune.ready).waitFor()
   await wait(page, tune.warmup ?? WARMUP)
   const offset = (Date.now() - started) / 1000
   await (tune.act ? tune.act(page) : act(page, demo.interaction))

@@ -183,6 +183,7 @@ lab の記事に iframe で埋め込んだとき、デモの上を指で縦に�
 
 - `touch-action: none` を書かない。書くと、デモの上で記事のスクロールが止まる
 - ホバーで動くだけのデモ（マウスを追う、傾けるなど）は、CSS で `touch-action: pan-y` にする
+- 横だけで完結するドラッグは、常に `touch-action: pan-y` のままでよい。縦になぞる操作はページのスクロールに使うため、`touchGate` は呼ばない
 - 指で引っぱるデモは、CSS で `touch-action: pan-y` にし、main.ts で `touchGate(el)`（`src/shared/touch.ts`）を呼ぶ。横に動かし始めたらデモが受け取り、タップしてからなら縦にも引っぱれる。タッチの端末では左上に「tap to drag」が出る
 - 引っぱるデモは `e2e/motion.spec.ts` の `DRAG` に足す。iframe に入れて縦になぞったとき、記事がスクロールするかを見る
 

@@ -67,3 +67,10 @@ export const loadGroups = (): GroupText[] =>
           }
         })
     : []
+
+/**
+ * CI では飛ばすデモ。CI の機械には GPU がなく、toy-figure（キャラだけで 40 万三角形）は 1 コマに 0.4 秒以上かかって、どのテストも時間切れになる。手元の Chrome で見る
+ */
+const SKIP_ON_CI = ['toy-figure']
+export const skipOnCi = (slug: string) =>
+  !!process.env.CI && SKIP_ON_CI.includes(slug)

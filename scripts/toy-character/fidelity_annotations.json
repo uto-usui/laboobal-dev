@@ -1,0 +1,78 @@
+{
+  "42": {
+    "source_sha256": "615b87cf09a95a3dbde9d379a128a87c6a07182c87ff0a942991689214bbf2e8",
+    "defects": {
+      "holes": false,
+      "double_ears": false,
+      "missing_hair": false
+    },
+    "visual_review": {
+      "reviewed_views": ["front", "45", "left45", "side", "leftside", "back"],
+      "review_method": "補修後の6方向を色付き・白い材質で開いて確認した。元の欠け画像は残し、補修結果をrepair-review.pngへ出した。",
+      "holes": "頭全体を貫通する独立した大穴は確認しなかった。髪の表面の裂け目は missing_hair で不合格とする。首の切断端と毛先付近の微小なアルファの隙間を、頭部の貫通穴とは数えない。",
+      "double_ears": "正面では左右に一つずつ、斜めと両側面でも耳の重複は見当たらない。",
+      "missing_hair": "元の茶色い内部面と背景まで抜けるすき間は髪色のキャップで覆われた。白い材質でも裏当てがあり、帯状の開口は残らない。毛束の溝・不連続だった縁の形と、側面・背面のテクスチャのむらは残る。",
+      "other_differences": "赤い襟片を除去し、色の混ざった切り口の三角形は顔の後ろ・首の外側だけ髪色で隠した。首の切り口の凹凸と、瞳・鼻孔・唇の凹凸は残る。",
+      "evidence": [
+        "repair-review.png",
+        "repaired-side.png",
+        "repaired-clay-side.png",
+        "repaired-leftside.png",
+        "repaired-clay-leftside.png",
+        "repaired-back.png",
+        "repaired-clay-back.png",
+        "repair.json"
+      ],
+      "decision": "髪の内側に連続した裏当てを追加できたため、seed 42を位置合わせへ進める。一本だけなので順位は付けない。最終採用は近さの判定と分ける。",
+      "defect_regions_render_px": {
+        "side": [350, 90, 635, 410],
+        "leftside": [295, 110, 465, 325],
+        "back": [635, 265, 745, 650]
+      },
+      "original_decision": "当初は髪の欠けで除外した。依頼者が補修可能と判断したため、元の毛束を変えずに裏当てを加え、再検査した。"
+    },
+    "points": {
+      "crown": [623.5, 36],
+      "chin": [630.0, 376.5],
+      "temple_L": [510.0, 234.0],
+      "temple_R": [749.0, 234.0],
+      "cheek_L": [519.5, 323.0],
+      "cheek_R": [737.5, 323.0],
+      "jaw_L": [568.0, 367.0],
+      "jaw_R": [688.5, 367.0],
+      "eye_L_left": [548.5, 254.0],
+      "eye_L_right": [601.5, 262.5],
+      "eye_L_top": [574.0, 235.5],
+      "eye_L_bottom": [577.0, 271.5],
+      "eye_R_left": [662.0, 262.5],
+      "eye_R_right": [716.0, 253.5],
+      "eye_R_top": [688.0, 235.5],
+      "eye_R_bottom": [688.0, 272.0],
+      "iris_L_center": [581.5, 255.0],
+      "iris_L_left": [565.0, 255.0],
+      "iris_L_right": [598.5, 255.0],
+      "iris_R_center": [682.5, 255.0],
+      "iris_R_left": [666.5, 255.0],
+      "iris_R_right": [698.0, 255.0],
+      "nose_tip": [631.5, 299.0],
+      "nose_top": [631.5, 279.0],
+      "nose_bottom": [631.5, 306.0],
+      "ala_L": [613.5, 299.0],
+      "ala_R": [651.0, 299.0],
+      "mouth_L": [601.0, 324.0],
+      "mouth_R": [665.0, 323.5],
+      "mouth_center": [633.0, 327.0],
+      "lip_top": [632.5, 319.0],
+      "lip_bottom": [633.0, 335.0],
+      "ear_L": [477.5, 285.0],
+      "ear_R": [775.0, 285.0],
+      "ear_L_bottom": [509.5, 326.5],
+      "ear_R_bottom": [749.0, 326.5],
+      "eye_L_center": [575.25, 255.875],
+      "eye_R_center": [688.5, 255.875]
+    },
+    "annotation_uncertainty_px": 1.5,
+    "annotation_source": "seed-42-front.png, fixed orthographic camera, manually read at 920px and divided by two",
+    "repair_review_script_sha256": "bea74f12bfef376c510129004907c6a8cc3db19e71208ef8511fcec6721d23f6"
+  }
+}

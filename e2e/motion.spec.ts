@@ -1,4 +1,7 @@
+import { once } from 'node:events'
+import { createServer } from 'node:http'
 import { devices, expect, test, type Page } from '@playwright/test'
+import { skipOnCi } from './meta'
 
 /**
  * 動きを減らす設定（docs/demo-guide.md の 5 章）と、指でのスクロールを奪わないこと（src/shared/touch.ts）を見る
@@ -41,6 +44,7 @@ const AUTOPLAY = [
   'stroke-redraw',
   'three-typo',
   'three-video',
+  'toy-figure',
   'trigonometry-random-floating',
   'tweenmax-easing-of-scroll-parallax',
   'vhs-rewind',
@@ -89,6 +93,7 @@ test.describe('動きを減らす設定', () => {
 
   for (const slug of AUTOPLAY) {
     test(`${slug} は止まった絵になる`, async ({ page }) => {
+      test.skip(skipOnCi(slug), 'CI では飛ばす（e2e/meta.ts の SKIP_ON_CI）')
       const errors = watchErrors(page)
       await page.goto(`/${slug}/`)
       // 写真やフォントを読み終えて絵が落ち着くまで待ち、そのあと 3.5 秒（自動で進むスライダーの間隔より長い）止まっているかを見る
@@ -128,6 +133,7 @@ test.describe('指でのスクロールを奪わない', () => {
     'html-takiage',
     'html-sticker',
     'stroke-redraw',
+    'toy-figure',
   ]
   // HTML-in-Canvas（Chrome 157〜）のデモ。使えないブラウザではふつうの HTML を置くだけで touchGate を呼ばないので、
   // タップしてからの所は、使えるブラウザでだけ見る（Playwright の Chromium 156 では飛ばす）
@@ -142,18 +148,36 @@ test.describe('指でのスクロールを奪わない', () => {
     test(`${slug} を iframe に入れても、縦になぞると記事がスクロールする`, async ({
       page,
       context,
+      baseURL,
     }) => {
-      // デモと同じオリジンの記事のページ。中の iframe の touch-action を読めるよう、同じオリジンで返す
-      await page.route(HOST, (route) =>
-        route.fulfill({
-          contentType: 'text/html',
-          body: `<!doctype html><meta name="viewport" content="width=device-width">
-            <body style="margin:0"><p style="height:120px">article</p>
-            <iframe src="/${slug}/" style="display:block;width:100%;height:500px;border:0"></iframe>
-            <div style="height:2000px"></div></body>`,
-        }),
-      )
-      await page.goto(HOST)
+      test.skip(skipOnCi(slug), 'CI では飛ばす（e2e/meta.ts の SKIP_ON_CI）')
+      const horizontalOnly = slug === 'toy-figure'
+      const demo = new URL(`/${slug}/`, baseURL)
+      const article = `<!doctype html><meta name="viewport" content="width=device-width">
+        <body style="margin:0"><p style="height:120px">article</p>
+        <iframe title="demo" src="${demo.href}" style="display:block;width:100%;height:500px;border:0"></iframe>
+        <div style="height:2000px"></div></body>`
+      if (horizontalOnly) {
+        // 応答を差し替えるだけだと、Chrome は親をローカルのサイトと判定しない。
+        const server = createServer((_request, response) => {
+          response.writeHead(200, { 'Content-Type': 'text/html' })
+          response.end(article)
+        }).listen(0)
+        try {
+          await once(server, 'listening')
+          const address = server.address()
+          if (!address || typeof address === 'string')
+            throw new Error('No article port')
+          await page.goto(`http://localhost:${address.port}${HOST}`)
+        } finally {
+          server.close()
+        }
+      } else {
+        await page.route(HOST, (route) =>
+          route.fulfill({ contentType: 'text/html', body: article }),
+        )
+        await page.goto(HOST)
+      }
       const frame = page.frameLocator('iframe')
       await expect(frame.locator('.stage')).toBeVisible()
       const touchAction = () =>
@@ -186,6 +210,24 @@ test.describe('指でのスクロールを奪わない', () => {
         return before === (await scrollY())
       }
       await expect.poll(settled).toBe(true)
+      if (horizontalOnly) {
+        const stage = frame.locator('.toy-figure')
+        await expect(stage).toHaveAttribute('aria-busy', 'false')
+        await page.evaluate(() => scrollTo(0, 0))
+        await page.touchscreen.tap(190, 300)
+        await expect.poll(touchAction).toBe('pan-y')
+        await touch('touchStart', 160, 300)
+        for (let i = 1; i <= 10; i++)
+          await touch('touchMove', 160 + i * 10, 300)
+        await touch('touchEnd')
+        await expect(stage).toHaveAttribute('data-camera-angle', '43.8')
+        expect(await scrollY()).toBe(0)
+        expect(await page.evaluate(() => getSelection()?.toString())).toBe('')
+        await swipeUp(190, 450)
+        await expect.poll(scrollY).toBeGreaterThan(0)
+        await expect(stage).toHaveAttribute('data-camera-angle', '43.8')
+        return
+      }
       const drawable = await page.evaluate(() => {
         const canvas = document.createElement('canvas')
         canvas.setAttribute('content', 'drawable')
