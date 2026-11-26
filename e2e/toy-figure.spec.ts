@@ -6,6 +6,7 @@ const assetBytes = JSON.parse(
   ),
 ) as Record<string, number>
 import { devices, expect, test, type Page } from '@playwright/test'
+import { softwareGl } from './gpu'
 
 test.setTimeout(60_000)
 test.use({ channel: 'chrome' })
@@ -26,259 +27,270 @@ const still = async (page: Page) => {
   return before.equals(await page.screenshot())
 }
 
-test('toy-figure は歩き続け、押すと足をそろえて見てから再開する', async ({
-  page,
-}) => {
-  const errors: string[] = []
-  page.on('pageerror', (e) => errors.push(e.message))
-  await ready(page)
-  const stage = page.locator('.toy-figure')
-  await expect(stage).toHaveAttribute('data-walk-state', 'walk')
-  const before = await page.screenshot()
-  await page.waitForTimeout(1600)
-  expect(before.equals(await page.screenshot())).toBe(false)
-  await expect(stage).toHaveAttribute('data-walk-state', 'walk')
-  await page.mouse.move(1100, 350)
-  await page.mouse.click(1100, 350)
-  await expect(stage).toHaveAttribute('data-walk-state', 'look', {
-    timeout: 2500,
-  })
-  await expect(stage).toHaveAttribute('data-walking', 'idle')
-  await page.waitForTimeout(400)
-  await expect(stage).toHaveAttribute('data-walk-state', 'look')
-  await expect(stage).toHaveAttribute('data-walk-state', 'walk', {
-    timeout: 3000,
-  })
-  await page.waitForTimeout(1000)
-  await expect(stage).toHaveAttribute('data-walk-state', 'walk')
-  expect(errors).toEqual([])
-})
-
-test('toy-figure は8pxからドラッグを判定し、離した角度で歩き続ける', async ({
-  page,
-}) => {
-  await ready(page)
-  const stage = page.locator('.toy-figure')
-  const angle = (degrees: number) =>
-    expect(stage).toHaveAttribute('data-camera-angle', String(degrees))
-  await angle(30)
-  await page.mouse.move(400, 400)
-  await page.mouse.down()
-  await page.mouse.move(407, 400)
-  await page.mouse.up()
-  await expect(stage).toHaveAttribute('data-walk-state', 'look')
-  await angle(30)
-  await expect(stage).toHaveAttribute('data-walk-state', 'walk')
-
-  await page.mouse.move(400, 400)
-  await page.mouse.down()
-  await page.mouse.move(408, 400)
-  await page.mouse.up()
-  await page.waitForTimeout(450)
-  await expect(stage).toHaveAttribute('data-walk-state', 'walk')
-  await angle(30)
-
-  await page.mouse.move(400, 400)
-  await page.mouse.down()
-  await page.mouse.move(500, 400, { steps: 10 })
-  await angle(43.8)
-  await expect(stage).toHaveAttribute('data-walk-state', 'walk')
-  await page.mouse.move(800, 400)
-  await angle(50)
-  await page.mouse.move(790, 400)
-  await angle(48.5)
-  await page.mouse.move(500, 400)
-  await angle(15)
-  await page.mouse.move(510, 400)
-  await angle(16.5)
-  await page.mouse.up()
-  await page.waitForTimeout(500)
-  await angle(16.5)
-  await expect(stage).toHaveAttribute('data-walk-state', 'walk')
-  await page.mouse.click(1000, 400)
-  await expect(stage).toHaveAttribute('data-walk-state', 'look')
-  await angle(16.5)
-})
-
-test('toy-figure は縦始まり、キャンセル、キャンバス外の操作を取り消す', async ({
-  page,
-}) => {
-  await ready(page)
-  const stage = page.locator('.toy-figure')
-  const canvas = stage.locator('canvas')
-  await page.mouse.move(400, 400)
-  await page.mouse.down()
-  await page.mouse.move(402, 412)
-  await page.mouse.move(500, 412)
-  await page.mouse.up()
-  await expect(stage).toHaveAttribute('data-camera-angle', '30')
-
-  await canvas.evaluate((el) => {
-    el.addEventListener(
-      'pointerdown',
-      (event) => {
-        const id = (event as PointerEvent).pointerId
-        el.addEventListener(
-          'pointermove',
-          () => {
-            el.dispatchEvent(
-              new PointerEvent('pointercancel', { pointerId: id }),
-            )
-          },
-          { once: true },
-        )
-      },
-      { once: true },
+test.describe('GPU で描いたときの動き', () => {
+  test.beforeEach(async ({ page }) => {
+    test.skip(
+      await softwareGl(page),
+      'GPU がないと遅すぎて、動きのテストが当てにならない',
     )
   })
-  await page.mouse.move(500, 400)
-  await page.mouse.down()
-  await page.mouse.move(620, 400)
-  await page.mouse.up()
-  await expect(stage).toHaveAttribute('data-camera-angle', '30')
 
-  await page.mouse.move(2, 400)
-  await page.mouse.down()
-  await page.mouse.move(-2, 400)
-  await page.mouse.up()
-  await page.waitForTimeout(450)
-  await expect(stage).toHaveAttribute('data-walk-state', 'walk')
-  await expect(stage).toHaveAttribute('data-camera-angle', '30')
-})
-
-test('toy-figure は動きを減らす設定でもキーとドラッグで角度を変えられる', async ({
-  page,
-}) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' })
-  await ready(page)
-  const stage = page.locator('.toy-figure')
-  const canvas = page.getByLabel('恐竜の野原を歩くフィギュア')
-  await page.keyboard.press('ArrowRight')
-  await expect(stage).toHaveAttribute('data-camera-angle', '30')
-  await page.keyboard.press('Tab')
-  await expect(canvas).toBeFocused()
-  expect(await canvas.evaluate((el) => el.matches(':focus-visible'))).toBe(true)
-  await page.keyboard.press('ArrowRight')
-  await expect(stage).toHaveAttribute('data-camera-angle', '35')
-  await page.keyboard.press('ArrowLeft')
-  await expect(stage).toHaveAttribute('data-camera-angle', '30')
-  await page.mouse.move(700, 400)
-  await page.mouse.down()
-  await page.mouse.move(600, 400)
-  await page.mouse.up()
-  await expect(stage).toHaveAttribute('data-camera-angle', '16.2')
-  await expect(stage).toHaveAttribute('data-walk-state', 'still')
-  await page.keyboard.press('Home')
-  await expect(stage).toHaveAttribute('data-camera-angle', '30')
-  await page.keyboard.press('Space')
-  await expect(stage).toHaveAttribute('data-walk-state', 'look')
-  await expect(stage).toHaveAttribute('data-walk-state', 'still')
-  await page.keyboard.press('Enter')
-  await expect(stage).toHaveAttribute('data-walk-state', 'look')
-})
-
-test('toy-figure は設定変更で静止し、視線の追従と押した反応は残る', async ({
-  page,
-}) => {
-  await ready(page)
-  const stage = page.locator('.toy-figure')
-  await expect.poll(() => still(page)).toBe(false)
-  await page.emulateMedia({ reducedMotion: 'reduce' })
-  await expect(stage).toHaveAttribute('data-walk-state', 'still')
-  await expect.poll(() => still(page)).toBe(true)
-  const before = await page.screenshot()
-  await page.mouse.move(20, 20)
-  await page.waitForTimeout(2200)
-  expect(before.equals(await page.screenshot())).toBe(false)
-  // 視線の減衰が、描画の丸め誤差より小さくなるまで待つ。
-  await expect.poll(() => still(page), { timeout: 12_000 }).toBe(true)
-  await page.mouse.click(1000, 650)
-  await expect(stage).toHaveAttribute('data-walk-state', 'look')
-  await expect(stage).toHaveAttribute('data-walking', 'idle')
-  await expect(stage).toHaveAttribute('data-walk-state', 'still', {
-    timeout: 2500,
-  })
-  await page.waitForTimeout(3000)
-  await expect.poll(() => still(page)).toBe(true)
-  await page.emulateMedia({ reducedMotion: 'no-preference' })
-  await expect(stage).toHaveAttribute('data-walk-state', 'walk')
-  await expect.poll(() => still(page)).toBe(false)
-})
-
-test('toy-figure は初めから動きを減らした場合も野原に立つ', async ({
-  page,
-}) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' })
-  await ready(page)
-  await expect(page.locator('.toy-figure')).toHaveAttribute(
-    'data-walk-state',
-    'still',
-  )
-  await expect.poll(() => still(page)).toBe(true)
-})
-
-test.describe('toy-figure のタッチ端末', () => {
-  const { viewport, userAgent, deviceScaleFactor, isMobile, hasTouch } =
-    devices['iPhone 13']
-  test.use({ viewport, userAgent, deviceScaleFactor, isMobile, hasTouch })
-
-  test('toy-figure のタップと縦のスクロールを区別する', async ({
+  test('toy-figure は歩き続け、押すと足をそろえて見てから再開する', async ({
     page,
-    context,
   }) => {
-    await page.route('**/__toy-touch-host__', (route) =>
-      route.fulfill({
-        contentType: 'text/html',
-        body: '<!doctype html><meta name="viewport" content="width=device-width"><body style="margin:0"><div style="height:120px">article</div><iframe title="toy" src="/toy-figure/" style="display:block;width:100%;height:500px;border:0"></iframe><div style="height:2000px"></div></body>',
-      }),
-    )
-    await page.goto('/__toy-touch-host__')
-    const frame = page.frameLocator('iframe')
-    await expect(frame.locator('.toy-figure')).toHaveAttribute(
-      'aria-busy',
-      'false',
-      { timeout: 15_000 },
-    )
-    expect(
-      await frame
-        .locator('.stage')
-        .evaluate((el) => getComputedStyle(el).touchAction),
-    ).toBe('pan-y')
-    await frame.locator('canvas').tap({ position: { x: 300, y: 250 } })
-    await expect(frame.locator('.toy-figure')).toHaveAttribute(
-      'data-walk-state',
-      'look',
-      { timeout: 2500 },
-    )
-    await expect(frame.locator('.toy-figure')).toHaveAttribute(
-      'data-walk-state',
-      'walk',
-      { timeout: 3000 },
-    )
+    const errors: string[] = []
+    page.on('pageerror', (e) => errors.push(e.message))
+    await ready(page)
+    const stage = page.locator('.toy-figure')
+    await expect(stage).toHaveAttribute('data-walk-state', 'walk')
+    const before = await page.screenshot()
+    await page.waitForTimeout(1600)
+    expect(before.equals(await page.screenshot())).toBe(false)
+    await expect(stage).toHaveAttribute('data-walk-state', 'walk')
+    await page.mouse.move(1100, 350)
+    await page.mouse.click(1100, 350)
+    await expect(stage).toHaveAttribute('data-walk-state', 'look', {
+      timeout: 2500,
+    })
+    await expect(stage).toHaveAttribute('data-walking', 'idle')
+    await page.waitForTimeout(400)
+    await expect(stage).toHaveAttribute('data-walk-state', 'look')
+    await expect(stage).toHaveAttribute('data-walk-state', 'walk', {
+      timeout: 3000,
+    })
+    await page.waitForTimeout(1000)
+    await expect(stage).toHaveAttribute('data-walk-state', 'walk')
+    expect(errors).toEqual([])
+  })
+
+  test('toy-figure は8pxからドラッグを判定し、離した角度で歩き続ける', async ({
+    page,
+  }) => {
+    await ready(page)
+    const stage = page.locator('.toy-figure')
+    const angle = (degrees: number) =>
+      expect(stage).toHaveAttribute('data-camera-angle', String(degrees))
+    await angle(30)
+    await page.mouse.move(400, 400)
+    await page.mouse.down()
+    await page.mouse.move(407, 400)
+    await page.mouse.up()
+    await expect(stage).toHaveAttribute('data-walk-state', 'look')
+    await angle(30)
+    await expect(stage).toHaveAttribute('data-walk-state', 'walk')
+
+    await page.mouse.move(400, 400)
+    await page.mouse.down()
+    await page.mouse.move(408, 400)
+    await page.mouse.up()
+    await page.waitForTimeout(450)
+    await expect(stage).toHaveAttribute('data-walk-state', 'walk')
+    await angle(30)
+
+    await page.mouse.move(400, 400)
+    await page.mouse.down()
+    await page.mouse.move(500, 400, { steps: 10 })
+    await angle(43.8)
+    await expect(stage).toHaveAttribute('data-walk-state', 'walk')
+    await page.mouse.move(800, 400)
+    await angle(50)
+    await page.mouse.move(790, 400)
+    await angle(48.5)
+    await page.mouse.move(500, 400)
+    await angle(15)
+    await page.mouse.move(510, 400)
+    await angle(16.5)
+    await page.mouse.up()
+    await page.waitForTimeout(500)
+    await angle(16.5)
+    await expect(stage).toHaveAttribute('data-walk-state', 'walk')
+    await page.mouse.click(1000, 400)
+    await expect(stage).toHaveAttribute('data-walk-state', 'look')
+    await angle(16.5)
+  })
+
+  test('toy-figure は縦始まり、キャンセル、キャンバス外の操作を取り消す', async ({
+    page,
+  }) => {
+    await ready(page)
+    const stage = page.locator('.toy-figure')
+    const canvas = stage.locator('canvas')
+    await page.mouse.move(400, 400)
+    await page.mouse.down()
+    await page.mouse.move(402, 412)
+    await page.mouse.move(500, 412)
+    await page.mouse.up()
+    await expect(stage).toHaveAttribute('data-camera-angle', '30')
+
+    await canvas.evaluate((el) => {
+      el.addEventListener(
+        'pointerdown',
+        (event) => {
+          const id = (event as PointerEvent).pointerId
+          el.addEventListener(
+            'pointermove',
+            () => {
+              el.dispatchEvent(
+                new PointerEvent('pointercancel', { pointerId: id }),
+              )
+            },
+            { once: true },
+          )
+        },
+        { once: true },
+      )
+    })
+    await page.mouse.move(500, 400)
+    await page.mouse.down()
+    await page.mouse.move(620, 400)
+    await page.mouse.up()
+    await expect(stage).toHaveAttribute('data-camera-angle', '30')
+
+    await page.mouse.move(2, 400)
+    await page.mouse.down()
+    await page.mouse.move(-2, 400)
+    await page.mouse.up()
+    await page.waitForTimeout(450)
+    await expect(stage).toHaveAttribute('data-walk-state', 'walk')
+    await expect(stage).toHaveAttribute('data-camera-angle', '30')
+  })
+
+  test('toy-figure は動きを減らす設定でもキーとドラッグで角度を変えられる', async ({
+    page,
+  }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
-    await expect(frame.locator('.toy-figure')).toHaveAttribute(
+    await ready(page)
+    const stage = page.locator('.toy-figure')
+    const canvas = page.getByLabel('恐竜の野原を歩くフィギュア')
+    await page.keyboard.press('ArrowRight')
+    await expect(stage).toHaveAttribute('data-camera-angle', '30')
+    await page.keyboard.press('Tab')
+    await expect(canvas).toBeFocused()
+    expect(await canvas.evaluate((el) => el.matches(':focus-visible'))).toBe(
+      true,
+    )
+    await page.keyboard.press('ArrowRight')
+    await expect(stage).toHaveAttribute('data-camera-angle', '35')
+    await page.keyboard.press('ArrowLeft')
+    await expect(stage).toHaveAttribute('data-camera-angle', '30')
+    await page.mouse.move(700, 400)
+    await page.mouse.down()
+    await page.mouse.move(600, 400)
+    await page.mouse.up()
+    await expect(stage).toHaveAttribute('data-camera-angle', '16.2')
+    await expect(stage).toHaveAttribute('data-walk-state', 'still')
+    await page.keyboard.press('Home')
+    await expect(stage).toHaveAttribute('data-camera-angle', '30')
+    await page.keyboard.press('Space')
+    await expect(stage).toHaveAttribute('data-walk-state', 'look')
+    await expect(stage).toHaveAttribute('data-walk-state', 'still')
+    await page.keyboard.press('Enter')
+    await expect(stage).toHaveAttribute('data-walk-state', 'look')
+  })
+
+  test('toy-figure は設定変更で静止し、視線の追従と押した反応は残る', async ({
+    page,
+  }) => {
+    await ready(page)
+    const stage = page.locator('.toy-figure')
+    await expect.poll(() => still(page)).toBe(false)
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await expect(stage).toHaveAttribute('data-walk-state', 'still')
+    await expect.poll(() => still(page)).toBe(true)
+    const before = await page.screenshot()
+    await page.mouse.move(20, 20)
+    await page.waitForTimeout(2200)
+    expect(before.equals(await page.screenshot())).toBe(false)
+    // 視線の減衰が、描画の丸め誤差より小さくなるまで待つ。
+    await expect.poll(() => still(page), { timeout: 12_000 }).toBe(true)
+    await page.mouse.click(1000, 650)
+    await expect(stage).toHaveAttribute('data-walk-state', 'look')
+    await expect(stage).toHaveAttribute('data-walking', 'idle')
+    await expect(stage).toHaveAttribute('data-walk-state', 'still', {
+      timeout: 2500,
+    })
+    await page.waitForTimeout(3000)
+    await expect.poll(() => still(page)).toBe(true)
+    await page.emulateMedia({ reducedMotion: 'no-preference' })
+    await expect(stage).toHaveAttribute('data-walk-state', 'walk')
+    await expect.poll(() => still(page)).toBe(false)
+  })
+
+  test('toy-figure は初めから動きを減らした場合も野原に立つ', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+    await ready(page)
+    await expect(page.locator('.toy-figure')).toHaveAttribute(
       'data-walk-state',
       'still',
     )
-    const cdp = await context.newCDPSession(page)
-    await cdp.send('Input.dispatchTouchEvent', {
-      type: 'touchStart',
-      touchPoints: [{ x: 190, y: 450 }],
-    })
-    for (let i = 1; i <= 10; i++)
+    await expect.poll(() => still(page)).toBe(true)
+  })
+
+  test.describe('toy-figure のタッチ端末', () => {
+    const { viewport, userAgent, deviceScaleFactor, isMobile, hasTouch } =
+      devices['iPhone 13']
+    test.use({ viewport, userAgent, deviceScaleFactor, isMobile, hasTouch })
+
+    test('toy-figure のタップと縦のスクロールを区別する', async ({
+      page,
+      context,
+    }) => {
+      await page.route('**/__toy-touch-host__', (route) =>
+        route.fulfill({
+          contentType: 'text/html',
+          body: '<!doctype html><meta name="viewport" content="width=device-width"><body style="margin:0"><div style="height:120px">article</div><iframe title="toy" src="/toy-figure/" style="display:block;width:100%;height:500px;border:0"></iframe><div style="height:2000px"></div></body>',
+        }),
+      )
+      await page.goto('/__toy-touch-host__')
+      const frame = page.frameLocator('iframe')
+      await expect(frame.locator('.toy-figure')).toHaveAttribute(
+        'aria-busy',
+        'false',
+        { timeout: 15_000 },
+      )
+      expect(
+        await frame
+          .locator('.stage')
+          .evaluate((el) => getComputedStyle(el).touchAction),
+      ).toBe('pan-y')
+      await frame.locator('canvas').tap({ position: { x: 300, y: 250 } })
+      await expect(frame.locator('.toy-figure')).toHaveAttribute(
+        'data-walk-state',
+        'look',
+        { timeout: 2500 },
+      )
+      await expect(frame.locator('.toy-figure')).toHaveAttribute(
+        'data-walk-state',
+        'walk',
+        { timeout: 3000 },
+      )
+      await page.emulateMedia({ reducedMotion: 'reduce' })
+      await expect(frame.locator('.toy-figure')).toHaveAttribute(
+        'data-walk-state',
+        'still',
+      )
+      const cdp = await context.newCDPSession(page)
       await cdp.send('Input.dispatchTouchEvent', {
-        type: 'touchMove',
-        touchPoints: [{ x: 190, y: 450 - i * 20 }],
+        type: 'touchStart',
+        touchPoints: [{ x: 190, y: 450 }],
       })
-    await cdp.send('Input.dispatchTouchEvent', {
-      type: 'touchEnd',
-      touchPoints: [],
+      for (let i = 1; i <= 10; i++)
+        await cdp.send('Input.dispatchTouchEvent', {
+          type: 'touchMove',
+          touchPoints: [{ x: 190, y: 450 - i * 20 }],
+        })
+      await cdp.send('Input.dispatchTouchEvent', {
+        type: 'touchEnd',
+        touchPoints: [],
+      })
+      await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0)
+      await expect(frame.locator('.toy-figure')).toHaveAttribute(
+        'data-walk-state',
+        'still',
+      )
     })
-    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0)
-    await expect(frame.locator('.toy-figure')).toHaveAttribute(
-      'data-walk-state',
-      'still',
-    )
   })
 })
 

@@ -7,6 +7,7 @@ import {
   type Page,
 } from '@playwright/test'
 import type { Batch, DemoMeta, Interaction } from '../src/lib/demos'
+import { GPU_ONLY, softwareGl } from './gpu'
 
 type Demo = Pick<DemoMeta, 'slug' | 'batch' | 'interaction'>
 
@@ -180,7 +181,9 @@ for (const demo of demos) {
 
     await expectDrawn('')
 
-    await interact(page, demo)
+    // GPU がないと 1 コマが遅すぎて、マウスの移動が時間切れになる
+    if (!GPU_ONLY.includes(demo.slug) || !(await softwareGl(page)))
+      await interact(page, demo)
 
     // 開いたまま縮めても、横にはみ出さない
     await page.setViewportSize({ width: 800, height: 500 })
