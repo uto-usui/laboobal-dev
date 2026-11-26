@@ -495,24 +495,12 @@ export function createWalker(
       .clone()
       .slerp(step.orientation1, progress)
     poseLeg(moving, ankle, knee, orientation)
-    character.updateMatrixWorld(true)
-    const initialSole = sampleSole(moving).y
-    const landingFloor =
-      u > 0.75
-        ? THREE.MathUtils.lerp(
-            Math.max(initialSole, floor + 0.00005),
-            floor + 0.00005,
-            smooth((u - 0.75) / 0.25),
-          )
-        : floor + 0.00005
+    // 運ぶ足はもぐったときだけ床へ上げる。歩の終わりに床へ引き下ろすと太ももと足首が跳ねる
+    const landingFloor = floor + 0.00005
     for (let i = 0; i < 64; i++) {
       character.updateMatrixWorld(true)
       const sole = sampleSole(moving)
-      if (
-        sole.y >= landingFloor - 1e-8 ||
-        Math.abs(sole.y - landingFloor) < 1e-8
-      )
-        break
+      if (sole.y >= landingFloor - 1e-8) break
       const desiredY = ankle.y + landingFloor - sole.y
       const dy = hip.y - desiredY
       const local = flat.clone().applyAxisAngle(UP, -yaw)
