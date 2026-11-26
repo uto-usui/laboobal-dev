@@ -418,7 +418,7 @@ export function createWalker(
     pelvisRoll =
       THREE.MathUtils.lerp(step.roll0, step.roll1, progress) +
       THREE.MathUtils.degToRad(9.5) *
-        Math.sin(Math.PI * u) ** 0.7 *
+        Math.sin(Math.PI * u) ** 2 *
         (support === 0 ? -1 : 1)
     setWorld(
       pelvis,
@@ -435,7 +435,7 @@ export function createWalker(
     if (inspect) renderedSupport = support
     plant()
     const hip = hipAt(moving, character.position, yaw)
-    const knee = THREE.MathUtils.degToRad(40) * Math.sin(Math.PI * u) ** 0.7
+    const knee = THREE.MathUtils.degToRad(40) * Math.sin(Math.PI * u) ** 2
     const bent = moving.a.clone().add(moving.b.clone().applyAxisAngle(X, knee))
     const length = bent.length()
     const angleAt = (
@@ -495,15 +495,25 @@ export function createWalker(
       .clone()
       .slerp(step.orientation1, progress)
     poseLeg(moving, ankle, knee, orientation)
+    character.updateMatrixWorld(true)
+    const initialSole = sampleSole(moving).y
+    const landingFloor =
+      u > 0.75
+        ? THREE.MathUtils.lerp(
+            Math.max(initialSole, floor + 0.00005),
+            floor + 0.00005,
+            smooth((u - 0.75) / 0.25),
+          )
+        : floor + 0.00005
     for (let i = 0; i < 64; i++) {
       character.updateMatrixWorld(true)
       const sole = sampleSole(moving)
       if (
-        (u < 0.9 && sole.y >= floor + 0.00005) ||
-        Math.abs(sole.y - floor - 0.00005) < 1e-8
+        sole.y >= landingFloor - 1e-8 ||
+        Math.abs(sole.y - landingFloor) < 1e-8
       )
         break
-      const desiredY = ankle.y + floor + 0.00005 - sole.y
+      const desiredY = ankle.y + landingFloor - sole.y
       const dy = hip.y - desiredY
       const local = flat.clone().applyAxisAngle(UP, -yaw)
       const forward =
@@ -515,7 +525,7 @@ export function createWalker(
         hip.y - Math.sqrt(Math.max(0, length * length - flat.lengthSq()))
       poseLeg(moving, ankle, knee, orientation)
     }
-    armAngle = THREE.MathUtils.lerp(step.arm0, step.arm1, progress)
+    armAngle = THREE.MathUtils.lerp(step.arm0, step.arm1, smooth(progress))
     pitch(arms[0], armAngle)
     pitch(arms[1], -armAngle)
     lower.object.quaternion
