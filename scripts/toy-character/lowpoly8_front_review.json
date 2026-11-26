@@ -1,0 +1,12 @@
+{
+  "use_head_blend": true,
+  "observation": "立ち姿の正面で、襟の前の開きの上に水平の首肌の段が見える。正面から実際に見える体の首肌だけheadを混ぜ、襟の境界からの面に沿う距離を用いる。",
+  "checked_images": {
+    "rest-opening-0.png": "330e6faaec4d76b00a7dd2c64ce529b079f1e2af58c5939124365f1a081a6084",
+    "rest-opening-25.png": "85935fa2e2efd467014c18ff59697fabd0bc6f6cbdacd784a4f3ae6043ee411c",
+    "range-rest-0.png": "b91762e100f3a3ef935d81f2d96a47738f79813951a9e902a51200e1d108302a",
+    "range-rest-90.png": "79d6983ead31ef81c3a80146e065ae3ac1cc6fa0a1207d65748a50e0042fc3d0"
+  },
+  "source_blend_sha256": "ba140203f0e7ba1c98f36f48766205d833353b6f34316663e9004a9f99ebb2f4",
+  "evidence_scope": "First white rest render inspection before conditional blend. range-rest images are regenerated later; their original digests describe that earlier observation."
+}
