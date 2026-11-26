@@ -25,3 +25,9 @@ playwright/.cache/
 
 # scripts/capture-social.mjs の出力（SNS 用の動画）
 /social/
+
+# キャラ制作の作業場所（参照写真、.blend、確認用レンダ）。コミットしない
+/.work/
+__pycache__/
+# お子さんの写真から描いたデザイン画。スクリプトはこの場所を読むが、公開しない
+/docs/toy-character/design/
